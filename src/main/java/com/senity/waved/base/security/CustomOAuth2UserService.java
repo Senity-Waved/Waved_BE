@@ -30,18 +30,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String providerId = oAuth2User.getAttribute("sub");
         String email = oAuth2User.getAttribute("email");
 
-        Member member = memberRepository.findByEmail(email).orElseGet(() -> {
-            AuthLevel authLevel = "waved7777@gmail.com".equals(email) ? AuthLevel.ADMIN : AuthLevel.MEMBER;
-            Member newMember = Member.builder()
-                    .email(email)
-                    .authLevel(authLevel)
-                    .build();
-            return memberRepository.save(newMember);
-        });
+        Member member = memberRepository.findByEmail(email).orElseGet(() -> createNewMember(email));
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 oAuth2User.getAttributes(),
                 "name");
+    }
+
+    private Member createNewMember(String email) {
+        AuthLevel authLevel = "waved7777@gmail.com".equals(email) ? AuthLevel.ADMIN : AuthLevel.MEMBER;
+        Member newMember = Member.builder()
+                .email(email)
+                .authLevel(authLevel)
+                .build();
+        return memberRepository.save(newMember);
     }
 }

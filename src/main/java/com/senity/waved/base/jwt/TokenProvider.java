@@ -24,7 +24,8 @@ public class TokenProvider implements InitializingBean {
     private final long tokenValidityInMilliseconds;
     private final String secret2;
     private final long tokenValidityInMilliseconds2;
-    private Key key;
+    private Key accessTokenKey;
+    private Key refreshTokenKey;
 
     public TokenProvider(
             @Value("${custom.jwt.secret}") String secret,
@@ -41,8 +42,10 @@ public class TokenProvider implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() {
-        byte[] keyBytes = Decoders.BASE64.decode(secret);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+        byte[] accessTokenKeyBytes = Decoders.BASE64.decode(secret);
+        this.accessTokenKey = Keys.hmacShaKeyFor(accessTokenKeyBytes);
+        byte[] refreshTokenKeyBytes = Decoders.BASE64.decode(secret2);
+        this.refreshTokenKey = Keys.hmacShaKeyFor(refreshTokenKeyBytes);
     }
 
     public TokenDto createToken(String email) {
@@ -52,13 +55,13 @@ public class TokenProvider implements InitializingBean {
 
         String accessToken = Jwts.builder()
                 .setSubject(email)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(accessTokenKey, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
                 .compact();
 
         String refreshToken = Jwts.builder()
                 .setSubject(email)
-                .signWith(key, SignatureAlgorithm.HS512)
+                .signWith(refreshTokenKey, SignatureAlgorithm.HS512)
                 .setExpiration(validity2)
                 .compact();
 
@@ -68,7 +71,7 @@ public class TokenProvider implements InitializingBean {
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts
                 .parserBuilder()
-                .setSigningKey(key)
+                .setSigningKey(accessTokenKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -83,26 +86,25 @@ public class TokenProvider implements InitializingBean {
 
     }
 
-    public Map<String, String> validateToken(String token) {
-        Map<String, String> map = new HashMap<>();
+    public void validateAccessToken(String token) {
+        validateToken(token, accessTokenKey);
+    }
 
+    public void validateRefreshToken(String token) {
+        validateToken(token, refreshTokenKey);
+    }
+
+    private void validateToken(String token, Key key) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            map.put("result", "SUCCESS");
-            map.put("msg", "인증성공");
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            map.put("result", "FAIL");
-            map.put("msg", "잘못된 JWT 서명입니다");
+            throw new MalformedJwtException("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
-            map.put("result", "FAIL");
-            map.put("msg", "만료된 JWT 토큰입니다.");
+            throw new ExpiredJwtException(null, null, "만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e) {
-            map.put("result", "FAIL");
-            map.put("msg", "지원되지 않는 JWT 토큰입니다");
+            throw new UnsupportedJwtException("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e) {
-            map.put("result", "FAIL");
-            map.put("msg", "JWT 토큰이 잘못되었습니다.");
+            throw new IllegalArgumentException("JWT 토큰이 잘못되었습니다.");
         }
-        return map;
     }
 }
