@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.redis.core.RedisHash;
 
-@RedisHash(value = "email", timeToLive = 3600 * 24 * 14)
+@RedisHash(value = "MemberToken", timeToLive = 3600 * 24 * 14)
 @AllArgsConstructor
 @Getter
 @Setter

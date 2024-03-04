@@ -32,10 +32,10 @@ public class JwtFilter extends GenericFilterBean {
                          FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         String jwt = resolveToken(httpServletRequest, AUTHORIZATION_HEADER);
-        validateToken(jwt, "액세스 토큰", httpServletRequest.getRequestURI());
+        validateToken(jwt, "accessToken", httpServletRequest.getRequestURI());
 
         String refreshToken = resolveToken(httpServletRequest, REFRESH_TOKEN_HEADER);
-        validateToken(refreshToken, "리프레시 토큰", httpServletRequest.getRequestURI());
+        validateToken(refreshToken, "refreshToken", httpServletRequest.getRequestURI());
 
         filterChain.doFilter(servletRequest, servletResponse);
     }
@@ -43,7 +43,7 @@ public class JwtFilter extends GenericFilterBean {
     private void validateToken(String token, String tokenType, String requestURI) {
         if (StringUtils.hasText(token)) {
             try {
-                if (tokenType.equals("액세스 토큰")) {
+                if (tokenType.equals("accessToken")) {
                     tokenProvider.validateAccessToken(token);
                     Authentication authentication = tokenProvider.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
