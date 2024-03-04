@@ -1,5 +1,8 @@
 package com.senity.waved.base.jwt;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
@@ -21,6 +24,7 @@ public class JwtFilter extends GenericFilterBean {
     public static final String AUTHORIZATION_HEADER = "Authorization";
     private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
     private final TokenProvider tokenProvider;
+
     public JwtFilter(TokenProvider tokenProvider) {
         this.tokenProvider = tokenProvider;
     }
@@ -33,21 +37,19 @@ public class JwtFilter extends GenericFilterBean {
         String requestURI = httpServletRequest.getRequestURI();
 
         if (StringUtils.hasText(jwt)) {
-            Map<String, String> resultMap = tokenProvider.validateToken(jwt);
-            if (resultMap.get("result").equals("SUCCESS")) {
+            try {
+                tokenProvider.validateToken(jwt);
                 Authentication authentication = tokenProvider.getAuthentication(jwt);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
                 logger.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}",
                         authentication.getName(), requestURI);
-            } else {
-                servletRequest.setAttribute("tokenexception", resultMap);
-                logger.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
+            } catch (ExpiredJwtException e) {
+                setTokenExceptionAttribute(servletRequest, "만료된 JWT 토큰입니다.", requestURI);
+            } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+                setTokenExceptionAttribute(servletRequest, "잘못된 JWT 토큰입니다.", requestURI);
             }
         } else {
-            Map<String, String> map = new HashMap<>();
-            map.put("result", "FAIL");
-            map.put("msg", "인증정보가 없습니다");
-            servletRequest.setAttribute("tokenexception", map);
+            setTokenExceptionAttribute(servletRequest, "인증정보가 없습니다.", requestURI);
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
@@ -60,5 +62,13 @@ public class JwtFilter extends GenericFilterBean {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private void setTokenExceptionAttribute(ServletRequest servletRequest, String message, String requestURI) {
+        Map<String, String> map = new HashMap<>();
+        map.put("result", "FAIL");
+        map.put("msg", message);
+        servletRequest.setAttribute("tokenException", map);
+        logger.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
     }
 }
