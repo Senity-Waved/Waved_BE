@@ -1,16 +1,19 @@
 package com.senity.waved.domain.member.entity;
 
 import com.senity.waved.common.BaseEntity;
+import com.senity.waved.domain.member.dto.MemberJoinDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class Member extends BaseEntity {
@@ -39,6 +42,13 @@ public class Member extends BaseEntity {
     @Column(name="github_token", nullable=true)
     private String githubToken;
 
-    @Column(name="reward", nullable=true)
-    private Long reward;
+    @Column(name="certification_pass", nullable=true)
+    private Long certificationPass;
+
+    public void updateInfo(MemberJoinDto joinDto) {
+        this.nickname = joinDto.getNickname();
+        this.birthYear = joinDto.getBirthYear();
+        this.gender = joinDto.getGender();
+        this.jobTitle = joinDto.getJobTitle();
+    }
 }
