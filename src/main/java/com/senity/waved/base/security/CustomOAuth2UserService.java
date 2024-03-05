@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -30,7 +31,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String providerId = oAuth2User.getAttribute("sub");
         String email = oAuth2User.getAttribute("email");
 
-        Member member = memberRepository.findByEmail(email).orElseGet(() -> createNewMember(email));
+        memberRepository.findByEmail(email).orElseGet(() -> createNewMember(email, generateRandomNickname()));
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
@@ -38,12 +39,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 "name");
     }
 
-    private Member createNewMember(String email) {
+    private Member createNewMember(String email, String nickname) {
         AuthLevel authLevel = "waved7777@gmail.com".equals(email) ? AuthLevel.ADMIN : AuthLevel.MEMBER;
         Member newMember = Member.builder()
                 .email(email)
+                .nickname(nickname)
                 .authLevel(authLevel)
+                .certificationPass(0L)
                 .build();
         return memberRepository.save(newMember);
+    }
+
+    private String generateRandomNickname() {
+        UUID uuid = UUID.randomUUID();
+        String hash = Integer.toHexString(uuid.hashCode());
+        return hash.substring(0, Math.min(hash.length(), 6));
     }
 }

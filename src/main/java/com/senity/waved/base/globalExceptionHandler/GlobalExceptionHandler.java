@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.security.auth.login.AccountNotFoundException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -25,6 +27,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({UnsupportedJwtException.class, IllegalArgumentException.class})
     public ResponseEntity<String> handleInvalidJwtException(JwtException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<String> handleAccountNotFoundException(AccountNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 }
 

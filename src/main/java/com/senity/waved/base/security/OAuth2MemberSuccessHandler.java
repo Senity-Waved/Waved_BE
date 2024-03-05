@@ -27,10 +27,10 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
-        String userEmail = (String) oAuth2User.getAttribute("email");
+        String userEmail = oAuth2User.getAttribute("email");
+
         TokenDto token = new TokenDto(tokenProvider.createAccessToken(userEmail),
                 tokenProvider.createRefreshToken(userEmail));
-
         redisRepository.save(new Redis(token.getRefreshToken(), userEmail));
 
         response.setContentType("application/json;charset=UTF-8");
