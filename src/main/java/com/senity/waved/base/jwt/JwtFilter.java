@@ -1,5 +1,6 @@
 package com.senity.waved.base.jwt;
 
+import com.senity.waved.domain.member.exception.MultipleLoginException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -51,6 +52,9 @@ public class JwtFilter extends GenericFilterBean {
             } catch (MalformedJwtException e) {
                 writeErrorResponse(servletResponse, e.getMessage());
                 return;
+            } catch (MultipleLoginException e) {
+                writeErrorResponse(servletResponse, e.getMessage());
+                return;
             } catch (UnsupportedJwtException e) {
                 writeErrorResponse(servletResponse, e.getMessage());
                 return;
@@ -58,12 +62,10 @@ public class JwtFilter extends GenericFilterBean {
                 writeErrorResponse(servletResponse, e.getMessage());
                 return;
             }
-
         } else {
             writeErrorResponse(servletResponse, "인증정보가 없습니다.");
             return;
         }
-
         filterChain.doFilter(servletRequest, servletResponse);
     }
 

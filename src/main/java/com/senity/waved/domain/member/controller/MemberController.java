@@ -33,7 +33,7 @@ public class MemberController {
     @PostMapping("/reissue")
     public ResponseEntity<String> reissue(HttpServletRequest request) {
         String refreshToken = memberService.resolveRefreshToken(request.getHeader("Authorization"));
-        return new ResponseEntity<>(tokenProvider.generateAccessToken(refreshToken), HttpStatus.OK);
+        return tokenProvider.generateAccessToken(refreshToken);
     }
 
     @PostMapping("/logout")

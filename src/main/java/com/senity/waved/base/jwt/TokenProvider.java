@@ -1,11 +1,15 @@
 package com.senity.waved.base.jwt;
 
+import com.senity.waved.base.redis.Redis;
 import com.senity.waved.base.redis.RedisUtil;
+import com.senity.waved.domain.member.exception.MultipleLoginException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,6 +20,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
@@ -71,17 +76,26 @@ public class TokenProvider implements InitializingBean {
         return refreshToken;
     }
 
-    public String generateAccessToken(String refreshToken) {
-        validateToken(refreshToken);
-        Claims claims = Jwts
-                .parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(refreshToken)
-                .getBody();
-        String email = claims.getSubject();
+    public ResponseEntity<String> generateAccessToken(String refreshToken) {
+        try {
+            validateToken(refreshToken);
+            Claims claims = Jwts
+                    .parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(refreshToken)
+                    .getBody();
+            String email = claims.getSubject();
+            Optional<Redis> optionalRedis = redisUtil.findByEmail(email);
+            if (optionalRedis.isPresent() && (!optionalRedis.get().getRefreshToken().equals(refreshToken))) {
+                throw new MultipleLoginException("다른 위치에서 로그인하여 현재 세션이 로그아웃되었습니다.");
+            }
 
-        return createAccessToken(email);
+            String accessToken = createAccessToken(email);
+            return ResponseEntity.ok(accessToken);
+        } catch (MultipleLoginException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        }
     }
 
     public Authentication getAuthentication(String token) {
