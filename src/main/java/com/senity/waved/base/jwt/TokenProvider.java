@@ -1,5 +1,6 @@
 package com.senity.waved.base.jwt;
 
+import com.senity.waved.base.redis.RedisUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -24,15 +25,18 @@ public class TokenProvider implements InitializingBean {
     private final long tokenValidityInMilliseconds;
     private final long tokenValidityInMilliseconds2;
     private Key key;
+    private final RedisUtil redisUtil;
 
     public TokenProvider(
             @Value("${custom.jwt.secret}") String secret,
             @Value("${custom.jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
-            @Value("${custom.jwt.token-validity-in-seconds2}") long tokenValidityInSeconds2)
+            @Value("${custom.jwt.token-validity-in-seconds2}") long tokenValidityInSeconds2,
+            RedisUtil redisUtil)
     {
         this.secret = secret;
         this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
         this.tokenValidityInMilliseconds2 = tokenValidityInSeconds2 * 2000;
+        this.redisUtil = redisUtil;
     }
 
     @Override
@@ -98,6 +102,9 @@ public class TokenProvider implements InitializingBean {
     }
 
     public void validateToken(String token) {
+        if (redisUtil.hasKeyBlackList(token)) {
+            throw new BlackListedTokenException("블랙리스트에 포함된 토큰입니다.");
+        }
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {

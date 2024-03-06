@@ -12,6 +12,6 @@ import lombok.experimental.SuperBuilder;
 public class MemberJoinDto {
     private String nickname;
     private String birthYear;
-    private Gender gender = Gender.NONE;
+    private Gender gender;
     private String jobTitle;
 }

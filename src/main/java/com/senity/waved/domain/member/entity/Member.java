@@ -34,6 +34,7 @@ public class Member extends BaseEntity {
     private String birthYear;
 
     @Column(name="gender", nullable=true)
+    @Enumerated(EnumType.STRING)
     private Gender gender;
 
     @Column(name="github_id", nullable=true)

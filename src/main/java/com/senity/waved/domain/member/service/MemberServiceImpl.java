@@ -1,5 +1,6 @@
 package com.senity.waved.domain.member.service;
 
+import com.senity.waved.base.redis.RedisUtil;
 import com.senity.waved.domain.member.dto.MemberJoinDto;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -17,6 +18,7 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final RedisUtil redisUtil;
 
     public String resolveRefreshToken(String refreshToken) {
         if (refreshToken == null || !refreshToken.startsWith("Bearer ")) {
@@ -31,5 +33,11 @@ public class MemberServiceImpl implements MemberService {
         Member member = optionalMember.orElseThrow(AccountNotFoundException::new);
         member.updateInfo(joinDto);
         memberRepository.save(member);
+    }
+
+    public void logout(String token, String email) {
+
+        redisUtil.setBlackList(token, "accessToken", 10);
+        redisUtil.deleteByEmail(email);
     }
 }
