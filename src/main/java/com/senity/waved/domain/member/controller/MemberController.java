@@ -44,4 +44,12 @@ public class MemberController {
         memberService.logout(token, email);
         return new ResponseEntity<>("로그아웃 완료", HttpStatus.OK);
     }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteMember(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        String email = user.getUsername();
+        memberService.deleteMember(email);
+        return new ResponseEntity<>("회원 탈퇴 완료", HttpStatus.OK);
+    }
 }

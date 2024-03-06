@@ -9,5 +9,5 @@ public interface MemberService {
     String resolveRefreshToken(String refreshToken);
     void joinAfterOauth(User user, MemberJoinDto joinDto) throws AccountNotFoundException;
     void logout(String token, String email);
+    void deleteMember(String email);
 }
-
