@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senity.waved.base.jwt.TokenDto;
 import com.senity.waved.base.jwt.TokenProvider;
 import com.senity.waved.base.redis.Redis;
-import com.senity.waved.base.redis.RedisRepository;
+import com.senity.waved.base.redis.RedisUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +15,14 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
 public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final TokenProvider tokenProvider;
-    private final RedisRepository redisRepository;
+    private final RedisUtil redisUtil;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -31,7 +32,12 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
 
         TokenDto token = new TokenDto(tokenProvider.createAccessToken(userEmail),
                 tokenProvider.createRefreshToken(userEmail));
-        redisRepository.save(new Redis(token.getRefreshToken(), userEmail));
+
+        Optional<Redis> optionalRedis = redisUtil.findByEmail(userEmail);
+        if (optionalRedis.isPresent()) {
+            redisUtil.deleteByEmail(userEmail);
+        }
+        redisUtil.save(userEmail, token.getRefreshToken());
 
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();

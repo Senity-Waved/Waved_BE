@@ -1,5 +1,6 @@
 package com.senity.waved.base.jwt;
 
+import com.senity.waved.domain.member.exception.MultipleLoginException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -8,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -16,8 +18,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class JwtFilter extends GenericFilterBean {
 
@@ -44,15 +44,36 @@ public class JwtFilter extends GenericFilterBean {
                 logger.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}",
                         authentication.getName(), requestURI);
             } catch (ExpiredJwtException e) {
-                setTokenExceptionAttribute(servletRequest, "만료된 JWT 토큰입니다.", requestURI);
-            } catch (MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
-                setTokenExceptionAttribute(servletRequest, "잘못된 JWT 토큰입니다.", requestURI);
+                writeErrorResponse(servletResponse, e.getMessage());
+                return;
+            } catch (BlackListedTokenException e) {
+                writeErrorResponse(servletResponse, e.getMessage());
+                return;
+            } catch (MalformedJwtException e) {
+                writeErrorResponse(servletResponse, e.getMessage());
+                return;
+            } catch (MultipleLoginException e) {
+                writeErrorResponse(servletResponse, e.getMessage());
+                return;
+            } catch (UnsupportedJwtException e) {
+                writeErrorResponse(servletResponse, e.getMessage());
+                return;
+            } catch (IllegalArgumentException e) {
+                writeErrorResponse(servletResponse, e.getMessage());
+                return;
             }
         } else {
-            setTokenExceptionAttribute(servletRequest, "인증정보가 없습니다.", requestURI);
+            writeErrorResponse(servletResponse, "인증정보가 없습니다.");
+            return;
         }
-
         filterChain.doFilter(servletRequest, servletResponse);
+    }
+
+    private void writeErrorResponse(ServletResponse response, String message) throws IOException {
+        HttpServletResponse httpServletResponse = (HttpServletResponse) response;
+        httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        httpServletResponse.setContentType("text/plain; charset=UTF-8");
+        httpServletResponse.getWriter().write(message);
     }
 
     private String resolveToken(HttpServletRequest request) {
@@ -62,13 +83,5 @@ public class JwtFilter extends GenericFilterBean {
             return bearerToken.substring(7);
         }
         return null;
-    }
-
-    private void setTokenExceptionAttribute(ServletRequest servletRequest, String message, String requestURI) {
-        Map<String, String> map = new HashMap<>();
-        map.put("result", "FAIL");
-        map.put("msg", message);
-        servletRequest.setAttribute("tokenException", map);
-        logger.debug("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
     }
 }

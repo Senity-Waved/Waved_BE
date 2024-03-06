@@ -17,21 +17,39 @@ import javax.security.auth.login.AccountNotFoundException;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/members")
 public class MemberController {
 
     private final TokenProvider tokenProvider;
     private final MemberService memberService;
 
     @PatchMapping("/join")
-    public ResponseEntity<String> join(Authentication authentication, @RequestBody MemberJoinDto joinDto) throws AccountNotFoundException {
+    public ResponseEntity<String> join(Authentication authentication, @RequestBody(required = false) MemberJoinDto joinDto) throws AccountNotFoundException {
         User user = (User) authentication.getPrincipal();
         memberService.joinAfterOauth(user, joinDto);
-        return new ResponseEntity<>("로그인 성공", HttpStatus.OK);
+        return new ResponseEntity<>("회원가입 추가 정보 등록 성공", HttpStatus.OK);
     }
 
     @PostMapping("/reissue")
-    public String reissue(HttpServletRequest request) {
+    public ResponseEntity<String> reissue(HttpServletRequest request) {
         String refreshToken = memberService.resolveRefreshToken(request.getHeader("Authorization"));
         return tokenProvider.generateAccessToken(refreshToken);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(Authentication authentication, HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        User user = (User) authentication.getPrincipal();
+        String email = user.getUsername();
+        memberService.logout(token, email);
+        return new ResponseEntity<>("로그아웃 완료", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deleteMember(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        String email = user.getUsername();
+        memberService.deleteMember(email);
+        return new ResponseEntity<>("회원 탈퇴 완료", HttpStatus.OK);
     }
 }
