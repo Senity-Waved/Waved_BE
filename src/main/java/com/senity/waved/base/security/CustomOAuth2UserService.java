@@ -13,7 +13,9 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -40,12 +42,19 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private Member createNewMember(String email, String nickname) {
-        AuthLevel authLevel = "waved7777@gmail.com".equals(email) ? AuthLevel.ADMIN : AuthLevel.MEMBER;
+        AuthLevel authLevel = AuthLevel.MEMBER;
+        List<String> adminMembers = Arrays.asList("waved7777@gmail.com", "imholy96@gmail.com"
+                , "vywns9978@gmail.com", "waved8888@gmail.com", "fetest1228@gmail.com");
+
+        if (adminMembers.contains(email)) {
+            authLevel = AuthLevel.ADMIN;
+        }
+
         Member newMember = Member.builder()
                 .email(email)
                 .nickname(nickname)
                 .authLevel(authLevel)
-                .certificationPass(0L)
+                .githubConnection(false)
                 .build();
         return memberRepository.save(newMember);
     }
@@ -53,6 +62,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private String generateRandomNickname() {
         UUID uuid = UUID.randomUUID();
         String hash = Integer.toHexString(uuid.hashCode());
-        return hash.substring(0, Math.min(hash.length(), 6));
+        return "서퍼" + hash.substring(0, Math.min(hash.length(), 6));
     }
 }
