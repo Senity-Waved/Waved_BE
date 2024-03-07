@@ -2,18 +2,17 @@ package com.senity.waved.domain.member.entity;
 
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.member.dto.MemberJoinDto;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.senity.waved.domain.myChallenge.entity.MyChallenge;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class Member extends BaseEntity {
@@ -43,13 +42,21 @@ public class Member extends BaseEntity {
     @Column(name="github_token", nullable=true)
     private String githubToken;
 
-    @Column(name="certification_pass", nullable=true)
-    private Long certificationPass;
+    @Column(name="github_connection", nullable = true)
+    private Boolean githubConnection;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MyChallenge> myChallenges = new ArrayList<>();
 
     public void updateInfo(MemberJoinDto joinDto) {
         this.nickname = joinDto.getNickname();
         this.birthYear = joinDto.getBirthYear();
         this.gender = joinDto.getGender();
         this.jobTitle = joinDto.getJobTitle();
+    }
+
+    public void updateGitInfo(String githubId, String githubToken) {
+        this.githubId = githubId;
+        this.githubToken = githubToken;
     }
 }
