@@ -1,7 +1,7 @@
-package com.senity.waved.domain.Challenge.entity;
+package com.senity.waved.domain.challenge.entity;
 
 import com.senity.waved.common.BaseEntity;
-import com.senity.waved.domain.ChanllengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,11 +25,11 @@ public class Challenge extends BaseEntity {
     @Column(name="challenge_type")
     private String challengeType;
 
-    @Column(name="certification_type")
-    private String certificationType;
+    @Column(name="verification_type")
+    private String verificationType;
 
-    @Column(name="certification_description", columnDefinition = "TEXT")
-    private String certificationDescription;
+    @Column(name="verificatoin_description", columnDefinition = "TEXT")
+    private String verificationDescription;
 
     @Column(name="is_free")
     private Boolean isFree;

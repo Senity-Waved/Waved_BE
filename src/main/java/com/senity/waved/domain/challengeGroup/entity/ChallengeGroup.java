@@ -1,7 +1,7 @@
-package com.senity.waved.domain.ChanllengeGroup.entity;
+package com.senity.waved.domain.challengeGroup.entity;
 
 import com.senity.waved.common.BaseEntity;
-import com.senity.waved.domain.Challenge.entity.Challenge;
+import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import jakarta.persistence.*;
 import lombok.Getter;

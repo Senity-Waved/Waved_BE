@@ -1,6 +1,7 @@
 package com.senity.waved.domain.member.entity;
 
 import com.senity.waved.common.BaseEntity;
+import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.MemberJoinDto;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import jakarta.persistence.*;
@@ -55,8 +56,9 @@ public class Member extends BaseEntity {
         this.jobTitle = joinDto.getJobTitle();
     }
 
-    public void updateGitInfo(String githubId, String githubToken) {
-        this.githubId = githubId;
-        this.githubToken = githubToken;
+    public void updateGithubInfo(GithubInfoDto github, Boolean githubConnection) {
+        githubId = github.getGithubId();
+        githubToken = github.getGithubToken();
+        this.githubConnection = githubConnection;
     }
 }
