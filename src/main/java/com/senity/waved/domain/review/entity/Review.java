@@ -3,6 +3,7 @@ package com.senity.waved.domain.review.entity;
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,15 @@ public class Review extends BaseEntity {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public static ReviewResponseDto getReviewResponse(Review review) {
+        return ReviewResponseDto.builder()
+                .nickname(review.getMember().getNickname())
+                .jobTitle(review.getMember().getJobTitle())
+                .challengeGroupTitle(String.valueOf(review.getChallengeGroup().getCohort()))
+                .content(review.getContent())
+                .createDate(review.getCreateDate())
+                .build();
     }
 }

@@ -9,14 +9,22 @@ import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
+import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
+import com.senity.waved.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -92,6 +100,27 @@ public class MemberServiceImpl implements MemberService {
     public void deleteGithubInfo(String email) {
         Member member = getMemberByEmail(email);
         member.updateGithubInfo(GithubInfoDto.builder().build());
+    }
+
+    @Transactional
+    public Page<ReviewResponseDto> getReviewsPaged(String email, int pageNumber, int pageSize) {
+        Member member = getMemberByEmail(email);
+        List<Review> reviews = member.getReviews();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        List<ReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
+
+        return new PageImpl<>(responseDtoList, pageable, reviews.size());
+    }
+
+    private List<ReviewResponseDto> getPaginatedReviewResponseDtoList(List<Review> reviews, Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), reviews.size());
+
+        return reviews.subList(start, end)
+                .stream()
+                .map(Review::getReviewResponse)
+                .collect(Collectors.toList());
     }
 
     private GHUser checkCredentials(GithubInfoDto githubDto) {

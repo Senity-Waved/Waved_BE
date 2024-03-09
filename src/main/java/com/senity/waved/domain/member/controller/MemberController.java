@@ -5,14 +5,18 @@ import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
 import com.senity.waved.domain.member.service.MemberService;
+import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -80,4 +84,14 @@ public class MemberController {
         memberService.deleteGithubInfo(user.getUsername());
         return new ResponseEntity<>("github 연동 해제했습니다.", HttpStatus.OK);
     }
+
+    @GetMapping("/reviews")
+    public Page<ReviewResponseDto> getReviews(
+            @AuthenticationPrincipal User user,
+            @RequestParam(value = "page", defaultValue = "0") int pageNumber,
+            @RequestParam(value = "limit", defaultValue = "5") int pageSize
+    ) {
+        return memberService.getReviewsPaged(user.getUsername(), pageNumber, pageSize);
+    }
 }
+

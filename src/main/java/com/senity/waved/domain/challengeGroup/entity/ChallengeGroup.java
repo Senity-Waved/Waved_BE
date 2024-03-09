@@ -18,7 +18,10 @@ import java.util.List;
 @SuperBuilder(toBuilder = true)
 public class ChallengeGroup extends BaseEntity {
 
-    @Column(name="participant_count")
+    @Column(name = "cohort")
+    private Long cohort;
+
+    @Column(name = "participant_count")
     private Long participantCount;
 
     @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

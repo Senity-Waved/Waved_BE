@@ -2,6 +2,7 @@ package com.senity.waved.domain.challenge.entity;
 
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,4 +34,7 @@ public class Challenge extends BaseEntity {
 
     @Column(name="is_free")
     private Boolean isFree;
+
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Review> reviews = new ArrayList<>();
 }

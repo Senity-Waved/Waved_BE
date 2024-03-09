@@ -8,5 +8,4 @@ import java.util.Optional;
 
 public interface ChallengeGroupRepository extends JpaRepository<ChallengeGroup, Long> {
     Optional<ChallengeGroup> getChallengeGroupByMyChallengesContains(MyChallenge myChallenge);
-
 }
