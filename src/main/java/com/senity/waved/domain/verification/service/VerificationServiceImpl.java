@@ -10,6 +10,7 @@ import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.entity.Verification;
+import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,14 @@ public class VerificationServiceImpl implements VerificationService {
                 break;
             default:
                 throw new IllegalArgumentException("지원하지 않는 인증 유형입니다.");
+        }
+    }
+
+    public void challengeGroupIsTextType(Long challengeGroupId) throws ChallengeGroupVerificationException {
+        ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
+
+        if (challengeGroup.getChallenge().getVerificationType() != VerificationType.TEXT) {
+            throw new ChallengeGroupVerificationException("이 챌린지는 글 인증이 아닙니다.");
         }
     }
 
