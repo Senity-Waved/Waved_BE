@@ -33,25 +33,24 @@ public class VerificationServiceImpl implements VerificationService {
 
         switch (verificationType) {
             case TEXT:
-                verifyText(requestDto, member, challengeGroup);
+            case LINK:
+                verifyTextOrLink(requestDto, member, challengeGroup, verificationType);
                 break;
             case PICTURE:
                 break;
             case GITHUB:
-                break;
-            case LINK:
                 break;
             default:
                 throw new IllegalArgumentException("지원하지 않는 인증 유형입니다.");
         }
     }
 
-    private void verifyText(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
+    private void verifyTextOrLink(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, VerificationType verificationType) {
         Verification verification = Verification.builder()
                 .content(requestDto.getContent())
                 .member(member)
                 .challengeGroup(challengeGroup)
-                .verificationType(VerificationType.TEXT)
+                .verificationType(verificationType)
                 .build();
         verificationRepository.save(verification);
     }
@@ -62,10 +61,6 @@ public class VerificationServiceImpl implements VerificationService {
 
     private void verifyGithub(VerificationRequestDto requestDto) {
         // TODO: GITHUB 인증 처리 로직 구현
-    }
-
-    private void verifyLink(VerificationRequestDto requestDto) {
-        // TODO: LINK 인증 처리 로직 구현
     }
 
     private Member getMemberByEmail(String email) {
