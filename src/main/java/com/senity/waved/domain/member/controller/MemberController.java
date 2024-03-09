@@ -2,7 +2,6 @@ package com.senity.waved.domain.member.controller;
 
 import com.senity.waved.base.jwt.TokenProvider;
 import com.senity.waved.domain.member.dto.GithubInfoDto;
-import com.senity.waved.domain.member.dto.request.MemberJoinRequestDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
 import com.senity.waved.domain.member.service.MemberService;
@@ -24,13 +23,13 @@ public class MemberController {
     private final TokenProvider tokenProvider;
     private final MemberService memberService;
 
-    @PatchMapping("/join")
-    public ResponseEntity<String> join(
+    @PatchMapping("/edit")
+    public ResponseEntity<String> editProfile(
             @AuthenticationPrincipal User user,
-            @RequestBody(required = false) MemberJoinRequestDto joinDto
+            @RequestBody(required = false) ProfileEditDto editDto
     ) {
-        memberService.joinAfterOauth(user.getUsername(), joinDto);
-        return new ResponseEntity<>("회원가입 추가 정보 등록 성공했습니다.", HttpStatus.OK);
+        memberService.editMemberProfile(user.getUsername(), editDto);
+        return new ResponseEntity<>("회원정보 등록 성공했습니다.", HttpStatus.OK);
     }
 
     @PostMapping("/reissue")
@@ -61,8 +60,6 @@ public class MemberController {
     public ProfileEditDto getMemberProfileEdit(@AuthenticationPrincipal User user) {
         return memberService.getProfileInfoToEdit(user.getUsername());
     }
-
-    // TODO 프로필 수정 PATCH
 
     @PostMapping("/github")
     public ResponseEntity<String> connectGithub(

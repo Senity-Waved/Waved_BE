@@ -23,10 +23,10 @@ public class Challenge extends BaseEntity {
     private String description;
 
     @Column(name="challenge_type")
-    private String challengeType;
+    private ChallengeType challengeType;
 
     @Column(name="verification_type")
-    private String verificationType;
+    private VerificationType verificationType;
 
     @Column(name="verificatoin_description", columnDefinition = "TEXT")
     private String verificationDescription;

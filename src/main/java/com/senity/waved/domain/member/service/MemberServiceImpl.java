@@ -35,7 +35,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Transactional
-    public void joinAfterOauth(String email, ProfileEditDto editDto) {
+    public void editMemberProfile(String email, ProfileEditDto editDto) {
         Member member = getMemberByEmail(email);
         member.updateInfo(editDto);
         memberRepository.save(member);
@@ -83,13 +83,15 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void saveGithubInfo(String email, GithubInfoDto githubDto) {
         Member member = getMemberByEmail(email);
-        member.updateGithubInfo(githubDto, true);
+        member.updateGithubInfo(githubDto);
+        memberRepository.save(member);
+        memberRepository.flush();
     }
 
     @Transactional
     public void deleteGithubInfo(String email) {
         Member member = getMemberByEmail(email);
-        member.updateGithubInfo(GithubInfoDto.builder().build(), false);
+        member.updateGithubInfo(GithubInfoDto.builder().build());
     }
 
     private GHUser checkCredentials(GithubInfoDto githubDto) {

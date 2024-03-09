@@ -44,9 +44,6 @@ public class Member extends BaseEntity {
     @Column(name="github_token", nullable=true)
     private String githubToken;
 
-    @Column(name="github_connection", nullable = true)
-    private Boolean githubConnection;
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MyChallenge> myChallenges = new ArrayList<>();
 
@@ -57,10 +54,9 @@ public class Member extends BaseEntity {
         this.jobTitle = editDto.getJobTitle();
     }
 
-    public void updateGithubInfo(GithubInfoDto github, Boolean githubConnection) {
-        githubId = github.getGithubId();
-        githubToken = github.getGithubToken();
-        this.githubConnection = githubConnection;
+    public void updateGithubInfo(GithubInfoDto github) {
+        this.githubId = github.getGithubId();
+        this.githubToken = github.getGithubToken();
     }
 
     public static ProfileInfoResponseDto getProfileInfoStatic(Member member) {

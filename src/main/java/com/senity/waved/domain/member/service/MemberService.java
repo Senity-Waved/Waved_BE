@@ -6,7 +6,8 @@ import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
 
 public interface MemberService {
     String resolveRefreshToken(String refreshToken);
-    void joinAfterOauth(String email, ProfileEditDto joinDto) ;
+
+    void editMemberProfile(String email, ProfileEditDto editDto) ;
     void logout(String email, String token);
     void deleteMember(String email);
 
@@ -15,6 +16,6 @@ public interface MemberService {
 
     GithubInfoDto getGithubInfoToEdit(String email);
     void checkGithubConnection(String email, GithubInfoDto github);
-    void saveGithubInfo(String email, GithubInfoDto gihub);
+    void saveGithubInfo(String email, GithubInfoDto github);
     void deleteGithubInfo(String email);
 }
