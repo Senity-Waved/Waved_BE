@@ -1,7 +1,9 @@
 package com.senity.waved.domain.member.entity;
 
 import com.senity.waved.common.BaseEntity;
-import com.senity.waved.domain.member.dto.MemberJoinDto;
+import com.senity.waved.domain.member.dto.GithubInfoDto;
+import com.senity.waved.domain.member.dto.ProfileEditDto;
+import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -42,21 +44,42 @@ public class Member extends BaseEntity {
     @Column(name="github_token", nullable=true)
     private String githubToken;
 
-    @Column(name="github_connection", nullable = true)
-    private Boolean githubConnection;
-
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<MyChallenge> myChallenges = new ArrayList<>();
 
-    public void updateInfo(MemberJoinDto joinDto) {
-        this.nickname = joinDto.getNickname();
-        this.birthYear = joinDto.getBirthYear();
-        this.gender = joinDto.getGender();
-        this.jobTitle = joinDto.getJobTitle();
+    public void updateInfo(ProfileEditDto editDto) {
+        this.nickname = editDto.getNickname();
+        this.birthYear = editDto.getBirthYear();
+        this.gender = editDto.getGender();
+        this.jobTitle = editDto.getJobTitle();
     }
 
-    public void updateGitInfo(String githubId, String githubToken) {
-        this.githubId = githubId;
-        this.githubToken = githubToken;
+    public void updateGithubInfo(GithubInfoDto github) {
+        this.githubId = github.getGithubId();
+        this.githubToken = github.getGithubToken();
+    }
+
+    public static ProfileInfoResponseDto getProfileInfoStatic(Member member) {
+        return ProfileInfoResponseDto.builder()
+                .nickname(member.getNickname())
+                .jobTitle(member.getJobTitle())
+                .githubId(member.getGithubId())
+                .build();
+    }
+
+    public static ProfileEditDto getProfileEditStatic(Member member) {
+        return ProfileEditDto.builder()
+                .nickname(member.getNickname())
+                .jobTitle(member.getJobTitle())
+                .birthYear(member.getBirthYear())
+                .gender(member.getGender())
+                .build();
+    }
+
+    public static GithubInfoDto getGithubInfoStatic(Member member) {
+        return GithubInfoDto.builder()
+                .githubId(member.getGithubId())
+                .githubToken(member.getGithubToken())
+                .build();
     }
 }

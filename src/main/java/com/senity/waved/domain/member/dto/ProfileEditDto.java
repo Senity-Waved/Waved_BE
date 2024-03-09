@@ -9,9 +9,9 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberJoinDto {
+public class ProfileEditDto {
     private String nickname;
+    private String jobTitle;
     private String birthYear;
     private Gender gender;
-    private String jobTitle;
 }

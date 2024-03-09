@@ -1,4 +1,4 @@
-package com.senity.waved.domain.ChanllengeGroup.controller;
+package com.senity.waved.domain.challengeGroup.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
