@@ -1,4 +1,4 @@
-package com.senity.waved.domain.myChallenge.entity;
+package com.senity.waved.domain.review.entity;
 
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
@@ -12,26 +12,10 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
-public class MyChallenge extends BaseEntity {
+public class Review extends BaseEntity {
 
-    @Column(name="status")
-    @Enumerated(EnumType.STRING)
-    private Status status;
-
-    @Column(name="success_count")
-    private Long successCount;
-
-    @Column(name="fail_count")
-    private Long failCount;
-
-    @Column(name="total_count")
-    private Long totalCount;
-
-    @Column(name="is_today_certification")
-    private Boolean isTodayCertification;
-
-    @Column(name="is_reviewed")
-    private Boolean isReviewed;
+    @Column(name = "content", columnDefinition = "TEXT")
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -40,4 +24,8 @@ public class MyChallenge extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_group_id")
     private ChallengeGroup challengeGroup;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }

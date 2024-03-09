@@ -33,7 +33,4 @@ public class Challenge extends BaseEntity {
 
     @Column(name="is_free")
     private Boolean isFree;
-
-    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<ChallengeGroup> challengeGroups = new ArrayList<>();
 }
