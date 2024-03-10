@@ -4,12 +4,12 @@ import com.senity.waved.domain.quiz.entity.Quiz;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
 public class QuizResponseDto {
-    private LocalDate date;
+    private Date date;
     private String question;
 
     public QuizResponseDto(Quiz quiz) {
