@@ -2,6 +2,7 @@ package com.senity.waved.domain.verification.service;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.entity.VerificationType;
+import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
@@ -11,6 +12,7 @@ import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
+import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +27,7 @@ public class VerificationServiceImpl implements VerificationService {
 
     private final ChallengeGroupRepository challengeGroupRepository;
     private final VerificationRepository verificationRepository;
+    private final ChallengeRepository challengeRepository;
     private final MemberRepository memberRepository;
     private final GithubService githubService;
 
@@ -32,8 +35,7 @@ public class VerificationServiceImpl implements VerificationService {
 
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
-
-        Challenge challenge = challengeGroup.getChallenge();
+        Challenge challenge = getChallenge(challengeGroup.getChallengeId());
         VerificationType verificationType = challenge.getVerificationType();
 
         switch (verificationType) {
@@ -54,7 +56,7 @@ public class VerificationServiceImpl implements VerificationService {
     public void challengeGroupIsTextType(Long challengeGroupId) throws ChallengeGroupVerificationException {
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
 
-        if (challengeGroup.getChallenge().getVerificationType() != VerificationType.TEXT) {
+        if (getChallenge(challengeGroup.getChallengeId()).getVerificationType() != VerificationType.TEXT) {
             throw new ChallengeGroupVerificationException("이 챌린지는 글 인증이 아닙니다.");
         }
     }
@@ -62,8 +64,8 @@ public class VerificationServiceImpl implements VerificationService {
     private void verifyTextOrLink(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, VerificationType verificationType) {
         Verification verification = Verification.builder()
                 .content(requestDto.getContent())
-                .member(member)
-                .challengeGroup(challengeGroup)
+                .memberId(member.getId())
+                .challengeGroupId(challengeGroup.getId())
                 .verificationType(verificationType)
                 .build();
         verificationRepository.save(verification);
@@ -95,5 +97,10 @@ public class VerificationServiceImpl implements VerificationService {
     private ChallengeGroup getChallengeGroup(Long challengeGroupId) {
         return challengeGroupRepository.findById(challengeGroupId)
                 .orElseThrow(() -> new ChallengeGroupNotFoundException("챌린지 기수를 찾을 수 없습니다."));
+    }
+
+    private Challenge getChallenge(Long challengeId) {
+        return challengeRepository.findById(challengeId)
+                .orElseThrow(() -> new ChallengeNotFoundException("챌린지를 찾을 수 없습니다."));
     }
 }

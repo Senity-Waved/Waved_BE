@@ -1,5 +1,6 @@
 package com.senity.waved.base.exception;
 
+import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
@@ -41,6 +42,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ChallengeGroupNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleChallengeGroupNotFoundException(ChallengeGroupNotFoundException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(ChallengeNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleChallengeNotFoundException(ChallengeNotFoundException e) {
         return e.getMessage();
     }
 

@@ -3,7 +3,7 @@ package com.senity.waved.domain.challenge.service;
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
+import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class ChallengeServiceImpl implements ChallengeService {
 
     private final ChallengeRepository challengeRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public Page<ReviewResponseDto> getReviewsPaged(Long challengeId, int pageNumber, int pageSize) {
@@ -42,7 +43,17 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         return reviews.subList(start, end)
                 .stream()
-                .map(Review::getReviewResponse)
+                .map(review -> {
+                    Member member = memberRepository.findById(review.getMemberId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 멤버를 찾을 수 없습니다."));
+
+                    return ReviewResponseDto.builder()
+                            .createDate(review.getCreateDate())
+                            .nickname(member.getNickname())
+                            .jobTitle(member.getJobTitle())
+                            .content(review.getContent())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 

@@ -3,6 +3,8 @@ package com.senity.waved.domain.verification.entity;
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challenge.entity.VerificationType;
 
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.member.entity.Member;
 import jakarta.persistence.*;
 
 import lombok.Getter;
@@ -31,10 +33,9 @@ public class Verification extends BaseEntity {
     public static Verification createGithubVerification(Member member, ChallengeGroup challengeGroup, boolean hasCommitsToday) {
         return Verification.builder()
                 .content(String.valueOf(hasCommitsToday))
-                .member(member)
-                .challengeGroup(challengeGroup)
+                .memberId(member.getId())
+                .challengeGroupId(challengeGroup.getId())
                 .verificationType(VerificationType.GITHUB)
                 .build();
     }
-
 }

@@ -36,7 +36,7 @@ public class ChallengeGroup extends BaseEntity {
     @Column(name = "end_date")
     private Date endDate;
 
-    @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Verification> Verifications  = new ArrayList<>();
 
     @Column(name = "challenge_id")
