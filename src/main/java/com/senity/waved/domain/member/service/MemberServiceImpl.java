@@ -37,7 +37,6 @@ import java.util.stream.Collectors;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final ChallengeGroupRepository challengeGroupRepository;
     private final RedisUtil redisUtil;
     private GitHub github;
 
@@ -126,18 +125,8 @@ public class MemberServiceImpl implements MemberService {
 
         return reviews.subList(start, end)
                 .stream()
-                .map(review -> {
-                    ChallengeGroup group = challengeGroupRepository.findById(review.getChallengeGroupId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 마이 챌린지를 찾을 수 없습니다."));
-
-                    return ReviewResponseDto.builder()
-                            .createDate(review.getCreateDate())
-                            .challengeGroupTitle(group.getGroupTitle())
-                            .content(review.getContent())
-                            .build();
-                })
+                .map(Review::getMemberReviewResponse)
                 .collect(Collectors.toList());
-
     }
 
     private GHUser checkCredentials(GithubInfoDto githubDto) {

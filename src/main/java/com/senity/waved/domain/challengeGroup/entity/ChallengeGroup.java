@@ -2,6 +2,8 @@ package com.senity.waved.domain.challengeGroup.entity;
 
 import com.senity.waved.common.BaseEntity;
 
+import com.senity.waved.domain.challenge.entity.Challenge;
+import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.quiz.entity.Quiz;
 import com.senity.waved.domain.verification.entity.Verification;
 import jakarta.persistence.*;
@@ -19,8 +21,8 @@ import java.util.List;
 @SuperBuilder(toBuilder = true)
 public class ChallengeGroup extends BaseEntity {
 
-    @Column(name = "index")
-    private Long index;
+    @Column(name = "groupIndex")
+    private Long groupIndex;
 
     @Column(name = "title")
     private String groupTitle;
@@ -36,13 +38,16 @@ public class ChallengeGroup extends BaseEntity {
     @Column(name = "end_date")
     private Date endDate;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Verification> Verifications  = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_id")
+    private Challenge challenge;
 
-    @Column(name = "challenge_id")
-    private Long challengeId;
+    @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MyChallenge> myChallenges = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Verification> verifications  = new ArrayList<>();
+
+    @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Quiz> quizzes = new ArrayList<>();
-
 }

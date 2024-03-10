@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class ChallengeServiceImpl implements ChallengeService {
 
     private final ChallengeRepository challengeRepository;
-    private final MemberRepository memberRepository;
 
     @Transactional
     public Page<ReviewResponseDto> getReviewsPaged(Long challengeId, int pageNumber, int pageSize) {
@@ -43,17 +42,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         return reviews.subList(start, end)
                 .stream()
-                .map(review -> {
-                    Member member = memberRepository.findById(review.getMemberId())
-                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 멤버를 찾을 수 없습니다."));
-
-                    return ReviewResponseDto.builder()
-                            .createDate(review.getCreateDate())
-                            .nickname(member.getNickname())
-                            .jobTitle(member.getJobTitle())
-                            .content(review.getContent())
-                            .build();
-                })
+                .map(Review::getChallengeReviewResponse)
                 .collect(Collectors.toList());
     }
 

@@ -1,4 +1,5 @@
 package com.senity.waved.domain.challengeGroup.service;
 
-public class ChallengeGroupServiceImpl {
+public class ChallengeGroupServiceImpl implements ChallengeGroupService {
+
 }

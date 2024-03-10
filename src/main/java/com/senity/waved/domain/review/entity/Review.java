@@ -1,6 +1,10 @@
 package com.senity.waved.domain.review.entity;
 
 import com.senity.waved.common.BaseEntity;
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.member.dto.ProfileEditDto;
+import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,13 +19,32 @@ public class Review extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @Column(name = "member_id")
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(name = "challenge_group_id")
-    private Long challengeGroupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_group_id")
+    private ChallengeGroup challengeGroup;
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public static ReviewResponseDto getMemberReviewResponse(Review review) {
+        return ReviewResponseDto.builder()
+                .challengeGroupTitle(review.getChallengeGroup().getGroupTitle())
+                .createDate(review.getCreateDate())
+                .content(review.getContent())
+                .build();
+    }
+
+    public static ReviewResponseDto getChallengeReviewResponse(Review review) {
+        return ReviewResponseDto.builder()
+                .nickname(review.getMember().getNickname())
+                .jobTitle(review.getMember().getJobTitle())
+                .createDate(review.getCreateDate())
+                .content(review.getContent())
+                .build();
     }
 }

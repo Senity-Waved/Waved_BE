@@ -34,9 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = myChallengeRepository.findById(myChallengeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 마이 챌린지를 찾을 수 없습니다."));
-
-        ChallengeGroup challengeGroup = challengeGroupRepository.findById(myChallenge.getChallengeGroupId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 챌린지 기수를 찾을 수 없습니다."));
+        ChallengeGroup challengeGroup = myChallenge.getChallengeGroup();
 
         if (challengeGroup.getEndDate().compareTo(getToday()) >= 0) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "종료된 마이 챌린지만 리뷰 작성이 가능합니다.");
@@ -45,8 +43,8 @@ public class ReviewServiceImpl implements ReviewService {
         checkReviewExist(challengeGroup.getId(), member.getId());
         Review newReview = Review.builder()
                 .content(content)
-                .memberId(member.getId())
-                .challengeGroupId(challengeGroup.getId())
+                .member(member)
+                .challengeGroup(challengeGroup)
                 .build();
 
         reviewRepository.save(newReview);
@@ -71,7 +69,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 리뷰를 찾을 수 없습니다."));
 
-        if (!review.getMemberId().equals(member.getId())) {
+        if (!review.getMember().getId().equals(member.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errMsg);
         }
         return review;

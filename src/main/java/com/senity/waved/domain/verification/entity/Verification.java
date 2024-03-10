@@ -24,17 +24,19 @@ public class Verification extends BaseEntity {
     @Column(name = "verification_type")
     private VerificationType verificationType;
 
-    @Column(name = "challenge_group_id")
-    private Long challengeGroupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(name = "challenge_id")
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_group_id")
+    private ChallengeGroup challengeGroup;
 
     public static Verification createGithubVerification(Member member, ChallengeGroup challengeGroup, boolean hasCommitsToday) {
         return Verification.builder()
                 .content(String.valueOf(hasCommitsToday))
-                .memberId(member.getId())
-                .challengeGroupId(challengeGroup.getId())
+                .member(member)
+                .challengeGroup(challengeGroup)
                 .verificationType(VerificationType.GITHUB)
                 .build();
     }

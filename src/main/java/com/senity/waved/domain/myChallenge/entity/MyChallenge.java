@@ -1,6 +1,8 @@
 package com.senity.waved.domain.myChallenge.entity;
 
 import com.senity.waved.common.BaseEntity;
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +20,11 @@ public class MyChallenge extends BaseEntity {
     @Column(name="my_verifs")
     private List<Boolean> myVerifs;
 
-    @Column(name = "member_id")
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
 
-    @Column(name = "challenge_group_id")
-    private Long challengeGroupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_group_id")
+    private ChallengeGroup challengeGroup;
 }

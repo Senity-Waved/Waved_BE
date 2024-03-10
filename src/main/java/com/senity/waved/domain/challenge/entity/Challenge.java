@@ -37,8 +37,9 @@ public class Challenge extends BaseEntity {
     private Boolean isFree;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_id")
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChallengeGroup> groups = new ArrayList<>();
 }

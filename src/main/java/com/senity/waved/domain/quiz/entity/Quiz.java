@@ -1,5 +1,6 @@
 package com.senity.waved.domain.quiz.entity;
 
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ public class Quiz {
     private Date date;
     private String question;
 
-    @Column(name = "challenge_group_id")
-    private Long challengeGroupId;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_group_id")
+    private ChallengeGroup challengeGroup;
 }
