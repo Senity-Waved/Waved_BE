@@ -37,4 +37,7 @@ public class Challenge extends BaseEntity {
 
     @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "challenge", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ChallengeGroup> groups = new ArrayList<>();
 }

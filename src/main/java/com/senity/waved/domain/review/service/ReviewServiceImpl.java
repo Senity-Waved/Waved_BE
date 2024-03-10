@@ -15,6 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
@@ -27,16 +32,21 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public void createChallengeReview(String email, Long myChallengeId, String content) {
         Member member = getMemberByEmail(email);
-        MyChallenge myChallenge = myChallengeRepository.findMyChallengeById(myChallengeId)
+        MyChallenge myChallenge = myChallengeRepository.findById(myChallengeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 마이 챌린지를 찾을 수 없습니다."));
 
-        ChallengeGroup challengeGroup = challengeGroupRepository.getChallengeGroupByMyChallengesContains(myChallenge)
+        ChallengeGroup challengeGroup = challengeGroupRepository.findById(myChallenge.getChallengeGroupId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 챌린지 기수를 찾을 수 없습니다."));
 
+        if (challengeGroup.getEndDate().compareTo(getToday()) >= 0) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "종료된 마이 챌린지만 리뷰 작성이 가능합니다.");
+        }
+
+        checkReviewExist(challengeGroup.getId(), member.getId());
         Review newReview = Review.builder()
                 .content(content)
-                .member(member)
-                .challengeGroup(challengeGroup)
+                .memberId(member.getId())
+                .challengeGroupId(challengeGroup.getId())
                 .build();
 
         reviewRepository.save(newReview);
@@ -61,10 +71,22 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 리뷰를 찾을 수 없습니다."));
 
-        if (!review.getMember().getId().equals(member.getId())) {
+        if (!review.getMemberId().equals(member.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errMsg);
         }
         return review;
+    }
+
+    private void checkReviewExist(Long challengeGroupId, Long memberId) {
+        Optional<Review> reviews = reviewRepository.findByChallengeGroupIdAndMemberId(challengeGroupId, memberId);
+        if (reviews.isPresent()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 챌린지에 이미 리뷰를 남기셨습니다.");
+        }
+    }
+
+    private Date getToday() {
+        LocalDate today = LocalDate.now();
+        return Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     private Member getMemberByEmail(String email) {

@@ -1,6 +1,5 @@
 package com.senity.waved.domain.review.controller;
 
-import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.review.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

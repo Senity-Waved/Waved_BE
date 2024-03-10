@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Getter
 @SuperBuilder
@@ -15,5 +15,5 @@ public class ReviewResponseDto {
     private String jobTitle;
     private String challengeGroupTitle;
     private String content;
-    private LocalDateTime createDate;
+    private Timestamp createDate;
 }

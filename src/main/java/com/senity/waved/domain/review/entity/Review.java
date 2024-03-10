@@ -1,9 +1,6 @@
 package com.senity.waved.domain.review.entity;
 
 import com.senity.waved.common.BaseEntity;
-import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,25 +15,13 @@ public class Review extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(name = "member_id")
+    private Long memberId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "challenge_group_id")
-    private ChallengeGroup challengeGroup;
+    @Column(name = "challenge_group_id")
+    private Long challengeGroupId;
 
     public void updateContent(String content) {
         this.content = content;
-    }
-
-    public static ReviewResponseDto getReviewResponse(Review review) {
-        return ReviewResponseDto.builder()
-                .nickname(review.getMember().getNickname())
-                .jobTitle(review.getMember().getJobTitle())
-                .challengeGroupTitle(String.valueOf(review.getChallengeGroup().getCohort()))
-                .content(review.getContent())
-                .createDate(review.getCreateDate())
-                .build();
     }
 }
