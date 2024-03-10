@@ -1,4 +1,5 @@
 package com.senity.waved.domain.myChallenge.service;
 
-public class MyChallengeServiceImpl {
+public class MyChallengeServiceImpl implements MyChallengeService {
+
 }

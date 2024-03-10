@@ -3,6 +3,8 @@ package com.senity.waved.domain.member.service;
 import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
+import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
+import org.springframework.data.domain.Page;
 
 public interface MemberService {
     String resolveRefreshToken(String refreshToken);
@@ -18,4 +20,6 @@ public interface MemberService {
     void checkGithubConnection(String email, GithubInfoDto github);
     void saveGithubInfo(String email, GithubInfoDto github);
     void deleteGithubInfo(String email);
+
+    Page<ReviewResponseDto> getReviewsPaged(String email, int pageNumber, int pageSize);
 }

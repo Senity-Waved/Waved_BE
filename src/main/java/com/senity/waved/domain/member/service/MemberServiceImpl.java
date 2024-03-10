@@ -1,6 +1,9 @@
 package com.senity.waved.domain.member.service;
 
 import com.senity.waved.base.redis.RedisUtil;
+import com.senity.waved.domain.challenge.repository.ChallengeRepository;
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
@@ -9,20 +12,32 @@ import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
+import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
+import com.senity.waved.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final ChallengeGroupRepository challengeGroupRepository;
     private final RedisUtil redisUtil;
     private GitHub github;
 
@@ -92,6 +107,37 @@ public class MemberServiceImpl implements MemberService {
     public void deleteGithubInfo(String email) {
         Member member = getMemberByEmail(email);
         member.updateGithubInfo(GithubInfoDto.builder().build());
+    }
+
+    @Transactional
+    public Page<ReviewResponseDto> getReviewsPaged(String email, int pageNumber, int pageSize) {
+        Member member = getMemberByEmail(email);
+        List<Review> reviews = member.getReviews();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        List<ReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
+
+        return new PageImpl<>(responseDtoList, pageable, reviews.size());
+    }
+
+    private List<ReviewResponseDto> getPaginatedReviewResponseDtoList(List<Review> reviews, Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), reviews.size());
+
+        return reviews.subList(start, end)
+                .stream()
+                .map(review -> {
+                    ChallengeGroup group = challengeGroupRepository.findById(review.getChallengeGroupId())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 마이 챌린지를 찾을 수 없습니다."));
+
+                    return ReviewResponseDto.builder()
+                            .createDate(review.getCreateDate())
+                            .challengeGroupTitle(group.getGroupTitle())
+                            .content(review.getContent())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
     }
 
     private GHUser checkCredentials(GithubInfoDto githubDto) {
