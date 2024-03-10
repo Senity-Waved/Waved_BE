@@ -1,6 +1,8 @@
 package com.senity.waved.domain.challengeGroup.entity;
 
 import com.senity.waved.common.BaseEntity;
+
+import com.senity.waved.domain.quiz.entity.Quiz;
 import com.senity.waved.domain.verification.entity.Verification;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -39,4 +41,8 @@ public class ChallengeGroup extends BaseEntity {
 
     @Column(name = "challenge_id")
     private Long challengeId;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Quiz> quizzes = new ArrayList<>();
+
 }

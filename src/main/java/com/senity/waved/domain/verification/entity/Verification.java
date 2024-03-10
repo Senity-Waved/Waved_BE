@@ -2,10 +2,9 @@ package com.senity.waved.domain.verification.entity;
 
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challenge.entity.VerificationType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+
+import jakarta.persistence.*;
+
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -28,4 +27,14 @@ public class Verification extends BaseEntity {
 
     @Column(name = "challenge_id")
     private Long memberId;
+
+    public static Verification createGithubVerification(Member member, ChallengeGroup challengeGroup, boolean hasCommitsToday) {
+        return Verification.builder()
+                .content(String.valueOf(hasCommitsToday))
+                .member(member)
+                .challengeGroup(challengeGroup)
+                .verificationType(VerificationType.GITHUB)
+                .build();
+    }
+
 }
