@@ -1,12 +1,11 @@
 package com.senity.waved.domain.quiz.entity;
 
-import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -18,11 +17,10 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate date;
+    private Date date;
     private String question;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "challenge_group_id")
-    private ChallengeGroup challengeGroup;
+    @Column(name = "challenge_group_id")
+    private Long challengeGroupId;
 
 }
