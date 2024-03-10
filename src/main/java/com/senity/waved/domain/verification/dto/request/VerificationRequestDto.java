@@ -6,6 +6,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VerificationRequestDto {
-    private Long challengeGroupId;
     private String content;
 }

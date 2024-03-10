@@ -31,4 +31,13 @@ public class Verification extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    public static Verification createGithubVerification(Member member, ChallengeGroup challengeGroup, boolean hasCommitsToday) {
+        return Verification.builder()
+                .content(String.valueOf(hasCommitsToday))
+                .member(member)
+                .challengeGroup(challengeGroup)
+                .verificationType(VerificationType.GITHUB)
+                .build();
+    }
+
 }

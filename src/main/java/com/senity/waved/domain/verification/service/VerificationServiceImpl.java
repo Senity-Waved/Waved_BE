@@ -16,18 +16,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class VerificationServiceImpl implements VerificationService {
+
     private final ChallengeGroupRepository challengeGroupRepository;
     private final VerificationRepository verificationRepository;
     private final MemberRepository memberRepository;
+    private final GithubService githubService;
 
-    public void verifyChallenge(VerificationRequestDto requestDto, String email) {
+    public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
 
         Member member = getMemberByEmail(email);
-        ChallengeGroup challengeGroup = getChallengeGroup(requestDto.getChallengeGroupId());
+        ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
 
         Challenge challenge = challengeGroup.getChallenge();
         VerificationType verificationType = challenge.getVerificationType();
@@ -40,6 +44,7 @@ public class VerificationServiceImpl implements VerificationService {
             case PICTURE:
                 break;
             case GITHUB:
+                verifyGithub(requestDto, member, challengeGroup, challengeGroupId); // challengeGroupId 추가
                 break;
             default:
                 throw new IllegalArgumentException("지원하지 않는 인증 유형입니다.");
@@ -68,8 +73,18 @@ public class VerificationServiceImpl implements VerificationService {
         // TODO: PICTURE 인증 처리 로직 구현
     }
 
-    private void verifyGithub(VerificationRequestDto requestDto) {
-        // TODO: GITHUB 인증 처리 로직 구현
+    public void verifyGithub(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, Long challengeGroupId) {
+
+        try {
+            boolean hasCommitsToday = githubService.hasCommitsToday(member.getGithubId(), member.getGithubToken());
+
+            Verification verification = Verification.createGithubVerification(member, challengeGroup, hasCommitsToday);
+            verificationRepository.save(verification);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("GitHub API 호출 중 오류 발생: " + e.getMessage());
+        }
     }
 
     private Member getMemberByEmail(String email) {
