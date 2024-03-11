@@ -3,6 +3,7 @@ package com.senity.waved.domain.challengeGroup.entity;
 import com.senity.waved.common.BaseEntity;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
+import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.quiz.entity.Quiz;
 import com.senity.waved.domain.verification.entity.Verification;
@@ -50,4 +51,17 @@ public class ChallengeGroup extends BaseEntity {
 
     @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Quiz> quizzes = new ArrayList<>();
+
+    public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group) {
+        return ChallengeGroupResponseDto.builder()
+                .groupTitle(group.getGroupTitle())
+                .participantCount(group.getParticipantCount())
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
+                .verificationType(group.getChallenge().getVerificationType())
+                .description(group.getChallenge().getDescription())
+                .verificationDescription(group.getChallenge().getVerificationDescription())
+                .challengeId(group.getChallenge().getId())
+                .build();
+    }
 }

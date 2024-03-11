@@ -15,8 +15,6 @@ public class ChallengeController {
 
     private final ChallengeService challengeService;
 
-/*    @GetMapping
-    public */
 
     @GetMapping("/{challengeId}/reviews")
     public Page<ReviewResponseDto> getReviews(
