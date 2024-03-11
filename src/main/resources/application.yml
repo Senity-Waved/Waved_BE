@@ -34,6 +34,9 @@ spring:
         use_sql_comments: true
         default_batch_fetch_size: 1000
     defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
 
   security:
     oauth2:

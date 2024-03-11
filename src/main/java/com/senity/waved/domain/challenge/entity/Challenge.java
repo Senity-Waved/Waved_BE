@@ -23,9 +23,6 @@ public class Challenge extends BaseEntity {
     @Column(name="description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name="challenge_type")
-    private ChallengeType challengeType;
-
     @Column(name="verification_type")
     @Enumerated(EnumType.STRING)
     private VerificationType verificationType;
