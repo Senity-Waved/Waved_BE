@@ -6,5 +6,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VerificationRequestDto {
+    private String link;
     private String content;
 }

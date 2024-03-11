@@ -29,19 +29,20 @@ public class VerificationServiceImpl implements VerificationService {
     private final GithubService githubService;
 
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
-
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
-
         Challenge challenge = challengeGroup.getChallenge();
         VerificationType verificationType = challenge.getVerificationType();
 
         switch (verificationType) {
             case TEXT:
+                verifyText(requestDto, member, challengeGroup);
+                break;
             case LINK:
-                verifyTextOrLink(requestDto, member, challengeGroup, verificationType);
+                verifyLink(requestDto, member, challengeGroup);
                 break;
             case PICTURE:
+                verifyPicture(requestDto);
                 break;
             case GITHUB:
                 verifyGithub(requestDto, member, challengeGroup, challengeGroupId);
@@ -59,18 +60,33 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
-    private void verifyTextOrLink(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, VerificationType verificationType) {
+    private void verifyText(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
+        validateRequestDto(requestDto);
+
         Verification verification = Verification.builder()
                 .content(requestDto.getContent())
                 .member(member)
                 .challengeGroup(challengeGroup)
-                .verificationType(verificationType)
+                .verificationType(VerificationType.TEXT)
                 .build();
         verificationRepository.save(verification);
     }
 
-    private void verifyPicture(VerificationRequestDto requestDto) {
-        // TODO: PICTURE 인증 처리 로직 구현
+    private void verifyLink(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
+        validateRequestDto(requestDto);
+
+        if (requestDto.getLink() == null || requestDto.getLink().isEmpty()) {
+            throw new IllegalArgumentException("링크를 입력해주세요.");
+        }
+
+        Verification verification = Verification.builder()
+                .content(requestDto.getContent())
+                .link(requestDto.getLink())
+                .member(member)
+                .challengeGroup(challengeGroup)
+                .verificationType(VerificationType.LINK)
+                .build();
+        verificationRepository.save(verification);
     }
 
     public void verifyGithub(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, Long challengeGroupId) {
@@ -87,6 +103,10 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
+    private void verifyPicture(VerificationRequestDto requestDto) {
+        // TODO: PICTURE 인증 처리 로직 구현
+    }
+
     private Member getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
@@ -95,5 +115,11 @@ public class VerificationServiceImpl implements VerificationService {
     private ChallengeGroup getChallengeGroup(Long challengeGroupId) {
         return challengeGroupRepository.findById(challengeGroupId)
                 .orElseThrow(() -> new ChallengeGroupNotFoundException("챌린지 기수를 찾을 수 없습니다."));
+    }
+
+    private void validateRequestDto(VerificationRequestDto requestDto) {
+        if (requestDto == null || requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
+            throw new IllegalArgumentException("내용을 입력해주세요.");
+        }
     }
 }
