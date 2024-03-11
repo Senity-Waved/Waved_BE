@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @SuperBuilder
@@ -14,8 +14,8 @@ import java.util.Date;
 public class ChallengeGroupResponseDto {
     private String groupTitle;
     private Long participantCount;
-    private Date startDate;
-    private Date endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     private VerificationType verificationType;
     private String description;
     private String verificationDescription;

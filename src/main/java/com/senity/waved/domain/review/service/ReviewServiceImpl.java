@@ -36,7 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 마이 챌린지를 찾을 수 없습니다."));
         ChallengeGroup challengeGroup = myChallenge.getChallengeGroup();
 
-        if (challengeGroup.getEndDate().compareTo(getToday()) >= 0) {
+        if (challengeGroup.getEndDate().isAfter(LocalDate.now())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "종료된 마이 챌린지만 리뷰 작성이 가능합니다.");
         }
 
@@ -80,11 +80,6 @@ public class ReviewServiceImpl implements ReviewService {
         if (reviews.isPresent()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 챌린지에 이미 리뷰를 남기셨습니다.");
         }
-    }
-
-    private Date getToday() {
-        LocalDate today = LocalDate.now();
-        return Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
     }
 
     private Member getMemberByEmail(String email) {
