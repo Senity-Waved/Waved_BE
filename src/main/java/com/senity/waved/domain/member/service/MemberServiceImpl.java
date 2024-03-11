@@ -88,6 +88,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public void checkGithubConnection(String email, GithubInfoDto githubDto) {
         GHUser ghUser = checkCredentials(githubDto);
+        System.out.println(githubDto.getGithubId() + "\n" + githubDto.getGithubToken());
         if (ghUser == null) {
             throw new WrongGithubInfoException("유효하지 않은 github 정보입니다.");
         }

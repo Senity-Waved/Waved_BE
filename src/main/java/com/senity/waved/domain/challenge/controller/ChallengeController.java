@@ -1,11 +1,15 @@
 package com.senity.waved.domain.challenge.controller;
 
 import com.senity.waved.domain.challenge.service.ChallengeService;
+import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
+import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -15,6 +19,10 @@ public class ChallengeController {
 
     private final ChallengeService challengeService;
 
+    @GetMapping("/waiting")
+    public List<ChallengeGroupHomeResponseDto> getHomeChallengeGroups() {
+        return challengeService.getHomeChallengeGroupsListed();
+    }
 
     @GetMapping("/{challengeId}/reviews")
     public Page<ReviewResponseDto> getReviews(

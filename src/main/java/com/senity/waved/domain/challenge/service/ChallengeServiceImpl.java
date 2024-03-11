@@ -2,6 +2,7 @@ package com.senity.waved.domain.challenge.service;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
+import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
@@ -22,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,31 +33,18 @@ import java.util.stream.Collectors;
 public class ChallengeServiceImpl implements ChallengeService {
 
     private final ChallengeRepository challengeRepository;
-    private final ChallengeGroupRepository groupRepository;
 
-    @Transactional
-    @Scheduled(fixedDelay = 10000) // 10초 단위
-    public void makeChallengeGroupScheduled() {
+    @Transactional(readOnly = true)
+    public List<ChallengeGroupHomeResponseDto> getHomeChallengeGroupsListed() {
+        List<ChallengeGroupHomeResponseDto> homeGroups = new ArrayList<>();
         for (int i = 1; i <= 4; i++) {
             Challenge challenge = getChallengeById(i * 1L);
+            int groupSize = challenge.getGroups().size();
 
-            int newGroupIndex = challenge.getGroups().size() + 1;
-            String newGroupTitle = challenge.getTitle() + " " + newGroupIndex + "기";
-
-            LocalDate newStartDate = challenge.getGroups().get(newGroupIndex - 2).getEndDate().plusDays(1);
-            LocalDate newEndDate = newStartDate.plusDays(13);
-
-            ChallengeGroup newGroup = ChallengeGroup.builder()
-                    .groupIndex(Long.valueOf(newGroupIndex))
-                    .groupTitle(newGroupTitle)
-                    .startDate(newStartDate)
-                    .endDate(newEndDate)
-                    .challenge(challenge)
-                    .participantCount(0L)
-                    .build();
-
-            groupRepository.save(newGroup);
+            ChallengeGroup group = challenge.getGroups().get(groupSize - 1);
+            homeGroups.add(ChallengeGroup.getHomeGroupResponse(group));
         }
+        return homeGroups;
     }
 
     @Transactional
@@ -81,6 +70,34 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     private Challenge getChallengeById(Long id) {
         return challengeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.OK, "해당 챌린지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 챌린지를 찾을 수 없습니다."));
     }
+
+    /* 챌린지 그룹 자동 생성 메서드: 테스트 시 사용 X
+
+    @Transactional
+    @Scheduled(fixedDelay = 10000) // 10초 단위
+    public void makeChallengeGroupScheduled() {
+        for (int i = 1; i <= 4; i++) {
+            Challenge challenge = getChallengeById(i * 1L);
+
+            int newGroupIndex = challenge.getGroups().size() + 1;
+            String newGroupTitle = challenge.getTitle() + " " + newGroupIndex + "기";
+
+            LocalDate newStartDate = challenge.getGroups().get(newGroupIndex - 2).getEndDate().plusDays(1);
+            LocalDate newEndDate = newStartDate.plusDays(13);
+
+            ChallengeGroup newGroup = ChallengeGroup.builder()
+                    .groupIndex(Long.valueOf(newGroupIndex))
+                    .groupTitle(newGroupTitle)
+                    .startDate(newStartDate)
+                    .endDate(newEndDate)
+                    .challenge(challenge)
+                    .participantCount(0L)
+                    .build();
+
+            groupRepository.save(newGroup);
+        }
+    }
+    */
 }

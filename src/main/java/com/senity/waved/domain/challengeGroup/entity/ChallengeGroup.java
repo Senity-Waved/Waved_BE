@@ -3,6 +3,7 @@ package com.senity.waved.domain.challengeGroup.entity;
 import com.senity.waved.common.BaseEntity;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
+import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.quiz.entity.Quiz;
@@ -14,7 +15,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -51,16 +51,37 @@ public class ChallengeGroup extends BaseEntity {
     @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Quiz> quizzes = new ArrayList<>();
 
+    public void addMyChallenge(MyChallenge myChallenge) {
+        this.myChallenges.add(myChallenge);
+    }
+
+    public void deleteMyChallenge(MyChallenge myChallenge) {
+        this.myChallenges.remove(myChallenge);
+    }
+
     public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group) {
+        Challenge challenge = group.getChallenge();
         return ChallengeGroupResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .participantCount(group.getParticipantCount())
                 .startDate(group.getStartDate())
                 .endDate(group.getEndDate())
-                .verificationType(group.getChallenge().getVerificationType())
-                .description(group.getChallenge().getDescription())
-                .verificationDescription(group.getChallenge().getVerificationDescription())
-                .challengeId(group.getChallenge().getId())
+                .verificationType(challenge.getVerificationType())
+                .description(challenge.getDescription())
+                .verificationDescription(challenge.getVerificationDescription())
+                .challengeId(challenge.getId())
+                .build();
+    }
+
+    public static ChallengeGroupHomeResponseDto getHomeGroupResponse(ChallengeGroup group) {
+        Challenge challenge = group.getChallenge();
+        return ChallengeGroupHomeResponseDto.builder()
+                .groupTitle(group.getGroupTitle())
+                .verificationType(challenge.getVerificationType())
+                .isFree(challenge.getIsFree())
+                .participantCount(group.getParticipantCount())
+                .startDate(group.getStartDate())
+                .challengeGroupId(group.getId())
                 .build();
     }
 }

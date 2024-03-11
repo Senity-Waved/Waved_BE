@@ -11,15 +11,13 @@ import java.time.LocalDate;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChallengeGroupResponseDto {
+public class ChallengeGroupHomeResponseDto {
     private String groupTitle;
+    private VerificationType verificationType;
+    private Boolean isFree;
     private Long participantCount;
     private LocalDate startDate;
-    private LocalDate endDate;
-    private VerificationType verificationType;
-    private String description;
-    private String verificationDescription;
 
-    // 챌린지(전체 그룹) 리뷰 paged 조회를 위한 id값
-    private Long challengeId;
+    // group 상세페이지 호출을 위한 id값
+    private Long challengeGroupId;
 }
