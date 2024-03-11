@@ -2,7 +2,6 @@ package com.senity.waved.domain.review.entity;
 
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import jakarta.persistence.*;
@@ -26,6 +25,9 @@ public class Review extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_group_id")
     private ChallengeGroup challengeGroup;
+
+    @Column(name = "challenge_id")
+    private Long challengeId;
 
     public void updateContent(String content) {
         this.content = content;

@@ -21,7 +21,7 @@ import java.util.List;
 @SuperBuilder(toBuilder = true)
 public class ChallengeGroup extends BaseEntity {
 
-    @Column(name = "groupIndex")
+    @Column(name = "group_index")
     private Long groupIndex;
 
     @Column(name = "title")
