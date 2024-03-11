@@ -8,7 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Getter
@@ -18,7 +19,10 @@ public class MyChallenge extends BaseEntity {
 
     @ElementCollection
     @Column(name="my_verifs")
-    private List<Boolean> myVerifs;
+    private int[] myVerifs;
+
+    @Column(name = "success_count")
+    private Long successCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -27,4 +31,28 @@ public class MyChallenge extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_group_id")
     private ChallengeGroup challengeGroup;
+
+    public void updateVerificationStatus(int dayIndex, boolean isSuccess) {
+        if (this.myVerifs != null && dayIndex >= 0 && dayIndex < this.myVerifs.length) {
+            this.myVerifs[dayIndex] = isSuccess ? 1 : 0;
+        }
+    }
+
+    public boolean isValidChallengePeriod(LocalDate startDate, LocalDate currentDate) {
+        long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
+        return daysFromStart >= 0 && daysFromStart < 14;
+    }
+
+    public void incrementSuccessCount() {
+        this.successCount += 1;
+    }
+
+    public void setSuccessCount(Long successCount) {
+        this.successCount = successCount;
+    }
+
+    public void setMyVerifs(int[] myVerifs) {
+        this.myVerifs = myVerifs;
+    }
+
 }

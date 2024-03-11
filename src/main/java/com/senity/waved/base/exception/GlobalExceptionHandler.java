@@ -4,6 +4,7 @@ import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundEx
 import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
+import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.quiz.exception.QuizNotFoundException;
 import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
 import org.springframework.http.HttpStatus;
@@ -53,6 +54,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ChallengeGroupVerificationException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleChallengeGroupVerificationException(ChallengeGroupVerificationException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(MyChallengeNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleMyChallengeNotFoundException(MyChallengeNotFoundException e) {
         return e.getMessage();
     }
 }

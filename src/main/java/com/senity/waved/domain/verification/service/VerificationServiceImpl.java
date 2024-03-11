@@ -1,13 +1,15 @@
 package com.senity.waved.domain.verification.service;
 
-import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.entity.VerificationType;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
+import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
+import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
@@ -17,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Transactional
@@ -27,14 +31,13 @@ public class VerificationServiceImpl implements VerificationService {
     private final VerificationRepository verificationRepository;
     private final MemberRepository memberRepository;
     private final GithubService githubService;
+    private final MyChallengeRepository myChallengeRepository;
 
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
-        Challenge challenge = challengeGroup.getChallenge();
-        VerificationType verificationType = challenge.getVerificationType();
 
-        switch (verificationType) {
+        switch (challengeGroup.getChallenge().getVerificationType()) {
             case TEXT:
                 verifyText(requestDto, member, challengeGroup);
                 break;
@@ -50,6 +53,8 @@ public class VerificationServiceImpl implements VerificationService {
             default:
                 throw new IllegalArgumentException("지원하지 않는 인증 유형입니다.");
         }
+
+        updateMyChallengeStatus(member, challengeGroup, true);
     }
 
     public void challengeGroupIsTextType(Long challengeGroupId) throws ChallengeGroupVerificationException {
@@ -122,4 +127,40 @@ public class VerificationServiceImpl implements VerificationService {
             throw new IllegalArgumentException("내용을 입력해주세요.");
         }
     }
+    //TODO: 깃헙 인증내역 업데이트 테스트
+    private void updateMyChallengeStatus(Member member, ChallengeGroup challengeGroup, boolean isSuccess) {
+        LocalDate currentDate = LocalDate.now();
+
+        MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
+
+        if (myChallenge.isValidChallengePeriod(challengeGroup.getStartDate(), currentDate)) {
+            initVerification(myChallenge);
+
+            updateVerificationAndSuccessCount(myChallenge, challengeGroup.getStartDate(), currentDate, isSuccess);
+
+            myChallengeRepository.save(myChallenge);
+        }
+    }
+
+    private MyChallenge findMyChallenge(Member member, ChallengeGroup challengeGroup) {
+        return myChallengeRepository.findByMemberAndChallengeGroup(member, challengeGroup)
+                .orElseThrow(() -> new MyChallengeNotFoundException("MyChallenge 엔티티를 찾을 수 없습니다."));
+    }
+
+    private void initVerification(MyChallenge myChallenge) {
+        if (myChallenge.getMyVerifs() == null || myChallenge.getMyVerifs().length == 0) {
+            myChallenge.setMyVerifs(new int[14]);
+            myChallenge.setSuccessCount(0L);
+        }
+    }
+
+    private void updateVerificationAndSuccessCount(MyChallenge myChallenge, LocalDate startDate, LocalDate currentDate, boolean isSuccess) {
+        long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
+        myChallenge.updateVerificationStatus((int)daysFromStart, isSuccess);
+
+        if (isSuccess) {
+            myChallenge.incrementSuccessCount();
+        }
+    }
+
 }
