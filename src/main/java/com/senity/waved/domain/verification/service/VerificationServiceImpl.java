@@ -1,5 +1,6 @@
 package com.senity.waved.domain.verification.service;
 
+import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.entity.VerificationType;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
@@ -37,7 +38,10 @@ public class VerificationServiceImpl implements VerificationService {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
 
-        switch (challengeGroup.getChallenge().getVerificationType()) {
+        Challenge challenge = challengeGroup.getChallenge();
+        VerificationType verificationType = challenge.getVerificationType();
+
+        switch (verificationType) {
             case TEXT:
                 verifyText(requestDto, member, challengeGroup);
                 break;
@@ -127,6 +131,7 @@ public class VerificationServiceImpl implements VerificationService {
             throw new IllegalArgumentException("내용을 입력해주세요.");
         }
     }
+
     //TODO: 깃헙 인증내역 업데이트 테스트
     private void updateMyChallengeStatus(Member member, ChallengeGroup challengeGroup, boolean isSuccess) {
         LocalDate currentDate = LocalDate.now();
