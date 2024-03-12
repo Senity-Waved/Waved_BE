@@ -1,6 +1,7 @@
 package com.senity.waved.domain.myChallenge.controller;
 
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
+import com.senity.waved.domain.myChallenge.dto.response.MyVerifsResponseDto;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
 import com.senity.waved.domain.myChallenge.service.MyChallengeService;
@@ -33,14 +34,14 @@ public class MyChallengeController {
             @RequestParam(value = "status", defaultValue = "PROGRESS") ChallengeStatus status
     ) {
         return myChallengeService.getMyChallengesListed(user.getUsername(), status);
+    }
  
     @GetMapping("/{myChallengeId}")
-    public ResponseEntity<MyChallengeResponseDto> getMyChallengeStatus(@PathVariable("myChallengeId") Long myChallengeId) {
-        MyChallenge myChallenge = myChallengeService.findMyChallengeById(myChallengeId);
-        MyChallengeResponseDto myChallengeResponseDto = new MyChallengeResponseDto(myChallenge);
-        return ResponseEntity.ok().body(myChallengeResponseDto);
+    public ResponseEntity<MyVerifsResponseDto> getMyChallengeStatus(@PathVariable("myChallengeId") Long myChallengeId) {
+        return ResponseEntity.ok().body(myChallengeService.getMyVerifications(myChallengeId));
     }
-     
+
+    // TODO 예외 처리
     @DeleteMapping("/{myChallengeId}/delete")
     public ResponseEntity<String> cancelMyChallenge(
             @PathVariable("myChallengeId") Long myChallengeId,

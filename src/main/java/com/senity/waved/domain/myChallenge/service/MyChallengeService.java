@@ -1,13 +1,13 @@
 package com.senity.waved.domain.myChallenge.service;
 
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
+import com.senity.waved.domain.myChallenge.dto.response.MyVerifsResponseDto;
 import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
-import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 
 import java.util.List;
 
 public interface MyChallengeService {
-    MyChallenge findMyChallengeById(Long myChallengeId);
+    MyVerifsResponseDto getMyVerifications(Long myChallengeId);
 
     void cancelAppliedMyChallenge(Long myChallengeId);
 

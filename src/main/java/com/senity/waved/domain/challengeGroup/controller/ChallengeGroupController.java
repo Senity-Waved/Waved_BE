@@ -40,6 +40,7 @@ public class ChallengeGroupController {
     ) {
         challengeGroupService.applyForChallengeGroup(user.getUsername(), groupId);
         return new ResponseEntity<>("챌린지 그룹 참여 신청을 완료했습니다.", HttpStatus.OK);
+    }
 
     @GetMapping("/dates")
     public ResponseEntity<List<VerificationListResponseDto>> getVerificationsByDate(
@@ -48,7 +49,6 @@ public class ChallengeGroupController {
         Timestamp timestamp = Timestamp.valueOf(verificationDate);
         List<VerificationListResponseDto> verifications = challengeGroupService.getVerifications(challengeGroupId, timestamp);
         return ResponseEntity.ok(verifications);
-
     }
 }
 

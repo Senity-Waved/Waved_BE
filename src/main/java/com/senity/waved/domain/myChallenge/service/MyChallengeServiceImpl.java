@@ -5,6 +5,7 @@ import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepositor
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
+import com.senity.waved.domain.myChallenge.dto.response.MyVerifsResponseDto;
 import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
@@ -58,6 +59,11 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         return myChallengesListed.stream()
                 .map(myChallenge -> mapToResponseDto(myChallenge, status))
                 .collect(Collectors.toList());
+    }
+
+    public MyVerifsResponseDto getMyVerifications(Long myChallengeId) {
+        MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+        return new MyVerifsResponseDto(myChallenge);
     }
 
     private MyChallengeResponseDto mapToResponseDto(MyChallenge myChallenge, ChallengeStatus status) {
