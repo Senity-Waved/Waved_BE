@@ -3,6 +3,8 @@ package com.senity.waved.domain.myChallenge.entity;
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
+import com.senity.waved.domain.myChallenge.service.MyChallengeService;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,6 +12,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -23,6 +28,9 @@ public class MyChallenge extends BaseEntity {
 
     @Column(name = "success_count")
     private Long successCount;
+  
+    @Column(name = "is_reviewed")
+    private Boolean isReviewed;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -55,4 +63,38 @@ public class MyChallenge extends BaseEntity {
         this.myVerifs = myVerifs;
     }
 
+    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified) {
+        ChallengeGroup group = myChallenge.getChallengeGroup();
+        return MyChallengeResponseDto.builder()
+                .groupTitle(group.getGroupTitle())
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
+                .successCount(myChallenge.getSuccessCount())
+                .myChallengeId(myChallenge.getId())
+                .groupId(group.getId())
+                .isVerified(isVerified)
+                .build();
+    }
+
+    public static MyChallengeResponseDto getMyChallengesWaiting(MyChallenge myChallenge) {
+        ChallengeGroup group = myChallenge.getChallengeGroup();
+        return MyChallengeResponseDto.builder()
+                .groupTitle(group.getGroupTitle())
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
+                .groupId(group.getId())
+                .build();
+    }
+
+    public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge) {
+        ChallengeGroup group = myChallenge.getChallengeGroup();
+        return MyChallengeResponseDto.builder()
+                .groupTitle(group.getGroupTitle())
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
+                .groupId(group.getId())
+                .myChallengeId(myChallenge.getId())
+                .isReviewed(myChallenge.getIsReviewed())
+                .build();
+    }
 }

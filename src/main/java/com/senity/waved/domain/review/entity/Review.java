@@ -37,14 +37,16 @@ public class Review extends BaseEntity {
         return ReviewResponseDto.builder()
                 .challengeGroupTitle(review.getChallengeGroup().getGroupTitle())
                 .createDate(review.getCreateDate())
+                .challengeId(review.challengeId)
                 .content(review.getContent())
                 .build();
     }
 
     public static ReviewResponseDto getChallengeReviewResponse(Review review) {
+        Member member = review.getMember();
         return ReviewResponseDto.builder()
-                .nickname(review.getMember().getNickname())
-                .jobTitle(review.getMember().getJobTitle())
+                .nickname(member.getNickname())
+                .jobTitle(member.getJobTitle())
                 .createDate(review.getCreateDate())
                 .content(review.getContent())
                 .build();

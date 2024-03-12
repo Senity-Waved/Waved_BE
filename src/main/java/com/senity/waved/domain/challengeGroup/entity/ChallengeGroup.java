@@ -2,6 +2,8 @@ package com.senity.waved.domain.challengeGroup.entity;
 
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challenge.entity.Challenge;
+import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
+import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.quiz.entity.Quiz;
 import com.senity.waved.domain.verification.entity.Verification;
@@ -47,4 +49,41 @@ public class ChallengeGroup extends BaseEntity {
 
     @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Quiz> quizzes = new ArrayList<>();
+
+    public void addMyChallenge(MyChallenge myChallenge) {
+        myChallenges.add(myChallenge);
+        participantCount++;
+    }
+
+    public void deleteMyChallenge(MyChallenge myChallenge) {
+        myChallenges.remove(myChallenge);
+        participantCount--;
+    }
+
+    public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group, Boolean isApplied) {
+        Challenge challenge = group.getChallenge();
+        return ChallengeGroupResponseDto.builder()
+                .groupTitle(group.getGroupTitle())
+                .participantCount(group.getParticipantCount())
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
+                .verificationType(challenge.getVerificationType())
+                .description(challenge.getDescription())
+                .verificationDescription(challenge.getVerificationDescription())
+                .isApplied(isApplied)
+                .challengeId(challenge.getId())
+                .build();
+    }
+
+    public static ChallengeGroupHomeResponseDto getHomeGroupResponse(ChallengeGroup group) {
+        Challenge challenge = group.getChallenge();
+        return ChallengeGroupHomeResponseDto.builder()
+                .groupTitle(group.getGroupTitle())
+                .verificationType(challenge.getVerificationType())
+                .isFree(challenge.getIsFree())
+                .participantCount(group.getParticipantCount())
+                .startDate(group.getStartDate())
+                .challengeGroupId(group.getId())
+                .build();
+    }
 }
