@@ -7,6 +7,7 @@ import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepositor
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
+import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,12 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     public void applyForChallengeGroup(String email, Long groupId) {
         Member member = getMemberByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
+
+        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberAndChallengeGroup(member, group);
+        if (myChallenge.isPresent()) {
+            throw new AlreadyMyChallengeExistsException("이미 신청되어있는 챌린지 그룹 입니다.");
+        }
+
         MyChallenge newMyChallenge = MyChallenge.builder()
                 .challengeGroup(group)
                 .successCount(0L)
@@ -41,9 +49,13 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         groupRepository.save(group);
     }
 
-    public ChallengeGroupResponseDto getGroupDetail(Long groupId) {
+    public ChallengeGroupResponseDto getGroupDetail(String email, Long groupId) {
         ChallengeGroup group = getGroupById(groupId);
-        return ChallengeGroup.getGroupResponse(group);
+        Member member = getMemberByEmail(email);
+        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberAndChallengeGroup(member, group);
+
+        Boolean isApplied = myChallenge.isPresent()? true : false;
+        return ChallengeGroup.getGroupResponse(group, isApplied);
     }
 
     private ChallengeGroup getGroupById(Long id) {

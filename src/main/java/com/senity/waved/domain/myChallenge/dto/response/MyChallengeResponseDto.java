@@ -15,7 +15,9 @@ public class MyChallengeResponseDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long successCount;
+    private Boolean isReviewed;
+    private Boolean isVerified;
+
     private Long groupId;
     private Long myChallengeId;
-    private Boolean isReviewed;
 }

@@ -5,5 +5,5 @@ import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupRespons
 public interface ChallengeGroupService {
 
     void applyForChallengeGroup(String email, Long groupId);
-    ChallengeGroupResponseDto getGroupDetail(Long groupId);
+    ChallengeGroupResponseDto getGroupDetail(String email, Long groupId);
 }

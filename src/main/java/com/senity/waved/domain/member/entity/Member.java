@@ -56,10 +56,10 @@ public class Member extends BaseEntity {
     private List<Verification> verification = new ArrayList<>();
 
     public void updateInfo(ProfileEditDto editDto) {
-        this.nickname = editDto.getNickname();
-        this.birthYear = editDto.getBirthYear();
-        this.gender = editDto.getGender();
-        this.jobTitle = editDto.getJobTitle();
+        nickname = editDto.getNickname();
+        birthYear = editDto.getBirthYear();
+        gender = editDto.getGender();
+        jobTitle = editDto.getJobTitle();
     }
 
     public void updateGithubInfo(GithubInfoDto github) {

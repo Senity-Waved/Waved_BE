@@ -16,4 +16,6 @@ public class ReviewResponseDto {
     private String challengeGroupTitle;
     private String content;
     private Timestamp createDate;
+
+    private Long challengeId;
 }

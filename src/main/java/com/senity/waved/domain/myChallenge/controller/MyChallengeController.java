@@ -1,6 +1,7 @@
 package com.senity.waved.domain.myChallenge.controller;
 
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
+import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
 import com.senity.waved.domain.myChallenge.service.MyChallengeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,27 +27,15 @@ public class MyChallengeController {
             @AuthenticationPrincipal User user
     ) {
         myChallengeService.cancelAppliedMyChallenge(myChallengeId);
-        return new ResponseEntity<>("챌린지 그룹 신청 취소를 완료했습니다.", HttpStatus.OK);
+        return new ResponseEntity<>("챌린지 그룹 신청 취소 완료했습니다.", HttpStatus.OK);
     }
 
-    @GetMapping("/inProgress")
-    public List<MyChallengeResponseDto> getMyChallengesInProgress(
-            @AuthenticationPrincipal User user
+    @GetMapping
+    public List<MyChallengeResponseDto> getMyChallenges(
+            @AuthenticationPrincipal User user,
+            @RequestParam(value = "status", defaultValue = "PROGRESS") ChallengeStatus status
     ) {
-        return myChallengeService.getMyChallengesInProgressListed(user.getUsername());
+        return myChallengeService.getMyChallengesListed(user.getUsername(), status);
     }
 
-    @GetMapping("/waiting")
-    public List<MyChallengeResponseDto> getMyChallengesWaiting(
-            @AuthenticationPrincipal User user
-    ) {
-        return myChallengeService.getMyChallengesWaitingListed(user.getUsername());
-    }
-
-    @GetMapping("/completed")
-    public List<MyChallengeResponseDto> getMyChallengesCompleted(
-            @AuthenticationPrincipal User user
-    ) {
-        return myChallengeService.getMyChallengesCompletedListed(user.getUsername());
-    }
 }

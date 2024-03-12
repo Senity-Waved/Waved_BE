@@ -62,7 +62,7 @@ public class MyChallenge extends BaseEntity {
     }
 
 
-    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge) {
+    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified) {
         ChallengeGroup group = myChallenge.getChallengeGroup();
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
@@ -71,6 +71,7 @@ public class MyChallenge extends BaseEntity {
                 .successCount(myChallenge.getSuccessCount())
                 .myChallengeId(myChallenge.getId())
                 .groupId(group.getId())
+                .isVerified(isVerified)
                 .build();
     }
 
@@ -90,8 +91,8 @@ public class MyChallenge extends BaseEntity {
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
                 .endDate(group.getEndDate())
-                .myChallengeId(myChallenge.getId())
                 .groupId(group.getId())
+                .myChallengeId(myChallenge.getId())
                 .isReviewed(myChallenge.getIsReviewed())
                 .build();
     }

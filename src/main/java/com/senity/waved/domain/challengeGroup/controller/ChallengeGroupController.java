@@ -13,21 +13,22 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/groups")
+@RequestMapping("/api/v1/challengeGroups/{challengeGroupId}")
 public class ChallengeGroupController {
 
     public final ChallengeGroupService challengeGroupService;
 
-    @GetMapping("/{groupId}")
+    @GetMapping
     public ChallengeGroupResponseDto getChallengeGroup(
-            @PathVariable("groupId") Long groupId
+            @AuthenticationPrincipal User user,
+            @PathVariable("challengeGroupId") Long groupId
     ) {
-        return challengeGroupService.getGroupDetail(groupId);
+        return challengeGroupService.getGroupDetail(user.getUsername(), groupId);
     }
 
-    @PostMapping("/{groupId}/apply")
+    @PostMapping("/apply")
     public ResponseEntity<String> applyChallengeGroup(
-            @PathVariable("groupId") Long groupId,
+            @PathVariable("challengeGroupId") Long groupId,
             @AuthenticationPrincipal User user
     ) {
         challengeGroupService.applyForChallengeGroup(user.getUsername(), groupId);

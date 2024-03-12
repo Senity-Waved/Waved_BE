@@ -1,19 +1,18 @@
 package com.senity.waved.domain.myChallenge.service;
 
-import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
+import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
+import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -37,33 +36,41 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyChallengeResponseDto> getMyChallengesInProgressListed(String email) {
+    public List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status) {
         Long memberId = getMemberByEmail(email).getId();
-        List<MyChallenge> inProgressListed = myChallengeRepository.findMyChallengesInProgress(memberId, LocalDate.now());
+        List<MyChallenge> myChallengesListed;
 
-        return inProgressListed.stream()
-                .map(MyChallenge::getMyChallengesInProgress)
+        switch (status) {
+            case PROGRESS:
+                    myChallengesListed = myChallengeRepository.findMyChallengesInProgress(memberId, LocalDate.now());
+                    break;
+            case WAITING:
+                    myChallengesListed = myChallengeRepository.findMyChallengesWaiting(memberId, LocalDate.now());
+                    break;
+            case COMPLETED:
+                    myChallengesListed = myChallengeRepository.findMyChallengesCompleted(memberId, LocalDate.now());
+                    break;
+            default:
+                throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");
+        }
+
+        return myChallengesListed.stream()
+                .map(myChallenge -> mapToResponseDto(myChallenge, status))
                 .collect(Collectors.toList());
     }
 
-    @Transactional(readOnly = true)
-    public List<MyChallengeResponseDto> getMyChallengesWaitingListed(String email) {
-        Long memberId = getMemberByEmail(email).getId();
-        List<MyChallenge> inProgressListed = myChallengeRepository.findMyChallengesWaiting(memberId, LocalDate.now());
-
-        return inProgressListed.stream()
-                .map(MyChallenge::getMyChallengesWaiting)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<MyChallengeResponseDto> getMyChallengesCompletedListed(String email) {
-        Long memberId = getMemberByEmail(email).getId();
-        List<MyChallenge> inProgressListed = myChallengeRepository.findMyChallengesCompleted(memberId, LocalDate.now());
-
-        return inProgressListed.stream()
-                .map(MyChallenge::getMyChallengesCompleted)
-                .collect(Collectors.toList());
+    private MyChallengeResponseDto mapToResponseDto(MyChallenge myChallenge, ChallengeStatus status) {
+        switch (status) {
+            case PROGRESS:
+                // TODO isVerified 판단 후 현재 인증 여부 반환값에 추가
+                return myChallenge.getMyChallengesInProgress(myChallenge, true);
+            case WAITING:
+                return myChallenge.getMyChallengesWaiting(myChallenge);
+            case COMPLETED:
+                return myChallenge.getMyChallengesCompleted(myChallenge);
+            default:
+                throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");
+        }
     }
 
     private Member getMemberByEmail(String email) {
@@ -73,6 +80,6 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
     private MyChallenge getMyChallengeById(Long id) {
         return myChallengeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 마이 챌린지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 }

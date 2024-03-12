@@ -52,14 +52,16 @@ public class ChallengeGroup extends BaseEntity {
     private List<Quiz> quizzes = new ArrayList<>();
 
     public void addMyChallenge(MyChallenge myChallenge) {
-        this.myChallenges.add(myChallenge);
+        myChallenges.add(myChallenge);
+        participantCount++;
     }
 
     public void deleteMyChallenge(MyChallenge myChallenge) {
-        this.myChallenges.remove(myChallenge);
+        myChallenges.remove(myChallenge);
+        participantCount--;
     }
 
-    public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group) {
+    public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group, Boolean isApplied) {
         Challenge challenge = group.getChallenge();
         return ChallengeGroupResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
@@ -69,6 +71,7 @@ public class ChallengeGroup extends BaseEntity {
                 .verificationType(challenge.getVerificationType())
                 .description(challenge.getDescription())
                 .verificationDescription(challenge.getVerificationDescription())
+                .isApplied(isApplied)
                 .challengeId(challenge.getId())
                 .build();
     }

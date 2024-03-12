@@ -37,6 +37,7 @@ public class Review extends BaseEntity {
         return ReviewResponseDto.builder()
                 .challengeGroupTitle(review.getChallengeGroup().getGroupTitle())
                 .createDate(review.getCreateDate())
+                .challengeId(review.challengeId)
                 .content(review.getContent())
                 .build();
     }
