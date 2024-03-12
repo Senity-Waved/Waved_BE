@@ -12,7 +12,9 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+
 import java.util.List;
+
 
 @Entity
 @Getter
@@ -26,7 +28,7 @@ public class MyChallenge extends BaseEntity {
 
     @Column(name = "success_count")
     private Long successCount;
-
+  
     @Column(name = "is_reviewed")
     private Boolean isReviewed;
 
@@ -60,7 +62,6 @@ public class MyChallenge extends BaseEntity {
     public void setMyVerifs(int[] myVerifs) {
         this.myVerifs = myVerifs;
     }
-
 
     public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified) {
         ChallengeGroup group = myChallenge.getChallengeGroup();

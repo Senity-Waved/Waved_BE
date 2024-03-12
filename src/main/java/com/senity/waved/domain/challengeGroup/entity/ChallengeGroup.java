@@ -1,7 +1,6 @@
 package com.senity.waved.domain.challengeGroup.entity;
 
 import com.senity.waved.common.BaseEntity;
-
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;

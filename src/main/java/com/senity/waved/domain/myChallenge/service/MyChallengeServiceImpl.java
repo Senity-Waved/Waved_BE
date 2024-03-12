@@ -19,12 +19,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class MyChallengeServiceImpl implements MyChallengeService {
 
     private final MyChallengeRepository myChallengeRepository;
     private final MemberRepository memberRepository;
-    private final ChallengeGroupRepository groupRepository;
+    private final ChallengeGroupRepository challengeGroupRepository;
 
     public void cancelAppliedMyChallenge(Long myChallengeId) {
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
@@ -32,7 +33,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
         myChallengeRepository.delete(myChallenge);
         group.deleteMyChallenge(myChallenge);
-        groupRepository.save(group);
+        challengeGroupRepository.save(group);
     }
 
     @Transactional(readOnly = true)
@@ -82,4 +83,9 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         return myChallengeRepository.findById(id)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
+
+//     public MyChallenge findMyChallengeById(Long myChallengeId) {
+//         return myChallengeRepository.findById(myChallengeId)
+//                 .orElseThrow(() -> new MyChallengeNotFoundException("MyChallenge를 찾을 수 없습니다."));
+//     }
 }

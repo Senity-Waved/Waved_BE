@@ -90,4 +90,10 @@ public class GlobalExceptionHandler {
     public String handleChallengeGroupVerificationException(ChallengeGroupVerificationException e) {
         return e.getMessage();
     }
+
+    @ExceptionHandler(MyChallengeNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleMyChallengeNotFoundException(MyChallengeNotFoundException e) {
+        return e.getMessage();
+    }
 }

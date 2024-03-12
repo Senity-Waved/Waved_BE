@@ -7,7 +7,10 @@ import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundEx
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
+import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
+import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
@@ -17,6 +20,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Transactional
@@ -27,9 +32,9 @@ public class VerificationServiceImpl implements VerificationService {
     private final VerificationRepository verificationRepository;
     private final MemberRepository memberRepository;
     private final GithubService githubService;
+    private final MyChallengeRepository myChallengeRepository;
 
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
-
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
 
@@ -38,10 +43,13 @@ public class VerificationServiceImpl implements VerificationService {
 
         switch (verificationType) {
             case TEXT:
+                verifyText(requestDto, member, challengeGroup);
+                break;
             case LINK:
-                verifyTextOrLink(requestDto, member, challengeGroup, verificationType);
+                verifyLink(requestDto, member, challengeGroup);
                 break;
             case PICTURE:
+                verifyPicture(requestDto);
                 break;
             case GITHUB:
                 verifyGithub(requestDto, member, challengeGroup, challengeGroupId);
@@ -49,6 +57,8 @@ public class VerificationServiceImpl implements VerificationService {
             default:
                 throw new IllegalArgumentException("지원하지 않는 인증 유형입니다.");
         }
+
+        updateMyChallengeStatus(member, challengeGroup, true);
     }
 
     public void challengeGroupIsTextType(Long challengeGroupId) throws ChallengeGroupVerificationException {
@@ -59,18 +69,33 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
-    private void verifyTextOrLink(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, VerificationType verificationType) {
+    private void verifyText(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
+        validateRequestDto(requestDto);
+
         Verification verification = Verification.builder()
                 .content(requestDto.getContent())
                 .member(member)
                 .challengeGroup(challengeGroup)
-                .verificationType(verificationType)
+                .verificationType(VerificationType.TEXT)
                 .build();
         verificationRepository.save(verification);
     }
 
-    private void verifyPicture(VerificationRequestDto requestDto) {
-        // TODO: PICTURE 인증 처리 로직 구현
+    private void verifyLink(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
+        validateRequestDto(requestDto);
+
+        if (requestDto.getLink() == null || requestDto.getLink().isEmpty()) {
+            throw new IllegalArgumentException("링크를 입력해주세요.");
+        }
+
+        Verification verification = Verification.builder()
+                .content(requestDto.getContent())
+                .link(requestDto.getLink())
+                .member(member)
+                .challengeGroup(challengeGroup)
+                .verificationType(VerificationType.LINK)
+                .build();
+        verificationRepository.save(verification);
     }
 
     public void verifyGithub(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, Long challengeGroupId) {
@@ -87,6 +112,10 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
+    private void verifyPicture(VerificationRequestDto requestDto) {
+        // TODO: PICTURE 인증 처리 로직 구현
+    }
+
     private Member getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
@@ -96,4 +125,47 @@ public class VerificationServiceImpl implements VerificationService {
         return challengeGroupRepository.findById(challengeGroupId)
                 .orElseThrow(() -> new ChallengeGroupNotFoundException("챌린지 기수를 찾을 수 없습니다."));
     }
+
+    private void validateRequestDto(VerificationRequestDto requestDto) {
+        if (requestDto == null || requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
+            throw new IllegalArgumentException("내용을 입력해주세요.");
+        }
+    }
+
+    //TODO: 깃헙 인증내역 업데이트 테스트
+    private void updateMyChallengeStatus(Member member, ChallengeGroup challengeGroup, boolean isSuccess) {
+        LocalDate currentDate = LocalDate.now();
+
+        MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
+
+        if (myChallenge.isValidChallengePeriod(challengeGroup.getStartDate(), currentDate)) {
+            initVerification(myChallenge);
+
+            updateVerificationAndSuccessCount(myChallenge, challengeGroup.getStartDate(), currentDate, isSuccess);
+
+            myChallengeRepository.save(myChallenge);
+        }
+    }
+
+    private MyChallenge findMyChallenge(Member member, ChallengeGroup challengeGroup) {
+        return myChallengeRepository.findByMemberAndChallengeGroup(member, challengeGroup)
+                .orElseThrow(() -> new MyChallengeNotFoundException("MyChallenge 엔티티를 찾을 수 없습니다."));
+    }
+
+    private void initVerification(MyChallenge myChallenge) {
+        if (myChallenge.getMyVerifs() == null || myChallenge.getMyVerifs().length == 0) {
+            myChallenge.setMyVerifs(new int[14]);
+            myChallenge.setSuccessCount(0L);
+        }
+    }
+
+    private void updateVerificationAndSuccessCount(MyChallenge myChallenge, LocalDate startDate, LocalDate currentDate, boolean isSuccess) {
+        long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
+        myChallenge.updateVerificationStatus((int)daysFromStart, isSuccess);
+
+        if (isSuccess) {
+            myChallenge.incrementSuccessCount();
+        }
+    }
+
 }
