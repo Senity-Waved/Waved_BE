@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -18,7 +18,7 @@ public class Quiz {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Date date;
+    private LocalDate date;
     private String question;
 
     @ManyToOne(fetch = FetchType.LAZY)
