@@ -11,6 +11,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 
 
 @Entity
@@ -37,9 +38,10 @@ public class MyChallenge extends BaseEntity {
     @JoinColumn(name = "challenge_group_id")
     private ChallengeGroup challengeGroup;
 
+    // 성공(2), 실패(1), 제출 안함(0)
     public void updateVerificationStatus(int dayIndex, boolean isSuccess) {
         if (this.myVerifs != null && dayIndex >= 0 && dayIndex < this.myVerifs.length) {
-            this.myVerifs[dayIndex] = isSuccess ? 1 : 0;
+            this.myVerifs[dayIndex] = isSuccess ? 2 : 1;
         }
     }
 
@@ -56,13 +58,13 @@ public class MyChallenge extends BaseEntity {
         }
     }
 
-
     public void setSuccessCount(Long successCount) {
         this.successCount = successCount;
     }
 
     public void setMyVerifs(int[] myVerifs) {
         this.myVerifs = myVerifs;
+        Arrays.fill(this.myVerifs, 0);
     }
 
     public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified) {
