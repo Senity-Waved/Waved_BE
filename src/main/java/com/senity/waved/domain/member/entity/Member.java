@@ -8,6 +8,7 @@ import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.review.entity.Review;
 import com.senity.waved.domain.verification.entity.Verification;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -47,12 +48,15 @@ public class Member extends BaseEntity {
     private String githubToken;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<MyChallenge> myChallenges = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Verification> verification = new ArrayList<>();
 
     public void updateInfo(ProfileEditDto editDto) {
