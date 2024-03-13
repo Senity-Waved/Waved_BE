@@ -20,7 +20,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '17'
-
+          
+      - name: Set YML
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_SECRET_YML }}" | base64 --decode > src/main/resources/application-secret.yml
+          find src
+          
       - name: Build with Gradle
         run: ./gradlew build
 
