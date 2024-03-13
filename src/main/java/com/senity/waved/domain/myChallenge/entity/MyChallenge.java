@@ -67,7 +67,7 @@ public class MyChallenge extends BaseEntity {
         Arrays.fill(this.myVerifs, 0);
     }
 
-    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified) {
+    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified, Boolean isGithubConnected) {
         ChallengeGroup group = myChallenge.getChallengeGroup();
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
@@ -77,6 +77,7 @@ public class MyChallenge extends BaseEntity {
                 .myChallengeId(myChallenge.getId())
                 .groupId(group.getId())
                 .isVerified(isVerified)
+                .isGithubConnected(isGithubConnected)
                 .build();
     }
 

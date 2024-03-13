@@ -67,10 +67,12 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     }
 
     private MyChallengeResponseDto mapToResponseDto(MyChallenge myChallenge, ChallengeStatus status) {
+        boolean isGithubConnected = myChallenge.getMember().isGithubConnected();
+
         switch (status) {
             case PROGRESS:
                 // TODO isVerified 판단 후 현재 인증 여부 반환값에 추가
-                return myChallenge.getMyChallengesInProgress(myChallenge, true);
+                return myChallenge.getMyChallengesInProgress(myChallenge, true, isGithubConnected);
             case WAITING:
                 return myChallenge.getMyChallengesWaiting(myChallenge);
             case COMPLETED:
@@ -90,8 +92,4 @@ public class MyChallengeServiceImpl implements MyChallengeService {
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 
-//     public MyChallenge findMyChallengeById(Long myChallengeId) {
-//         return myChallengeRepository.findById(myChallengeId)
-//                 .orElseThrow(() -> new MyChallengeNotFoundException("MyChallenge를 찾을 수 없습니다."));
-//     }
 }

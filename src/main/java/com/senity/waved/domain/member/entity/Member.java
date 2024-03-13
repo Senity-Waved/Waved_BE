@@ -94,4 +94,8 @@ public class Member extends BaseEntity {
                 .githubToken(member.getGithubToken())
                 .build();
     }
+
+    public boolean isGithubConnected() {
+        return this.githubId != null && !this.githubId.isEmpty() && this.githubToken != null && !this.githubToken.isEmpty();
+    }
 }
