@@ -8,6 +8,7 @@ import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.quiz.entity.Quiz;
 import com.senity.waved.domain.verification.entity.Verification;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -42,12 +43,15 @@ public class ChallengeGroup extends BaseEntity {
     private Challenge challenge;
 
     @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<MyChallenge> myChallenges = new ArrayList<>();
 
     @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Verification> verifications  = new ArrayList<>();
 
     @OneToMany(mappedBy = "challengeGroup", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Quiz> quizzes = new ArrayList<>();
 
     public void addMyChallenge(MyChallenge myChallenge) {
