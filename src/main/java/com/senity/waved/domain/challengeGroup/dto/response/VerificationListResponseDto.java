@@ -4,24 +4,24 @@ import com.senity.waved.domain.verification.entity.Verification;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Getter
 @Setter
 public class VerificationListResponseDto {
     private Long verificationId;
     private String content;
-    private LocalDate verificationDate;
+    private ZonedDateTime verificationDate;
 
     public VerificationListResponseDto(Verification verification) {
         this.verificationId = verification.getId();
         this.content = verification.getContent();
 
         if (verification.getCreateDate() != null) {
-            this.verificationDate = verification.getCreateDate().toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
+            LocalDateTime localDateTime = verification.getCreateDate().toLocalDateTime();
+            this.verificationDate = ZonedDateTime.of(localDateTime, ZoneId.of("Asia/Seoul"));
         }
     }
 }

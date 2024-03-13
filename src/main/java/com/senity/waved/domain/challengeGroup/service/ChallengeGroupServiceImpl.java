@@ -2,31 +2,27 @@ package com.senity.waved.domain.challengeGroup.service;
 
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.dto.response.VerificationListResponseDto;
-
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
-import com.senity.waved.domain.verification.entity.Verification;
-import com.senity.waved.domain.verification.repository.VerificationRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.verification.entity.Verification;
+import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.transaction.annotation.Transactional;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.util.HashMap;
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,7 +69,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
   
     @Override
     public List<VerificationListResponseDto> getVerifications(Long challengeGroupId, Timestamp verificationDate) {
-        ChallengeGroup challengeGroup = findChallengeGroupById(challengeGroupId);
+        ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
         LocalDateTime[] dateRange = calculateStartAndEndDate(verificationDate);
         List<Verification> verifications = findVerifications(challengeGroup, dateRange);
         return convertToDtoList(verifications);
@@ -89,14 +85,11 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .orElseThrow(() -> new MemberNotFoundException("해당 회원을 찾을 수 없습니다."));
     }
 
-    private ChallengeGroup findChallengeGroupById(Long challengeGroupId) {
-        return challengeGroupRepository.findById(challengeGroupId)
-                .orElseThrow(() -> new ChallengeGroupNotFoundException("챌린지 기수를 찾을 수 없습니다."));
-    }
-
     private LocalDateTime[] calculateStartAndEndDate(Timestamp verificationDate) {
-        LocalDateTime startOfDay = verificationDate.toLocalDateTime().toLocalDate().atStartOfDay();
-        LocalDateTime endOfDay = startOfDay.plusDays(1);
+        ZonedDateTime zonedStartOfDay = verificationDate.toLocalDateTime().atZone(ZoneId.of("Asia/Seoul")).toLocalDate().atStartOfDay(ZoneId.of("Asia/Seoul"));
+        LocalDateTime startOfDay = zonedStartOfDay.toLocalDateTime();
+        LocalDateTime endOfDay = startOfDay.withHour(23).withMinute(59).withSecond(59).withNano(999000000); // 23:59:59.999
+
         return new LocalDateTime[]{startOfDay, endOfDay};
     }
 

@@ -1,7 +1,7 @@
 package com.senity.waved.domain.challengeGroup.controller;
 
-
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
+import com.senity.waved.domain.challengeGroup.dto.response.VerificationListResponseDto;
 import com.senity.waved.domain.challengeGroup.service.ChallengeGroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,11 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
-import com.senity.waved.domain.challengeGroup.dto.response.VerificationListResponseDto;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -45,9 +42,8 @@ public class ChallengeGroupController {
     @GetMapping("/dates")
     public ResponseEntity<List<VerificationListResponseDto>> getVerificationsByDate(
             @PathVariable("challengeGroupId") Long challengeGroupId,
-            @RequestParam("verificationDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime verificationDate) {
-        Timestamp timestamp = Timestamp.valueOf(verificationDate);
-        List<VerificationListResponseDto> verifications = challengeGroupService.getVerifications(challengeGroupId, timestamp);
+            @RequestParam("verificationDate") Timestamp verificationDate) {
+        List<VerificationListResponseDto> verifications = challengeGroupService.getVerifications(challengeGroupId, verificationDate);
         return ResponseEntity.ok(verifications);
     }
 }
