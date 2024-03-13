@@ -41,24 +41,26 @@ public class VerificationServiceImpl implements VerificationService {
         Challenge challenge = challengeGroup.getChallenge();
         VerificationType verificationType = challenge.getVerificationType();
 
+        boolean isSuccess = false;
+
         switch (verificationType) {
             case TEXT:
-                verifyText(requestDto, member, challengeGroup);
+                isSuccess = verifyText(requestDto, member, challengeGroup);
                 break;
             case LINK:
-                verifyLink(requestDto, member, challengeGroup);
+                isSuccess = verifyLink(requestDto, member, challengeGroup);
                 break;
             case PICTURE:
-                verifyPicture(requestDto);
+                isSuccess = verifyPicture(requestDto, member, challengeGroup); // 수정 필요
                 break;
             case GITHUB:
-                verifyGithub(requestDto, member, challengeGroup, challengeGroupId);
+                isSuccess = verifyGithub(requestDto, member, challengeGroup, challengeGroupId);
                 break;
             default:
                 throw new IllegalArgumentException("지원하지 않는 인증 유형입니다.");
         }
 
-        updateMyChallengeStatus(member, challengeGroup, true);
+        updateMyChallengeStatus(member, challengeGroup, isSuccess);
     }
 
     public void challengeGroupIsTextType(Long challengeGroupId) throws ChallengeGroupVerificationException {
@@ -69,7 +71,7 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
-    private void verifyText(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
+    private boolean verifyText(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
         validateRequestDto(requestDto);
 
         Verification verification = Verification.builder()
@@ -79,9 +81,11 @@ public class VerificationServiceImpl implements VerificationService {
                 .verificationType(VerificationType.TEXT)
                 .build();
         verificationRepository.save(verification);
+
+        return true;
     }
 
-    private void verifyLink(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
+    private boolean verifyLink(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
         validateRequestDto(requestDto);
 
         if (requestDto.getLink() == null || requestDto.getLink().isEmpty()) {
@@ -96,24 +100,28 @@ public class VerificationServiceImpl implements VerificationService {
                 .verificationType(VerificationType.LINK)
                 .build();
         verificationRepository.save(verification);
+
+        return true;
     }
 
-    public void verifyGithub(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, Long challengeGroupId) {
-
+    public boolean verifyGithub(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, Long challengeGroupId) {
         try {
             boolean hasCommitsToday = githubService.hasCommitsToday(member.getGithubId(), member.getGithubToken());
-
             Verification verification = Verification.createGithubVerification(member, challengeGroup, hasCommitsToday);
             verificationRepository.save(verification);
 
+            // GitHub 인증 성공 여부 반환
+            return hasCommitsToday;
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("GitHub API 호출 중 오류 발생: " + e.getMessage());
         }
     }
 
-    private void verifyPicture(VerificationRequestDto requestDto) {
+    public boolean verifyPicture(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
         // TODO: PICTURE 인증 처리 로직 구현
+
+        return true;
     }
 
     private Member getMemberByEmail(String email) {
@@ -132,7 +140,7 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
-    //TODO: 깃헙 인증내역 업데이트 테스트
+    // TODO: 제출안함(0), 실패(1), 성공(2)
     private void updateMyChallengeStatus(Member member, ChallengeGroup challengeGroup, boolean isSuccess) {
         LocalDate currentDate = LocalDate.now();
 
@@ -161,11 +169,11 @@ public class VerificationServiceImpl implements VerificationService {
 
     private void updateVerificationAndSuccessCount(MyChallenge myChallenge, LocalDate startDate, LocalDate currentDate, boolean isSuccess) {
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
+        // isSuccess 가 true일 경우 성공(1), false일 경우 실패(0)로 업데이트
         myChallenge.updateVerificationStatus((int)daysFromStart, isSuccess);
 
         if (isSuccess) {
             myChallenge.incrementSuccessCount();
         }
     }
-
 }

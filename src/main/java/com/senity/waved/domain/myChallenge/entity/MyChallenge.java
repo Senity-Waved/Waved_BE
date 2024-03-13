@@ -4,7 +4,6 @@ import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
-import com.senity.waved.domain.myChallenge.service.MyChallengeService;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +11,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-
-import java.util.List;
 
 
 @Entity
@@ -52,8 +49,13 @@ public class MyChallenge extends BaseEntity {
     }
 
     public void incrementSuccessCount() {
-        this.successCount += 1;
+        if (this.successCount == null) {
+            this.successCount = 1L;
+        } else {
+            this.successCount += 1;
+        }
     }
+
 
     public void setSuccessCount(Long successCount) {
         this.successCount = successCount;
