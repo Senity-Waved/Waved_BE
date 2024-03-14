@@ -4,6 +4,7 @@ import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
+import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -84,6 +85,12 @@ public class MyChallenge extends BaseEntity {
         }
 
         return false;
+    }
+
+    public void verify() {
+        if (this.isVerified()) {
+            throw new AlreadyVerifiedException("이미 오늘의 인증을 완료했습니다.");
+        }
     }
 
     public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified, Boolean isGithubConnected) {

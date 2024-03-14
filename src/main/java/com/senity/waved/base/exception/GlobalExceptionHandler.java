@@ -10,6 +10,7 @@ import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundExceptio
 import com.senity.waved.domain.quiz.exception.QuizNotFoundException;
 import com.senity.waved.domain.review.exception.AlreadyReviewedException;
 import com.senity.waved.domain.review.exception.ReviewNotFoundException;
+import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -88,6 +89,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ChallengeGroupVerificationException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleChallengeGroupVerificationException(ChallengeGroupVerificationException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(AlreadyVerifiedException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleAlreadyVerifiedException(AlreadyVerifiedException e) {
         return e.getMessage();
     }
 }

@@ -38,6 +38,8 @@ public class VerificationServiceImpl implements VerificationService {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
 
+        MyChallenge myChallenge = verifyMyChallenge(member, challengeGroup);
+
         Challenge challenge = challengeGroup.getChallenge();
         VerificationType verificationType = challenge.getVerificationType();
 
@@ -157,7 +159,7 @@ public class VerificationServiceImpl implements VerificationService {
 
     private MyChallenge findMyChallenge(Member member, ChallengeGroup challengeGroup) {
         return myChallengeRepository.findByMemberAndChallengeGroup(member, challengeGroup)
-                .orElseThrow(() -> new MyChallengeNotFoundException("MyChallenge 엔티티를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 
     private void initVerification(MyChallenge myChallenge) {
@@ -175,5 +177,11 @@ public class VerificationServiceImpl implements VerificationService {
         if (isSuccess) {
             myChallenge.incrementSuccessCount();
         }
+    }
+
+    private MyChallenge verifyMyChallenge(Member member, ChallengeGroup challengeGroup) {
+        MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
+        myChallenge.verify();
+        return myChallenge;
     }
 }
