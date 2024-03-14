@@ -41,8 +41,9 @@ public class WebSecurityConfig {
                     exception.authenticationEntryPoint(jwtAuthenticationEntryPoint); // 인증 실패 처리
                 })
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers( "/oauth2/**").permitAll()
-                        .anyRequest().authenticated()
+                        //.requestMatchers( "/oauth2/**").permitAll()
+                        //.anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
