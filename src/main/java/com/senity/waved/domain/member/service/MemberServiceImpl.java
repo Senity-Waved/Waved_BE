@@ -1,9 +1,6 @@
 package com.senity.waved.domain.member.service;
 
 import com.senity.waved.base.redis.RedisUtil;
-import com.senity.waved.domain.challenge.repository.ChallengeRepository;
-import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
@@ -12,7 +9,6 @@ import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
-import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +19,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
@@ -85,7 +79,7 @@ public class MemberServiceImpl implements MemberService {
         return Member.getGithubInfoStatic(member);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void checkGithubConnection(String email, GithubInfoDto githubDto) {
         GHUser ghUser = checkCredentials(githubDto);
         if (ghUser == null) {

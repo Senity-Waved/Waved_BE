@@ -4,7 +4,6 @@ import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
-import com.senity.waved.domain.myChallenge.service.MyChallengeService;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,8 +11,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-
-import java.util.List;
+import java.util.Arrays;
 
 
 @Entity
@@ -40,9 +38,10 @@ public class MyChallenge extends BaseEntity {
     @JoinColumn(name = "challenge_group_id")
     private ChallengeGroup challengeGroup;
 
+    // 성공(2), 실패(1), 제출 안함(0)
     public void updateVerificationStatus(int dayIndex, boolean isSuccess) {
         if (this.myVerifs != null && dayIndex >= 0 && dayIndex < this.myVerifs.length) {
-            this.myVerifs[dayIndex] = isSuccess ? 1 : 0;
+            this.myVerifs[dayIndex] = isSuccess ? 2 : 1;
         }
     }
 
@@ -52,7 +51,11 @@ public class MyChallenge extends BaseEntity {
     }
 
     public void incrementSuccessCount() {
-        this.successCount += 1;
+        if (this.successCount == null) {
+            this.successCount = 1L;
+        } else {
+            this.successCount += 1;
+        }
     }
 
     public void setSuccessCount(Long successCount) {
@@ -61,9 +64,10 @@ public class MyChallenge extends BaseEntity {
 
     public void setMyVerifs(int[] myVerifs) {
         this.myVerifs = myVerifs;
+        Arrays.fill(this.myVerifs, 0);
     }
 
-    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified) {
+    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified, Boolean isGithubConnected) {
         ChallengeGroup group = myChallenge.getChallengeGroup();
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
@@ -73,6 +77,7 @@ public class MyChallenge extends BaseEntity {
                 .myChallengeId(myChallenge.getId())
                 .groupId(group.getId())
                 .isVerified(isVerified)
+                .isGithubConnected(isGithubConnected)
                 .build();
     }
 

@@ -17,6 +17,7 @@ public class MyChallengeResponseDto {
     private Long successCount;
     private Boolean isReviewed;
     private Boolean isVerified;
+    private Boolean isGithubConnected;
 
     private Long groupId;
     private Long myChallengeId;
