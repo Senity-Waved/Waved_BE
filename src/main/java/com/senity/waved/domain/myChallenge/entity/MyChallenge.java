@@ -30,6 +30,9 @@ public class MyChallenge extends BaseEntity {
     @Column(name = "is_reviewed")
     private Boolean isReviewed;
 
+    @Column(name = "is_verified")
+    private Boolean isVerified;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -65,6 +68,22 @@ public class MyChallenge extends BaseEntity {
     public void setMyVerifs(int[] myVerifs) {
         this.myVerifs = myVerifs;
         Arrays.fill(this.myVerifs, 0);
+    }
+
+    public boolean isVerified() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startDate = this.challengeGroup.getStartDate();
+        long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate); //startDate부터 오늘 날짜 차이 계산
+
+        if (this.myVerifs.length == 0) {
+            return false; // myVerifs 배열이 빈 배열이면 false
+        }
+
+        if (daysFromStart >= 0 && daysFromStart < this.myVerifs.length) {
+            return this.myVerifs[(int)daysFromStart] != 0; // 0이 아니면 true
+        }
+
+        return false;
     }
 
     public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified, Boolean isGithubConnected) {
