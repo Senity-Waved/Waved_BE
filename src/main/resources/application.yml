@@ -53,7 +53,7 @@ spring:
 
 app:
   oauth2:
-    authorized-redirect-uri: '${custom.oauth2.authorized-redirect-uri}'
+    authorized-redirect-uri: '${custom.oauth2.authorized-redirect-url}'
 
 logging:
   level:
