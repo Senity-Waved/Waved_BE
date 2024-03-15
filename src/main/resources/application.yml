@@ -19,6 +19,7 @@ spring:
     hikari:
       maximum-pool-size: '${custom.hikari.maximum-pool-size}'
       idle-timeout: '${custom.hikari.idle-timeout}'
+      max-lifetime: '${custom.hikari.max-lifetime}'
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: '${custom.db.url}'
     username: '${custom.db.username}'
