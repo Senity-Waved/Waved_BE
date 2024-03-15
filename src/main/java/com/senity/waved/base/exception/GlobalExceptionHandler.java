@@ -2,16 +2,18 @@ package com.senity.waved.base.exception;
 
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotCompletedException;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
+import com.senity.waved.domain.liked.exception.DuplicationLikeException;
 import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.quiz.exception.QuizNotFoundException;
 import com.senity.waved.domain.review.exception.AlreadyReviewedException;
 import com.senity.waved.domain.review.exception.ReviewNotFoundException;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
+import com.senity.waved.domain.verification.exception.VerificationNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -97,4 +99,17 @@ public class GlobalExceptionHandler {
     public String handleAlreadyVerifiedException(AlreadyVerifiedException e) {
         return e.getMessage();
     }
+
+    @ExceptionHandler(VerificationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleVerificationNotFoundException(VerificationNotFoundException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(DuplicationLikeException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleDuplicationLikeException(DuplicationLikeException e) {
+        return e.getMessage();
+    }
+
 }

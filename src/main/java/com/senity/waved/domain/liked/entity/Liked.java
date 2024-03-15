@@ -23,4 +23,12 @@ public class Liked extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public void setVerification(Verification verification) {
+        this.verification = verification;
+    }
+
+    public void setMember(Member member) {
+        this.verification = verification;
+    }
 }
