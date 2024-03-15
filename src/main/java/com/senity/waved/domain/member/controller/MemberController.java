@@ -1,12 +1,9 @@
 package com.senity.waved.domain.member.controller;
 
-import com.senity.waved.base.jwt.TokenDto;
 import com.senity.waved.base.jwt.TokenProvider;
 import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
-import com.senity.waved.domain.member.entity.AuthLevel;
-import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.service.MemberService;
 import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,29 +11,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
-
 
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
-
-import java.net.URI;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -115,59 +96,5 @@ public class MemberController {
             @RequestParam(value = "limit", defaultValue = "5") int pageSize
     ) {
         return memberService.getReviewsPaged(user.getUsername(), pageNumber, pageSize);
-    }
-
-    @GetMapping("/customlogin")
-    public TokenDto getTokens() {
-
-        // OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
-
-        // 액세스 토큰을 사용하여 Google API 호출을 위한 HTTP 요청을 생성합니다.
-        // HttpHeaders headers = new HttpHeaders();
-        // headers.setBearerAuth(accessToken.getTokenValue());
-        // RequestEntity<Void> request = new RequestEntity<>(headers, HttpMethod.GET, URI.create("https://www.googleapis.com/oauth2/v3/userinfo"));
-
-
-        RequestEntity<Void> request = new RequestEntity<>(new HttpHeaders(), HttpMethod.GET, URI.create("https://127.0.0.1/oauth2/authorization/google"));
-        // Google API로부터 사용자 정보를 가져옵니다.
-        ResponseEntity<String> response = restTemplate.exchange(request, String.class);
-        System.out.println(response);
-
-        String user = "";
-        //return memberService.getNewTokens(user.getUsername());
-        return memberService.getNewTokens(user);
-    }
-
-    @GetMapping("/login")
-    public TokenDto getTokens(@RegisteredOAuth2AuthorizedClient("google") OAuth2AuthorizedClient authorizedClient) {
-        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
-
-        // 액세스 토큰을 사용하여 Google API 호출을 위한 HTTP 요청을 생성합니다.
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken.getTokenValue());
-        RequestEntity<Void> request = new RequestEntity<>(headers, HttpMethod.GET, URI.create("https://www.googleapis.com/oauth2/v3/userinfo"));
-
-        // Google API로부터 사용자 정보를 가져옵니다.
-        ResponseEntity<String> response = restTemplate.exchange(request, String.class);
-
-        String user = "";
-        //return memberService.getNewTokens(user.getUsername());
-        return memberService.getNewTokens(user);
-    }
-
-    @GetMapping("/user")
-    public ResponseEntity<String> getUserInfo(@RegisteredOAuth2AuthorizedClient("google") OAuth2AuthorizedClient authorizedClient) {
-        // Google OAuth 2.0로부터 액세스 토큰을 가져옵니다.
-        OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
-
-        // 액세스 토큰을 사용하여 Google API 호출을 위한 HTTP 요청을 생성합니다.
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken.getTokenValue());
-        RequestEntity<Void> request = new RequestEntity<>(headers, HttpMethod.GET, URI.create("https://www.googleapis.com/oauth2/v3/userinfo"));
-
-        // Google API로부터 사용자 정보를 가져옵니다.
-        ResponseEntity<String> response = restTemplate.exchange(request, String.class);
-
-        return response;
     }
 }

@@ -1,9 +1,7 @@
 package com.senity.waved.base.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senity.waved.base.jwt.TokenDto;
 import com.senity.waved.base.jwt.TokenProvider;
-import com.senity.waved.base.redis.Redis;
 import com.senity.waved.base.redis.RedisUtil;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -20,15 +18,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("${custom.site.baseUrl}")
+    @Value("${custom.oauth2.authorized-redirect-url}")
     private String REDIRECT_URI;
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
@@ -50,19 +46,12 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         }
         redisUtil.save(userEmail, token.getRefreshToken());*/
 
-/*        response.setHeader("Authorization", "Bearer " + token.getAccessToken());
-
-        response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        out.print(new ObjectMapper().writeValueAsString(token));
-        out.flush();*/
-
         String url = makeRedirectUrl(token.getAccessToken(), token.getRefreshToken(), token.getHasInfo());
         response.sendRedirect(url);
     }
 
     private String makeRedirectUrl(String access, String refresh, Boolean hasInfo) {
-        return UriComponentsBuilder.fromUriString("http://localhost:3000/oauth")
+        return UriComponentsBuilder.fromUriString(REDIRECT_URI)
                 .queryParam("accessToken", access)
                 .queryParam("refreshToken", refresh)
                 .queryParam("hasInfo", hasInfo)

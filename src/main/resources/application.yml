@@ -1,5 +1,6 @@
 server:
   port: 9000
+
 spring:
   data:
     redis:
@@ -16,14 +17,15 @@ spring:
     active: prod
     include: secret
   datasource:
+    url: '${custom.db.url}'
+    username: '${custom.db.username}'
+    password: '${custom.db.password}'
+    driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: '${custom.hikari.maximum-pool-size}'
       idle-timeout: '${custom.hikari.idle-timeout}'
       max-lifetime: '${custom.hikari.max-lifetime}'
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: '${custom.db.url}'
-    username: '${custom.db.username}'
-    password: '${custom.db.password}'
+      minimum-idle: '${custom.hikari.minimum-idle}'
   jpa:
     hibernate:
       ddl-auto: update
@@ -45,10 +47,13 @@ spring:
         registration:
           google:
             client-name: Google
-            # redirect-uri: '${custom.site.baseUrl}/login/oauth2/code/google'
             scope:
               - email
               - profile
+
+app:
+  oauth2:
+    authorized-redirect-uri: '${custom.oauth2.authorized-redirect-uri}'
 
 logging:
   level:
