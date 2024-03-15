@@ -1,9 +1,12 @@
 package com.senity.waved.domain.member.service;
 
+import com.senity.waved.base.jwt.TokenDto;
+import com.senity.waved.base.jwt.TokenProvider;
 import com.senity.waved.base.redis.RedisUtil;
 import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
+import com.senity.waved.domain.member.entity.AuthLevel;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
@@ -19,11 +22,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,6 +43,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final RedisUtil redisUtil;
+    private final TokenProvider tokenProvider;
     private GitHub github;
 
     @Transactional(readOnly = true)
@@ -137,5 +149,44 @@ public class MemberServiceImpl implements MemberService {
     private Member getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
+    }
+
+
+    //
+    //
+    //
+
+    @Transactional
+    public TokenDto getNewTokens(String email) {
+        System.out.println("-----token email : " + email);
+        Member member = memberRepository.findByEmail(email).orElseGet(() -> createNewMember(email, generateRandomNickname()));
+
+        return new TokenDto(tokenProvider.createAccessToken(email),
+                tokenProvider.createRefreshToken(email), member.getHasInfo());
+    }
+
+    private Member createNewMember(String email, String nickname) {
+        AuthLevel authLevel = AuthLevel.MEMBER;
+        List<String> adminMembers = Arrays.asList("waved7777@gmail.com", "imholy96@gmail.com"
+                , "vywns9978@gmail.com", "waved8888@gmail.com", "fetest1228@gmail.com");
+
+        if (adminMembers.contains(email)) {
+            authLevel = AuthLevel.ADMIN;
+        }
+
+        Member newMember = Member.builder()
+                .email(email)
+                .nickname(nickname)
+                .authLevel(authLevel)
+                .hasInfo(false)
+                .build();
+
+        return memberRepository.save(newMember);
+    }
+
+    private String generateRandomNickname() {
+        UUID uuid = UUID.randomUUID();
+        String hash = Integer.toHexString(uuid.hashCode());
+        return "서퍼" + hash.substring(0, Math.min(hash.length(), 6));
     }
 }

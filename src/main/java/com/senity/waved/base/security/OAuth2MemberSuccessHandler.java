@@ -12,10 +12,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -26,6 +28,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    @Value("${custom.site.baseUrl}")
+    private String REDIRECT_URI;
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final RedisUtil redisUtil;
@@ -40,19 +44,26 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         TokenDto token = new TokenDto(tokenProvider.createAccessToken(userEmail),
                 tokenProvider.createRefreshToken(userEmail), member.getHasInfo());
 
-        /*Optional<Redis> optionalRedis = redisUtil.findByEmail(userEmail);
+        Optional<Redis> optionalRedis = redisUtil.findByEmail(userEmail);
         if (optionalRedis.isPresent()) {
             redisUtil.deleteByEmail(userEmail);
         }
-        redisUtil.save(userEmail, token.getRefreshToken());*/
-        log.info("info log={}", userEmail + token.getRefreshToken());
+        redisUtil.save(userEmail, token.getRefreshToken());
 
-        response.setHeader("Authorization", "Bearer " + token.getAccessToken());
+/*        response.setHeader("Authorization", "Bearer " + token.getAccessToken());
 
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         out.print(new ObjectMapper().writeValueAsString(token));
-        out.flush();
+        out.flush();*/
+
+        String url = makeRedirectUrl(token.getAccessToken());
+        getRedirectStrategy().sendRedirect(request, response, url);
+    }
+
+    private String makeRedirectUrl(String token) {
+        return UriComponentsBuilder.fromUriString(REDIRECT_URI + "/login/google/token/-----------------------" + token)
+                .build().toUriString();
     }
 
     private Member getMemberByEmail(String email) {
