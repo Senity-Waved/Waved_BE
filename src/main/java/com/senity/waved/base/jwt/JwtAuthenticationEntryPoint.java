@@ -17,10 +17,8 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                          AuthenticationException authException) throws IOException {
         if (authException instanceof AuthenticationServiceException) {
             AuthenticationServiceException jwtException = (AuthenticationServiceException) authException;
-            // JWT 예외 처리
             setResponse(response, 1, jwtException.getMessage());
         } else {
-            // 그 외 인증 실패 처리
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }

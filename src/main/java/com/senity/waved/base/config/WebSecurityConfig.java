@@ -52,7 +52,7 @@ public class WebSecurityConfig {
                                 .baseUri("/oauth2/authorization")
                         )
                         .redirectionEndpoint(redirection -> redirection
-                                .baseUri("/**")
+                                .baseUri("/oauth/**")
                         )
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2AuthenticationSuccessHandler)
