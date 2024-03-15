@@ -59,4 +59,10 @@ public class Verification extends BaseEntity {
         like.setVerification(this);
         this.likesCount++;
     }
+
+    public void removeLikeFromVerification(Liked like) {
+        this.likeds.remove(like);
+        like.setVerification(null);
+        this.likesCount--;
+    }
 }

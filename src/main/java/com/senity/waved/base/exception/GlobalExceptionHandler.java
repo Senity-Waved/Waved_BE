@@ -3,6 +3,7 @@ package com.senity.waved.base.exception;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotCompletedException;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.liked.exception.DuplicationLikeException;
+import com.senity.waved.domain.liked.exception.LikeNotAuthorizedException;
 import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
@@ -109,6 +110,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicationLikeException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleDuplicationLikeException(DuplicationLikeException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(LikeNotAuthorizedException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleLikeNotAuthorizedException(LikeNotAuthorizedException e) {
         return e.getMessage();
     }
 

@@ -2,6 +2,7 @@ package com.senity.waved.domain.liked.service;
 
 import com.senity.waved.domain.liked.entity.Liked;
 import com.senity.waved.domain.liked.exception.DuplicationLikeException;
+import com.senity.waved.domain.liked.exception.LikeNotAuthorizedException;
 import com.senity.waved.domain.liked.repository.LikedRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
@@ -47,6 +48,19 @@ public class LikedServiceImpl implements LikedService {
     public Long countLikesToVerification(Long verificationId) {
         Verification verification = getVerificationById(verificationId);
         return likedRepository.countLikesByVerification(verification);
+    }
+
+    @Override
+    @Transactional
+    public void removeLikeFromVerification(String email, Long verificationId) {
+        Member member = getMemberByEmail(email);
+        Verification verification = getVerificationById(verificationId);
+
+        Liked liked = likedRepository.findByMemberAndVerification(member, verification)
+                .orElseThrow(() -> new LikeNotAuthorizedException("해당 인증 내역에 좋아요를 누르지 않았습니다."));
+
+        verification.removeLikeFromVerification(liked);
+        likedRepository.delete(liked);
     }
 
     private Verification getVerificationById(Long id) {

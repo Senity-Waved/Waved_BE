@@ -34,4 +34,13 @@ public class LikedController {
         return ResponseEntity.ok(new LikedResponseDto(verificationId, likedCount));
     }
 
+    @DeleteMapping
+    public ResponseEntity<String> removeLikeFromVerification(
+            @PathVariable("verificationId") Long verificationId,
+            @AuthenticationPrincipal User user) {
+        likedService.removeLikeFromVerification(user.getUsername(), verificationId);
+
+        return new ResponseEntity<>("좋아요를 취소했습니다.", HttpStatus.OK);
+    }
+
 }
