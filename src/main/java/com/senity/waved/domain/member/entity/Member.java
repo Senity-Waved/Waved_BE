@@ -47,6 +47,9 @@ public class Member extends BaseEntity {
     @Column(name="github_token", nullable=true)
     private String githubToken;
 
+    @Column(name="has_info")
+    private Boolean hasInfo;
+
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<MyChallenge> myChallenges = new ArrayList<>();
@@ -59,11 +62,13 @@ public class Member extends BaseEntity {
     @Builder.Default
     private List<Verification> verification = new ArrayList<>();
 
+
     public void updateInfo(ProfileEditDto editDto) {
         nickname = editDto.getNickname();
         birthYear = editDto.getBirthYear();
         gender = editDto.getGender();
         jobTitle = editDto.getJobTitle();
+        hasInfo = true;
     }
 
     public void updateGithubInfo(GithubInfoDto github) {

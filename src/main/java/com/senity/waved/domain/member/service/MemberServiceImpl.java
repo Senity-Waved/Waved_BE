@@ -8,7 +8,7 @@ import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.member.repository.MemberRepository;
-import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
