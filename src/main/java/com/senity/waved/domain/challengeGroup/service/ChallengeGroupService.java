@@ -10,5 +10,5 @@ public interface ChallengeGroupService {
 
     void applyForChallengeGroup(String email, Long groupId);
     ChallengeGroupResponseDto getGroupDetail(String email, Long groupId);
-    List<VerificationListResponseDto> getVerifications(Long challengeGroupId, Timestamp verificationDate);
+    List<VerificationListResponseDto> getVerifications(String email, Long challengeGroupId, Timestamp verificationDate);
 }

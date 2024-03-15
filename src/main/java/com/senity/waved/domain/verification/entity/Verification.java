@@ -43,7 +43,7 @@ public class Verification extends BaseEntity {
     private ChallengeGroup challengeGroup;
 
     @OneToMany(mappedBy = "verification", cascade = CascadeType.ALL)
-    private List<Liked> likeds = new ArrayList<>();
+    private List<Liked> likes = new ArrayList<>();
 
     public static Verification createGithubVerification(Member member, ChallengeGroup challengeGroup, boolean hasCommitsToday) {
         return Verification.builder()
@@ -55,13 +55,13 @@ public class Verification extends BaseEntity {
     }
 
     public void addLikeToVerification(Liked like) {
-        this.likeds.add(like);
+        this.likes.add(like);
         like.setVerification(this);
         this.likesCount++;
     }
 
     public void removeLikeFromVerification(Liked like) {
-        this.likeds.remove(like);
+        this.likes.remove(like);
         like.setVerification(null);
         this.likesCount--;
     }

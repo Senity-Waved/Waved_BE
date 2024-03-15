@@ -5,13 +5,15 @@ import com.senity.waved.domain.challengeGroup.dto.response.VerificationListRespo
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
+import com.senity.waved.domain.liked.repository.LikedRepository;
 import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.entity.Verification;
+import com.senity.waved.domain.verification.exception.VerifyExistenceOnDate;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private final MyChallengeRepository myChallengeRepository;
     private final VerificationRepository verificationRepository;
     private final ChallengeGroupRepository challengeGroupRepository;
-
+    private final LikedRepository likedRepository;
 
     public void applyForChallengeGroup(String email, Long groupId) {
         Member member = getMemberByEmail(email);
@@ -68,11 +70,12 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     }
   
     @Override
-    public List<VerificationListResponseDto> getVerifications(Long challengeGroupId, Timestamp verificationDate) {
+    public List<VerificationListResponseDto> getVerifications(String email, Long challengeGroupId, Timestamp verificationDate) {
+        Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
         LocalDateTime[] dateRange = calculateStartAndEndDate(verificationDate);
         List<Verification> verifications = findVerifications(challengeGroup, dateRange);
-        return convertToDtoList(verifications);
+        return convertToDtoList(verifications, member);
     }
 
     private ChallengeGroup getGroupById(Long id) {
@@ -98,12 +101,16 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 Timestamp.valueOf(dateRange[0]), Timestamp.valueOf(dateRange[1]), challengeGroup);
     }
 
-    private List<VerificationListResponseDto> convertToDtoList(List<Verification> verifications) {
+    private List<VerificationListResponseDto> convertToDtoList(List<Verification> verifications, Member member) {
         if (verifications.isEmpty()) {
-            throw new IllegalArgumentException("해당 날짜에 존재하는 인증내역이 없습니다.");
+            throw new VerifyExistenceOnDate("해당 날짜에 존재하는 인증내역이 없습니다.");
         }
         return verifications.stream()
-                .map(VerificationListResponseDto::new)
+                .map(verification -> new VerificationListResponseDto(verification, isLikedByMember(verification, member)))
                 .collect(Collectors.toList());
+    }
+
+    private boolean isLikedByMember(Verification verification, Member member) {
+        return likedRepository.existsByMemberAndVerification(member, verification);
     }
 }

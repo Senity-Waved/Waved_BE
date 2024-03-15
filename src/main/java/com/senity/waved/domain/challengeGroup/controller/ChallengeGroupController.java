@@ -42,9 +42,10 @@ public class ChallengeGroupController {
     @GetMapping("/dates")
     public ResponseEntity<List<VerificationListResponseDto>> getVerificationsByDate(
             @PathVariable("challengeGroupId") Long challengeGroupId,
-            @RequestParam("verificationDate") Timestamp verificationDate) {
-        List<VerificationListResponseDto> verifications = challengeGroupService.getVerifications(challengeGroupId, verificationDate);
+            @RequestParam("verificationDate") Timestamp verificationDate,
+            @AuthenticationPrincipal User user) {
+        List<VerificationListResponseDto> verifications =
+                challengeGroupService.getVerifications(user.getUsername(), challengeGroupId, verificationDate);
         return ResponseEntity.ok(verifications);
     }
 }
-

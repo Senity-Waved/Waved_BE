@@ -15,6 +15,7 @@ import com.senity.waved.domain.review.exception.ReviewNotFoundException;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
 import com.senity.waved.domain.verification.exception.VerificationNotFoundException;
+import com.senity.waved.domain.verification.exception.VerifyExistenceOnDate;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -116,6 +117,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(LikeNotAuthorizedException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleLikeNotAuthorizedException(LikeNotAuthorizedException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(VerifyExistenceOnDate.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleVerifyExistenceOnDate(VerifyExistenceOnDate e) {
         return e.getMessage();
     }
 
