@@ -47,7 +47,6 @@ spring:
         registration:
           google:
             client-name: Google
-            redirect-uri: http://localhost:3000/oauth
             scope:
               - email
               - profile
