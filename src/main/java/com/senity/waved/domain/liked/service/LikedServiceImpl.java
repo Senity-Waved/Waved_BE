@@ -15,13 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class LikedServiceImpl implements LikedService {
     private final VerificationRepository verificationRepository;
     private final MemberRepository memberRepository;
     private final LikedRepository likedRepository;
 
     @Override
+    @Transactional
     public void addLikedToVerification(String email, Long verificationId) {
 
         Member member = getMemberByEmail(email);
@@ -38,7 +38,15 @@ public class LikedServiceImpl implements LikedService {
                 .member(member)
                 .build();
 
+        verification.addLikeToVerification(like);
         likedRepository.save(like);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long countLikesToVerification(Long verificationId) {
+        Verification verification = getVerificationById(verificationId);
+        return likedRepository.countLikesByVerification(verification);
     }
 
     private Verification getVerificationById(Long id) {

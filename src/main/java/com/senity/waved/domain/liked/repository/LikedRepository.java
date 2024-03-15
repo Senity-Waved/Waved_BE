@@ -7,4 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LikedRepository extends JpaRepository<Liked, Long> {
     boolean existsByMemberAndVerification(Member member, Verification verification);
+
+    Long countLikesByVerification(Verification verification);
 }

@@ -32,7 +32,7 @@ public class Verification extends BaseEntity {
 
     @Builder.Default
     @Column(name = "likes_count", nullable = false)
-    private Long likedsCount = 0L;
+    private Long likesCount = 0L;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -52,5 +52,11 @@ public class Verification extends BaseEntity {
                 .challengeGroup(challengeGroup)
                 .verificationType(VerificationType.GITHUB)
                 .build();
+    }
+
+    public void addLikeToVerification(Liked like) {
+        this.likeds.add(like);
+        like.setVerification(this);
+        this.likesCount++;
     }
 }
