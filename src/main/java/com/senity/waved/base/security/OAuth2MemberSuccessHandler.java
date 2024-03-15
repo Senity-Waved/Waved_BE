@@ -40,11 +40,11 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         TokenDto token = new TokenDto(tokenProvider.createAccessToken(userEmail),
                 tokenProvider.createRefreshToken(userEmail), member.getHasInfo());
 
-        Optional<Redis> optionalRedis = redisUtil.findByEmail(userEmail);
+        /*Optional<Redis> optionalRedis = redisUtil.findByEmail(userEmail);
         if (optionalRedis.isPresent()) {
             redisUtil.deleteByEmail(userEmail);
         }
-        redisUtil.save(userEmail, token.getRefreshToken());
+        redisUtil.save(userEmail, token.getRefreshToken());*/
         log.info("info log={}", userEmail + token.getRefreshToken());
 
         response.setHeader("Authorization", "Bearer " + token.getAccessToken());
