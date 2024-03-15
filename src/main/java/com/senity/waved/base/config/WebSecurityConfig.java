@@ -34,10 +34,7 @@ public class WebSecurityConfig {
 
         http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers(
-                                "/oauth2/**",
-                                "/login/oauth2/code/**"
-                        ).permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
