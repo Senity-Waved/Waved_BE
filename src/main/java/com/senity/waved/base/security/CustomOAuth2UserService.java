@@ -54,6 +54,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .email(email)
                 .nickname(nickname)
                 .authLevel(authLevel)
+                .hasInfo(false)
                 .build();
 
         return memberRepository.save(newMember);

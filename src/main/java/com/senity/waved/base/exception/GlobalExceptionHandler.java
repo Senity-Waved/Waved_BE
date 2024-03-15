@@ -5,7 +5,7 @@ import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundEx
 import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
-import com.senity.waved.domain.myChallenge.exception.MemberNotFoundException;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.quiz.exception.QuizNotFoundException;
 import com.senity.waved.domain.review.exception.AlreadyReviewedException;

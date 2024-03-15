@@ -1,4 +1,4 @@
-package com.senity.waved.domain.myChallenge.exception;
+package com.senity.waved.domain.member.exception;
 
 public class MemberNotFoundException extends RuntimeException {
     public MemberNotFoundException(String message) {
