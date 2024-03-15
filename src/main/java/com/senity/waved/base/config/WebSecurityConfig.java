@@ -43,7 +43,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .csrf(csrf -> csrf.disable())
-                .addFilterBefore(corsFilter, FilterSecurityInterceptor.class)
+                //.addFilterBefore(corsFilter, FilterSecurityInterceptor.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> {
                     exception.accessDeniedHandler(jwtAccessDeniedHandler); // 접근 거부 처리
@@ -63,7 +63,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://localhost:3000") // 허용할 도메인을 지정합니다
+                .allowedOrigins("http://localhost:3000") // 허용할 도메인을 지정합니다
                 .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드를 지정합니다
                 .allowedHeaders("*") // 허용할 요청 헤더를 지정합니다
                 .allowCredentials(true); // 인증 정보를 포함할지 여부를 지정합니다
