@@ -33,6 +33,16 @@ public class WebSecurityConfig {
         JwtFilter jwtFilter = new JwtFilter(tokenProvider);
 
         http
+                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .requestMatchers(
+                                "/oauth2/**",
+                                "/login/oauth2/code/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
                 .csrf(csrf -> csrf.disable())
                 .addFilterBefore(corsFilter, FilterSecurityInterceptor.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -40,14 +50,6 @@ public class WebSecurityConfig {
                     exception.accessDeniedHandler(jwtAccessDeniedHandler); // 접근 거부 처리
                     exception.authenticationEntryPoint(jwtAuthenticationEntryPoint); // 인증 실패 처리
                 })
-                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers( "/oauth2/**").permitAll()
-                        .requestMatchers("/login/oauth2/code/**").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorization -> authorization
                                 .baseUri("/oauth2/authorization")
