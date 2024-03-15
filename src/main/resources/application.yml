@@ -45,7 +45,7 @@ spring:
         registration:
           google:
             client-name: Google
-            redirect-uri: '${custom.site.baseUrl}/login/oauth2/code/google'
+            # redirect-uri: '${custom.site.baseUrl}/login/oauth2/code/google'
             scope:
               - email
               - profile
