@@ -16,11 +16,13 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
     private final TokenProvider tokenProvider;
     private final CorsFilter corsFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -56,5 +58,14 @@ public class WebSecurityConfig {
                 );
 
         return http.build();
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("https://localhost:3000") // 허용할 도메인을 지정합니다
+                .allowedMethods("GET", "POST", "PUT", "DELETE") // 허용할 HTTP 메서드를 지정합니다
+                .allowedHeaders("*") // 허용할 요청 헤더를 지정합니다
+                .allowCredentials(true); // 인증 정보를 포함할지 여부를 지정합니다
     }
 }
