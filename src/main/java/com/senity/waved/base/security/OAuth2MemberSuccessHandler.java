@@ -57,12 +57,15 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         out.print(new ObjectMapper().writeValueAsString(token));
         out.flush();*/
 
-        String url = makeRedirectUrl(token.getAccessToken());
+        String url = makeRedirectUrl(token.getAccessToken(), token.getRefreshToken(), token.getHasInfo());
         getRedirectStrategy().sendRedirect(request, response, url);
     }
 
-    private String makeRedirectUrl(String token) {
-        return UriComponentsBuilder.fromUriString(REDIRECT_URI + "/login/google/token/-----------------------" + token)
+    private String makeRedirectUrl(String access, String refresh, Boolean hasInfo) {
+        return UriComponentsBuilder.fromUriString("http://localhost:3000/oauth")
+                .queryParam("accessToken", access)
+                .queryParam("refreshToken", refresh)
+                .queryParam("hasInfo", hasInfo)
                 .build().toUriString();
     }
 

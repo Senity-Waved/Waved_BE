@@ -34,7 +34,7 @@ public class WebSecurityConfig {
 
         http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers("/oauth2/**").permitAll()
+                        .requestMatchers("/oauth2/**", "/api/v1/members/customlogin").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

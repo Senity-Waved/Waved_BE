@@ -117,6 +117,27 @@ public class MemberController {
         return memberService.getReviewsPaged(user.getUsername(), pageNumber, pageSize);
     }
 
+    @GetMapping("/customlogin")
+    public TokenDto getTokens() {
+
+        // OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
+
+        // 액세스 토큰을 사용하여 Google API 호출을 위한 HTTP 요청을 생성합니다.
+        // HttpHeaders headers = new HttpHeaders();
+        // headers.setBearerAuth(accessToken.getTokenValue());
+        // RequestEntity<Void> request = new RequestEntity<>(headers, HttpMethod.GET, URI.create("https://www.googleapis.com/oauth2/v3/userinfo"));
+
+
+        RequestEntity<Void> request = new RequestEntity<>(new HttpHeaders(), HttpMethod.GET, URI.create("https://127.0.0.1/oauth2/authorization/google"));
+        // Google API로부터 사용자 정보를 가져옵니다.
+        ResponseEntity<String> response = restTemplate.exchange(request, String.class);
+        System.out.println(response);
+
+        String user = "";
+        //return memberService.getNewTokens(user.getUsername());
+        return memberService.getNewTokens(user);
+    }
+
     @GetMapping("/login")
     public TokenDto getTokens(@RegisteredOAuth2AuthorizedClient("google") OAuth2AuthorizedClient authorizedClient) {
         OAuth2AccessToken accessToken = authorizedClient.getAccessToken();
