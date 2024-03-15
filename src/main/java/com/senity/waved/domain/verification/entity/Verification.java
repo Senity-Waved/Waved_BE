@@ -2,14 +2,17 @@ package com.senity.waved.domain.verification.entity;
 
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challenge.entity.VerificationType;
-
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.liked.entity.Liked;
 import com.senity.waved.domain.member.entity.Member;
 import jakarta.persistence.*;
-
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -27,6 +30,10 @@ public class Verification extends BaseEntity {
     @Column(name = "verification_type")
     private VerificationType verificationType;
 
+    @Builder.Default
+    @Column(name = "likes_count", nullable = false)
+    private Long likedsCount = 0L;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -34,6 +41,9 @@ public class Verification extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_group_id")
     private ChallengeGroup challengeGroup;
+
+    @OneToMany(mappedBy = "verification", cascade = CascadeType.ALL)
+    private List<Liked> likeds = new ArrayList<>();
 
     public static Verification createGithubVerification(Member member, ChallengeGroup challengeGroup, boolean hasCommitsToday) {
         return Verification.builder()
