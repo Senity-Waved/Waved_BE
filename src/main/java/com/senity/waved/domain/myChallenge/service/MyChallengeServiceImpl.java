@@ -68,11 +68,11 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
     private MyChallengeResponseDto mapToResponseDto(MyChallenge myChallenge, ChallengeStatus status) {
         boolean isGithubConnected = myChallenge.getMember().isGithubConnected();
+        boolean isVerified = myChallenge.isVerified();
 
         switch (status) {
             case PROGRESS:
-                // TODO isVerified 판단 후 현재 인증 여부 반환값에 추가
-                return myChallenge.getMyChallengesInProgress(myChallenge, true, isGithubConnected);
+                return myChallenge.getMyChallengesInProgress(myChallenge, isVerified, isGithubConnected);
             case WAITING:
                 return myChallenge.getMyChallengesWaiting(myChallenge);
             case COMPLETED:

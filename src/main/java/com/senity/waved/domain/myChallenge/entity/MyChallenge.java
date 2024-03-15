@@ -4,6 +4,7 @@ import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
+import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +30,9 @@ public class MyChallenge extends BaseEntity {
   
     @Column(name = "is_reviewed")
     private Boolean isReviewed;
+
+    @Column(name = "is_verified")
+    private Boolean isVerified;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -65,6 +69,28 @@ public class MyChallenge extends BaseEntity {
     public void setMyVerifs(int[] myVerifs) {
         this.myVerifs = myVerifs;
         Arrays.fill(this.myVerifs, 0);
+    }
+
+    public boolean isVerified() {
+        LocalDate currentDate = LocalDate.now();
+        LocalDate startDate = this.challengeGroup.getStartDate();
+        long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate); //startDate부터 오늘 날짜 차이 계산
+
+        if (this.myVerifs.length == 0) {
+            return false; // myVerifs 배열이 빈 배열이면 false
+        }
+
+        if (daysFromStart >= 0 && daysFromStart < this.myVerifs.length) {
+            return this.myVerifs[(int)daysFromStart] != 0; // 0이 아니면 true
+        }
+
+        return false;
+    }
+
+    public void verify() {
+        if (this.isVerified()) {
+            throw new AlreadyVerifiedException("이미 오늘의 인증을 완료했습니다.");
+        }
     }
 
     public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified, Boolean isGithubConnected) {
