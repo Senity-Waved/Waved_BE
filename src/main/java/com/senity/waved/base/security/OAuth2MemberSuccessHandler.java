@@ -47,6 +47,8 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         redisUtil.save(userEmail, token.getRefreshToken());
         log.info("info log={}", userEmail + token.getRefreshToken());
 
+        response.setHeader("Authorization", "Bearer " + token.getAccessToken());
+
         response.setContentType("application/json;charset=UTF-8");
         PrintWriter out = response.getWriter();
         out.print(new ObjectMapper().writeValueAsString(token));
