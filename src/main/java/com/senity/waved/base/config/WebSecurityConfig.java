@@ -34,7 +34,7 @@ public class WebSecurityConfig {
 
         http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers("/oauth2/**", "/api/v1/members/customlogin").permitAll()
+                        .requestMatchers("/oauth2/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
@@ -52,7 +52,7 @@ public class WebSecurityConfig {
                                 .baseUri("/oauth2/authorization")
                         )
                         .redirectionEndpoint(redirection -> redirection
-                                .baseUri("/login/oauth2/code/**")
+                                .baseUri("/**")
                         )
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2AuthenticationSuccessHandler)

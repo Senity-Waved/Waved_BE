@@ -58,7 +58,7 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         out.flush();*/
 
         String url = makeRedirectUrl(token.getAccessToken(), token.getRefreshToken(), token.getHasInfo());
-        getRedirectStrategy().sendRedirect(request, response, url);
+        response.sendRedirect(url);
     }
 
     private String makeRedirectUrl(String access, String refresh, Boolean hasInfo) {
