@@ -24,8 +24,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    @Value("${custom.oauth2.authorized-redirect-url}")
-    private String REDIRECT_URI;
+    @Value("${custom.site.frontUrl}")
+    private String FRONT_URL;
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final RedisUtil redisUtil;
@@ -47,12 +47,11 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         redisUtil.save(userEmail, token.getRefreshToken());*/
 
         String url = makeRedirectUrl(token.getAccessToken(), token.getRefreshToken(), token.getHasInfo());
-        log.info("send redirect to {}", url);
         response.sendRedirect(url);
     }
 
     private String makeRedirectUrl(String access, String refresh, Boolean hasInfo) {
-        return UriComponentsBuilder.fromUriString(REDIRECT_URI)
+        return UriComponentsBuilder.fromUriString(FRONT_URL + "/oauth")
                 .queryParam("accessToken", access)
                 .queryParam("refreshToken", refresh)
                 .queryParam("hasInfo", hasInfo)
