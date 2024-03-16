@@ -6,7 +6,7 @@ name: Build and deploy JAR app to Azure Web App - waved
 on:
   push:
     branches:
-      - Fix/#33
+      - main
   workflow_dispatch:
 
 jobs:
