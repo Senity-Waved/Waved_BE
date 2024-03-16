@@ -38,8 +38,6 @@ dependencies {
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
-	implementation 'org.slf4j:slf4j-logback:1.7.32'
-
 	testImplementation 'org.mockito:mockito-core:5.2.0'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
