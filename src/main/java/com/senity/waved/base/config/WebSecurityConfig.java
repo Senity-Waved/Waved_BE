@@ -16,11 +16,14 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
+
     private final TokenProvider tokenProvider;
     private final CorsFilter corsFilter;
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -44,15 +47,12 @@ public class WebSecurityConfig {
                 .addFilterBefore(corsFilter, FilterSecurityInterceptor.class)
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> {
-                    exception.accessDeniedHandler(jwtAccessDeniedHandler); // 접근 거부 처리
-                    exception.authenticationEntryPoint(jwtAuthenticationEntryPoint); // 인증 실패 처리
+                    exception.accessDeniedHandler(jwtAccessDeniedHandler);
+                    exception.authenticationEntryPoint(jwtAuthenticationEntryPoint);
                 })
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorization -> authorization
                                 .baseUri("/oauth2/authorization")
-                        )
-                        .redirectionEndpoint(redirection -> redirection
-                                .baseUri("/login/oauth2/code/**")
                         )
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2AuthenticationSuccessHandler)
