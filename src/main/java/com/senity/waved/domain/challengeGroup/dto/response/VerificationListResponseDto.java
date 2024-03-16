@@ -1,5 +1,6 @@
 package com.senity.waved.domain.challengeGroup.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.senity.waved.domain.verification.entity.Verification;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,10 +15,16 @@ public class VerificationListResponseDto {
     private Long verificationId;
     private String content;
     private ZonedDateTime verificationDate;
+    private Long likesCount;
 
-    public VerificationListResponseDto(Verification verification) {
+    @JsonProperty("isLiked")
+    private boolean isLiked;
+
+    public VerificationListResponseDto(Verification verification, boolean isLiked) {
         this.verificationId = verification.getId();
         this.content = verification.getContent();
+        this.isLiked = isLiked;
+        this.likesCount = verification.getLikesCount();
 
         if (verification.getCreateDate() != null) {
             LocalDateTime localDateTime = verification.getCreateDate().toLocalDateTime();
@@ -25,4 +32,3 @@ public class VerificationListResponseDto {
         }
     }
 }
-
