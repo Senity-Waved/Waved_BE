@@ -1,6 +1,5 @@
 package com.senity.waved.base.security;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.senity.waved.base.jwt.TokenDto;
 import com.senity.waved.base.jwt.TokenProvider;
 import com.senity.waved.base.redis.Redis;
@@ -12,13 +11,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Optional;
 
 @Slf4j
@@ -26,6 +26,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
+    @Value("${custom.site.frontUrl}")
+    private String FRONT_URL;
     private final MemberRepository memberRepository;
     private final TokenProvider tokenProvider;
     private final RedisUtil redisUtil;
@@ -40,19 +42,22 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         TokenDto token = new TokenDto(tokenProvider.createAccessToken(userEmail),
                 tokenProvider.createRefreshToken(userEmail), member.getHasInfo());
 
-        /*Optional<Redis> optionalRedis = redisUtil.findByEmail(userEmail);
+        Optional<Redis> optionalRedis = redisUtil.findByEmail(userEmail);
         if (optionalRedis.isPresent()) {
             redisUtil.deleteByEmail(userEmail);
         }
-        redisUtil.save(userEmail, token.getRefreshToken());*/
-        log.info("info log={}", userEmail + token.getRefreshToken());
+        redisUtil.save(userEmail, token.getRefreshToken());
 
-        response.setHeader("Authorization", "Bearer " + token.getAccessToken());
+        String url = makeRedirectUrl(token.getAccessToken(), token.getRefreshToken(), token.getHasInfo());
+        response.sendRedirect(url);
+    }
 
-        response.setContentType("application/json;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        out.print(new ObjectMapper().writeValueAsString(token));
-        out.flush();
+    private String makeRedirectUrl(String access, String refresh, Boolean hasInfo) {
+        return UriComponentsBuilder.fromUriString(FRONT_URL + "/oauth")
+                .queryParam("accessToken", access)
+                .queryParam("refreshToken", refresh)
+                .queryParam("hasInfo", hasInfo)
+                .build().toUriString();
     }
 
     private Member getMemberByEmail(String email) {
