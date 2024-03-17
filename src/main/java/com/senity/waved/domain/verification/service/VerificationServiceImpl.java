@@ -122,6 +122,11 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     private boolean verifyPicture(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
+
+        if (requestDto.getImageUrl() == null || requestDto.getImageUrl().isEmpty()) {
+            throw new IllegalArgumentException("이미지 URL을 입력해주세요.");
+        }
+
         try {
             byte[] pictureData = requestDto.getImageUrl().getBytes();
             String fileName = member.getId() + "_" + System.currentTimeMillis();

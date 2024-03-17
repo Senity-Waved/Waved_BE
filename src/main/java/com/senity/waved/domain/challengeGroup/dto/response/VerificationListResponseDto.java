@@ -14,6 +14,8 @@ import java.time.ZonedDateTime;
 public class VerificationListResponseDto {
     private Long verificationId;
     private String content;
+    private String link;
+    private String imageUrl;
     private ZonedDateTime verificationDate;
     private Long likesCount;
 
@@ -23,6 +25,8 @@ public class VerificationListResponseDto {
     public VerificationListResponseDto(Verification verification, boolean isLiked) {
         this.verificationId = verification.getId();
         this.content = verification.getContent();
+        this.link = verification.getLink();
+        this.imageUrl = verification.getImageUrl();
         this.isLiked = isLiked;
         this.likesCount = verification.getLikesCount();
 
