@@ -33,6 +33,7 @@ public class VerificationServiceImpl implements VerificationService {
     private final MemberRepository memberRepository;
     private final GithubService githubService;
     private final MyChallengeRepository myChallengeRepository;
+    private final AzureBlobStorageService azureBlobStorageService;
 
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
         Member member = getMemberByEmail(email);
@@ -120,10 +121,26 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
-    public boolean verifyPicture(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
-        // TODO: PICTURE 인증 처리 로직 구현
+    private boolean verifyPicture(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
+        try {
+            byte[] pictureData = requestDto.getImageUrl().getBytes();
+            String fileName = member.getId() + "_" + System.currentTimeMillis();
 
-        return true;
+            // Azure Blob Storage에 사진 업로드하고 URL 받아오기
+            String imageUrl = azureBlobStorageService.uploadPicture(pictureData, fileName);
+
+            Verification verification = Verification.builder()
+                    .member(member)
+                    .challengeGroup(challengeGroup)
+                    .verificationType(VerificationType.PICTURE)
+                    .imageUrl(imageUrl)
+                    .build();
+            verificationRepository.save(verification);
+
+            return true;
+        } catch (IOException e) {
+            throw new RuntimeException("사진 데이터 변환 중 오류가 발생했습니다.", e);
+        }
     }
 
     private Member getMemberByEmail(String email) {
