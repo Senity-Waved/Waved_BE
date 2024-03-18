@@ -26,6 +26,9 @@ public class Verification extends BaseEntity {
     @Column(name = "link", columnDefinition = "TEXT")
     private String link;
 
+    @Column(name = "image_url", columnDefinition = "TEXT")
+    private String imageUrl;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "verification_type")
     private VerificationType verificationType;

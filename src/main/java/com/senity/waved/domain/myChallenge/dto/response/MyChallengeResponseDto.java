@@ -19,6 +19,6 @@ public class MyChallengeResponseDto {
     private Boolean isVerified;
     private Boolean isGithubConnected;
 
-    private Long groupId;
+    private Long challengeGroupId;
     private Long myChallengeId;
 }

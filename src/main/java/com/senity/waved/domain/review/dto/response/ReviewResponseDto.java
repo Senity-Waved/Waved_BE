@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 public class ReviewResponseDto {
     private String nickname;
     private String jobTitle;
-    private String challengeGroupTitle;
+    private String groupTitle;
     private String content;
     private Timestamp createDate;
 

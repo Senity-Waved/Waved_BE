@@ -33,7 +33,7 @@ public class VerificationController {
     @PostMapping("/{challengeGroupId}")
     public ResponseEntity<String> verifyChallenge(@AuthenticationPrincipal User user,
                                                   @PathVariable("challengeGroupId") Long challengeGroupId,
-                                                  @RequestBody VerificationRequestDto requestDto) {
+                                                  @ModelAttribute VerificationRequestDto requestDto) {
 
         verificationService.verifyChallenge(requestDto, user.getUsername(), challengeGroupId);
         return ResponseEntity.ok("인증이 성공적으로 제출되었습니다.");
