@@ -82,6 +82,7 @@ public class VerificationServiceImpl implements VerificationService {
                 .member(member)
                 .challengeGroup(challengeGroup)
                 .verificationType(VerificationType.TEXT)
+                .isDeleted(false)
                 .build();
         verificationRepository.save(verification);
 
@@ -101,6 +102,7 @@ public class VerificationServiceImpl implements VerificationService {
                 .member(member)
                 .challengeGroup(challengeGroup)
                 .verificationType(VerificationType.LINK)
+                .isDeleted(false)
                 .build();
         verificationRepository.save(verification);
 
