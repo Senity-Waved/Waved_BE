@@ -101,7 +101,7 @@ public class MyChallenge extends BaseEntity {
                 .endDate(group.getEndDate())
                 .successCount(myChallenge.getSuccessCount())
                 .myChallengeId(myChallenge.getId())
-                .groupId(group.getId())
+                .challengeGroupId(group.getId())
                 .isVerified(isVerified)
                 .isGithubConnected(isGithubConnected)
                 .build();
@@ -113,7 +113,7 @@ public class MyChallenge extends BaseEntity {
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
                 .endDate(group.getEndDate())
-                .groupId(group.getId())
+                .challengeGroupId(group.getId())
                 .build();
     }
 
@@ -123,7 +123,7 @@ public class MyChallenge extends BaseEntity {
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
                 .endDate(group.getEndDate())
-                .groupId(group.getId())
+                .challengeGroupId(group.getId())
                 .myChallengeId(myChallenge.getId())
                 .isReviewed(myChallenge.getIsReviewed())
                 .build();
