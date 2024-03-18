@@ -46,10 +46,7 @@ dependencies {
 
 	implementation 'org.kohsuke:github-api:1.301'
 
-	implementation 'com.azure.spring:spring-cloud-azure-starter-storage'
 	implementation 'com.azure:azure-storage-blob:12.25.2'
-
-	implementation 'io.netty:netty-resolver-dns-native-macos:13.6.1'
 }
 
 tasks.named('test') {
