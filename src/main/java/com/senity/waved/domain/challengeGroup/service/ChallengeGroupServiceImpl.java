@@ -97,9 +97,11 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     }
 
     private List<Verification> findVerifications(ChallengeGroup challengeGroup, LocalDateTime[] dateRange) {
-        return verificationRepository.findByCreateDateBetweenAndChallengeGroup(
+
+        return verificationRepository.findByCreateDateBetweenAndChallengeGroupAndIsDeletedFalse (
                 Timestamp.valueOf(dateRange[0]), Timestamp.valueOf(dateRange[1]), challengeGroup);
     }
+
 
     private List<VerificationListResponseDto> convertToDtoList(List<Verification> verifications, Member member) {
         if (verifications.isEmpty()) {

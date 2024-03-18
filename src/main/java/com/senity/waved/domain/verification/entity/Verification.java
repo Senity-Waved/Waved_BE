@@ -2,6 +2,7 @@ package com.senity.waved.domain.verification.entity;
 
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challenge.entity.VerificationType;
+import com.senity.waved.domain.challengeGroup.dto.response.AdminVerificationListDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.liked.entity.Liked;
 import com.senity.waved.domain.member.entity.Member;
@@ -10,6 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +39,10 @@ public class Verification extends BaseEntity {
     @Column(name = "likes_count", nullable = false)
     private Long likesCount = 0L;
 
+    @ColumnDefault("FALSE")
+    @Column(nullable = false)
+    private Boolean isDeleted; // true -> 삭제
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
@@ -54,6 +60,7 @@ public class Verification extends BaseEntity {
                 .member(member)
                 .challengeGroup(challengeGroup)
                 .verificationType(VerificationType.GITHUB)
+                .isDeleted(false)
                 .build();
     }
 
@@ -67,5 +74,21 @@ public class Verification extends BaseEntity {
         this.likes.remove(like);
         like.setVerification(null);
         this.likesCount--;
+    }
+
+    public void markAsDeleted(Boolean b) {
+        this.isDeleted = b;
+    }
+
+    public static AdminVerificationListDto getAdminVerifications(Verification verification) {
+        Member member = verification.getMember();
+        return AdminVerificationListDto.builder()
+                .nickname(member.getNickname())
+                .content(verification.getContent())
+                .imageUrl(verification.getImageUrl())
+                .link(verification.getLink())
+                .verificationId(verification.getId())
+                .isDeleted(verification.getIsDeleted())
+                .build();
     }
 }

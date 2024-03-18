@@ -79,6 +79,18 @@ public class ChallengeGroup extends BaseEntity {
                 .build();
     }
 
+    public static ChallengeGroupResponseDto getGroupAdminResponse(ChallengeGroup group) {
+        Challenge challenge = group.getChallenge();
+        return ChallengeGroupResponseDto.builder()
+                .groupTitle(group.getGroupTitle())
+                .participantCount(group.getParticipantCount())
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
+                .verificationType(challenge.getVerificationType())
+                .challengeId(challenge.getId())
+                .build();
+    }
+
     public static ChallengeGroupHomeResponseDto getHomeGroupResponse(ChallengeGroup group) {
         Challenge challenge = group.getChallenge();
         return ChallengeGroupHomeResponseDto.builder()

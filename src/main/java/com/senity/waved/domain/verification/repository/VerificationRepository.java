@@ -10,7 +10,12 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface VerificationRepository extends JpaRepository<Verification, Long> {
-    @Query("SELECT v FROM Verification v WHERE v.createDate >= :startOfDay AND v.createDate <= :endOfDay AND v.challengeGroup = :challengeGroup")
-    List<Verification> findByCreateDateBetweenAndChallengeGroup(@Param("startOfDay") Timestamp startOfDay, @Param("endOfDay") Timestamp endOfDay, @Param("challengeGroup") ChallengeGroup challengeGroup);
 
+    List<Verification> findByChallengeGroup(ChallengeGroup challengeGroup);
+
+    @Query("SELECT v FROM Verification v WHERE v.createDate >= :startOfDay AND v.createDate <= :endOfDay AND v.challengeGroup = :challengeGroup AND v.isDeleted = FALSE")
+    List<Verification> findByCreateDateBetweenAndChallengeGroupAndIsDeletedFalse (
+            @Param("startOfDay") Timestamp startOfDay,
+            @Param("endOfDay") Timestamp endOfDay,
+            @Param("challengeGroup") ChallengeGroup challengeGroup);
 }
