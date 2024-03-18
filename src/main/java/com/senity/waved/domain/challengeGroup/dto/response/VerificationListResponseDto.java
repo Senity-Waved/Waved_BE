@@ -18,6 +18,7 @@ public class VerificationListResponseDto {
     private String imageUrl;
     private ZonedDateTime verificationDate;
     private Long likesCount;
+    private String nickname;
 
     @JsonProperty("isLiked")
     private boolean isLiked;
@@ -29,6 +30,7 @@ public class VerificationListResponseDto {
         this.imageUrl = verification.getImageUrl();
         this.isLiked = isLiked;
         this.likesCount = verification.getLikesCount();
+        this.nickname = verification.getMember().getNickname();
 
         if (verification.getCreateDate() != null) {
             LocalDateTime localDateTime = verification.getCreateDate().toLocalDateTime();
