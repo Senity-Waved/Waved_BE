@@ -5,15 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MyChallengeResponseDto {
     private String groupTitle;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private ZonedDateTime startDate;
+    private ZonedDateTime endDate;
     private Long successCount;
     private Boolean isReviewed;
     private Boolean isVerified;

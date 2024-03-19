@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,10 +33,10 @@ public class ChallengeGroup extends BaseEntity {
     private Long participantCount;
 
     @Column(name = "start_date")
-    private LocalDate startDate;
+    private ZonedDateTime startDate;
 
     @Column(name = "end_date")
-    private LocalDate endDate;
+    private ZonedDateTime endDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id")

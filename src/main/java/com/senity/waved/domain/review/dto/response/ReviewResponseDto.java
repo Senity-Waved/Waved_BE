@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.sql.Timestamp;
+import java.time.ZonedDateTime;
 
 @Getter
 @SuperBuilder
@@ -15,7 +15,6 @@ public class ReviewResponseDto {
     private String jobTitle;
     private String groupTitle;
     private String content;
-    private Timestamp createDate;
-
+    private ZonedDateTime createDate;
     private Long challengeId;
 }

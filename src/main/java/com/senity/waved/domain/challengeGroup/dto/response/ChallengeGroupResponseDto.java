@@ -1,13 +1,12 @@
 package com.senity.waved.domain.challengeGroup.dto.response;
 
 import com.senity.waved.domain.challenge.entity.VerificationType;
-import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Getter
 @SuperBuilder
@@ -15,8 +14,8 @@ import java.time.LocalDate;
 public class ChallengeGroupResponseDto {
     private String groupTitle;
     private Long participantCount;
-    private LocalDate startDate;
-    private LocalDate endDate;
+    private ZonedDateTime startDate;
+    private ZonedDateTime endDate;
     private VerificationType verificationType;
     private String description;
     private String verificationDescription;

@@ -16,7 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,7 +30,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public Page<ChallengeGroupResponseDto> getGroupsPaged(int pageNumber, int pageSize) {
-        List<ChallengeGroup> groups = groupRepository.findChallengeGroupsInProgress(LocalDate.now());
+        List<ChallengeGroup> groups = groupRepository.findChallengeGroupsInProgress(ZonedDateTime.now());
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         List<ChallengeGroupResponseDto> groupResponseDtoList = getPaginatedGroupResponseDtoList(groups, pageable);

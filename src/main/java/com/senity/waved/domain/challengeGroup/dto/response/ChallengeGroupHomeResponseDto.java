@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Getter
 @SuperBuilder
@@ -16,7 +16,7 @@ public class ChallengeGroupHomeResponseDto {
     private VerificationType verificationType;
     private Boolean isFree;
     private Long participantCount;
-    private LocalDate startDate;
+    private ZonedDateTime startDate;
 
     // group 상세페이지 호출을 위한 id값
     private Long challengeGroupId;

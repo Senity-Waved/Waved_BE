@@ -6,9 +6,9 @@ import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 @Service
@@ -54,7 +54,7 @@ public class VerificationServiceImpl implements VerificationService {
                 isSuccess = verifyLink(requestDto, member, challengeGroup);
                 break;
             case PICTURE:
-                isSuccess = verifyPicture(requestDto, member, challengeGroup); // 수정 필요
+                isSuccess = verifyPicture(requestDto, member, challengeGroup);
                 break;
             case GITHUB:
                 isSuccess = verifyGithub(requestDto, member, challengeGroup, challengeGroupId);
@@ -168,13 +168,12 @@ public class VerificationServiceImpl implements VerificationService {
 
     // TODO: 제출안함(0), 실패(1), 성공(2)
     private void updateMyChallengeStatus(Member member, ChallengeGroup challengeGroup, boolean isSuccess) {
-        LocalDate currentDate = LocalDate.now();
+        ZonedDateTime currentDate = ZonedDateTime.now();
 
         MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
 
         if (myChallenge.isValidChallengePeriod(challengeGroup.getStartDate(), currentDate)) {
             initVerification(myChallenge);
-
             updateVerificationAndSuccessCount(myChallenge, challengeGroup.getStartDate(), currentDate, isSuccess);
 
             myChallengeRepository.save(myChallenge);
@@ -193,7 +192,7 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
-    private void updateVerificationAndSuccessCount(MyChallenge myChallenge, LocalDate startDate, LocalDate currentDate, boolean isSuccess) {
+    private void updateVerificationAndSuccessCount(MyChallenge myChallenge, ZonedDateTime startDate, ZonedDateTime currentDate, boolean isSuccess) {
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
         // isSuccess 가 true일 경우 성공(1), false일 경우 실패(0)로 업데이트
         myChallenge.updateVerificationStatus((int)daysFromStart, isSuccess);

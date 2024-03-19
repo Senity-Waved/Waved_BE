@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,5 +13,5 @@ public interface ChallengeGroupRepository extends JpaRepository<ChallengeGroup, 
     Optional<ChallengeGroup> findById(Long id);
 
     @Query("SELECT cg FROM ChallengeGroup cg WHERE cg.startDate < :today AND cg.endDate > :today")
-    List<ChallengeGroup> findChallengeGroupsInProgress(@Param("today") LocalDate today);
+    List<ChallengeGroup> findChallengeGroupsInProgress(@Param("today") ZonedDateTime today);
 }

@@ -88,6 +88,7 @@ public class Verification extends BaseEntity {
                 .imageUrl(verification.getImageUrl())
                 .link(verification.getLink())
                 .verificationId(verification.getId())
+                .verificationDate(verification.getCreateDate())
                 .isDeleted(verification.getIsDeleted())
                 .build();
     }
