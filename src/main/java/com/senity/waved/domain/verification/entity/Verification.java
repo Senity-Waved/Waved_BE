@@ -51,6 +51,7 @@ public class Verification extends BaseEntity {
     @JoinColumn(name = "challenge_group_id")
     private ChallengeGroup challengeGroup;
 
+    @Builder.Default
     @OneToMany(mappedBy = "verification", cascade = CascadeType.ALL)
     private List<Liked> likes = new ArrayList<>();
 
