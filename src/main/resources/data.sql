@@ -1,3 +1,4 @@
+/*
 -- Insert data into challenge table
 -- challengeID 인증 타입 → 1,2번(TEXT), 3번(PICTURE), 4번(GITHUB), 5번(LINK)
 INSERT INTO `challenge` (`create_date`, `modified_date`, `description`, `is_free`, `title`, `verification_description`, `verification_type`)
@@ -141,5 +142,6 @@ VALUES
     ('2024-03-14 00:00:00', '2024-03-11 00:00:00', 3, 'true', 'GITHUB', 3),
     ('2024-03-15 00:00:00', '2024-03-11 00:00:00', 3, 'false', 'GITHUB', 3),
     ('2024-03-16 00:00:00', '2024-03-11 00:00:00', 2, '유진 프론트엔드 링크 인증합니다.', 'LINK', 3);
+*/
 */
 
