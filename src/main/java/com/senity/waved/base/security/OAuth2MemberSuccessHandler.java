@@ -2,10 +2,11 @@ package com.senity.waved.base.security;
 
 import com.senity.waved.base.jwt.TokenDto;
 import com.senity.waved.base.jwt.TokenProvider;
+import com.senity.waved.base.redis.Redis;
 import com.senity.waved.base.redis.RedisUtil;
 import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -40,11 +42,11 @@ public class OAuth2MemberSuccessHandler extends SimpleUrlAuthenticationSuccessHa
         TokenDto token = new TokenDto(tokenProvider.createAccessToken(userEmail),
                 tokenProvider.createRefreshToken(userEmail), member.getHasInfo());
 
-/*        Optional<Redis> optionalRedis = redisUtil.findByEmail(userEmail);
+        Optional<Redis> optionalRedis = redisUtil.findByEmail(userEmail);
         if (optionalRedis.isPresent()) {
             redisUtil.deleteByEmail(userEmail);
         }
-        redisUtil.save(userEmail, token.getRefreshToken());*/
+        redisUtil.save(userEmail, token.getRefreshToken());
 
         String url = makeRedirectUrl(token.getAccessToken(), token.getRefreshToken(), token.getHasInfo());
         response.sendRedirect(url);
