@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,13 +44,13 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
         switch (status) {
             case PROGRESS:
-                    myChallengesListed = myChallengeRepository.findMyChallengesInProgress(memberId, LocalDate.now());
+                    myChallengesListed = myChallengeRepository.findMyChallengesInProgress(memberId, ZonedDateTime.now());
                     break;
             case WAITING:
-                    myChallengesListed = myChallengeRepository.findMyChallengesWaiting(memberId, LocalDate.now());
+                    myChallengesListed = myChallengeRepository.findMyChallengesWaiting(memberId, ZonedDateTime.now());
                     break;
             case COMPLETED:
-                    myChallengesListed = myChallengeRepository.findMyChallengesCompleted(memberId, LocalDate.now());
+                    myChallengesListed = myChallengeRepository.findMyChallengesCompleted(memberId, ZonedDateTime.now());
                     break;
             default:
                 throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");

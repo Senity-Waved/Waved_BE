@@ -40,7 +40,7 @@ public class ChallengeGroupController {
     }
 
     @GetMapping("/dates")
-    public ResponseEntity<List<VerificationListResponseDto>> getVerificationsByDate(
+    public ResponseEntity<List<VerificationListResponseDto>> getVerificationsByDate (
             @PathVariable("challengeGroupId") Long challengeGroupId,
             @RequestParam("verificationDate") Timestamp verificationDate,
             @AuthenticationPrincipal User user) {

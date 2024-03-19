@@ -10,10 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-
 
 @Entity
 @Getter
@@ -49,7 +48,7 @@ public class MyChallenge extends BaseEntity {
         }
     }
 
-    public boolean isValidChallengePeriod(LocalDate startDate, LocalDate currentDate) {
+    public boolean isValidChallengePeriod(ZonedDateTime startDate, ZonedDateTime currentDate) {
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
         return daysFromStart >= 0 && daysFromStart < 14;
     }
@@ -72,8 +71,8 @@ public class MyChallenge extends BaseEntity {
     }
 
     public boolean isVerified() {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate startDate = this.challengeGroup.getStartDate();
+        ZonedDateTime currentDate = ZonedDateTime.now();
+        ZonedDateTime startDate = this.challengeGroup.getStartDate();
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate); //startDate부터 오늘 날짜 차이 계산
 
         if (this.myVerifs.length == 0) {

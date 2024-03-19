@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @Transactional(readOnly = true)
@@ -21,8 +23,9 @@ public class QuizServiceImpl implements QuizService {
     public Quiz findValidQuizByChallengeGroupId(Long challengeGroupId) {
         verificationService.challengeGroupIsTextType(challengeGroupId);
 
-        LocalDate today = LocalDate.now();
+        ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
         return quizRepository.findByChallengeGroupIdAndDate(challengeGroupId, today)
                 .orElseThrow(() -> new QuizNotFoundException("오늘의 퀴즈를 찾을 수 없습니다."));
     }
 }
+

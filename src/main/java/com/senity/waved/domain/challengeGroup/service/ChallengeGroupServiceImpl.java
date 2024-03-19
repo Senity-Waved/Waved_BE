@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -68,12 +67,12 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         Boolean isApplied = myChallenge.isPresent()? true : false;
         return ChallengeGroup.getGroupResponse(group, isApplied);
     }
-  
+
     @Override
     public List<VerificationListResponseDto> getVerifications(String email, Long challengeGroupId, Timestamp verificationDate) {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
-        LocalDateTime[] dateRange = calculateStartAndEndDate(verificationDate);
+        ZonedDateTime[] dateRange = calculateStartAndEndDate(verificationDate);
         List<Verification> verifications = findVerifications(challengeGroup, dateRange);
         return convertToDtoList(verifications, member);
     }
@@ -88,20 +87,20 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .orElseThrow(() -> new MemberNotFoundException("해당 회원을 찾을 수 없습니다."));
     }
 
-    private LocalDateTime[] calculateStartAndEndDate(Timestamp verificationDate) {
-        ZonedDateTime zonedStartOfDay = verificationDate.toLocalDateTime().atZone(ZoneId.of("Asia/Seoul")).toLocalDate().atStartOfDay(ZoneId.of("Asia/Seoul"));
-        LocalDateTime startOfDay = zonedStartOfDay.toLocalDateTime();
-        LocalDateTime endOfDay = startOfDay.withHour(23).withMinute(59).withSecond(59).withNano(999000000); // 23:59:59.999
+    private ZonedDateTime[] calculateStartAndEndDate(Timestamp verificationDate) {
+        ZonedDateTime startOfDay = verificationDate.toLocalDateTime().atZone(ZoneId.of("Asia/Seoul")).toLocalDate().atStartOfDay(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime endOfDay = startOfDay.withHour(23).withMinute(59).withSecond(59).withNano(999000000); // 23:59:59.999
 
-        return new LocalDateTime[]{startOfDay, endOfDay};
+        return new ZonedDateTime[]{startOfDay, endOfDay};
     }
 
-    private List<Verification> findVerifications(ChallengeGroup challengeGroup, LocalDateTime[] dateRange) {
-
+    private List<Verification> findVerifications(ChallengeGroup challengeGroup, ZonedDateTime[] dateRange) {
         return verificationRepository.findByCreateDateBetweenAndChallengeGroupAndIsDeletedFalse (
-                Timestamp.valueOf(dateRange[0]), Timestamp.valueOf(dateRange[1]), challengeGroup);
+                ZonedDateTime.of(dateRange[0].toLocalDate(), dateRange[0].toLocalTime(), dateRange[0].getZone()),
+                ZonedDateTime.of(dateRange[1].toLocalDate(), dateRange[1].toLocalTime(), dateRange[1].getZone()),
+                challengeGroup
+        );
     }
-
 
     private List<VerificationListResponseDto> convertToDtoList(List<Verification> verifications, Member member) {
         if (verifications.isEmpty()) {

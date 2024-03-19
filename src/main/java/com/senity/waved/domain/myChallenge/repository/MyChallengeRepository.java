@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,12 +16,12 @@ public interface MyChallengeRepository extends JpaRepository<MyChallenge, Long> 
     Optional<MyChallenge> findByMemberAndChallengeGroup(Member member, ChallengeGroup challengeGroup);
 
     @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.member.id = :memberId AND cg.startDate > :today")
-    List<MyChallenge> findMyChallengesWaiting(@Param("memberId") Long memberId, @Param("today") LocalDate today);
+    List<MyChallenge> findMyChallengesWaiting(@Param("memberId") Long memberId, @Param("today") ZonedDateTime today);
 
     @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.member.id = :memberId AND cg.startDate < :today AND cg.endDate > :today")
-    List<MyChallenge> findMyChallengesInProgress(@Param("memberId") Long memberId, @Param("today") LocalDate today);
+    List<MyChallenge> findMyChallengesInProgress(@Param("memberId") Long memberId, @Param("today") ZonedDateTime today);
 
     @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.member.id = :memberId AND cg.endDate < :today")
-    List<MyChallenge> findMyChallengesCompleted(@Param("memberId") Long memberId, @Param("today") LocalDate today);
+    List<MyChallenge> findMyChallengesCompleted(@Param("memberId") Long memberId, @Param("today") ZonedDateTime today);
 }
 

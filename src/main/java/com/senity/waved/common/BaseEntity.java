@@ -6,12 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -28,10 +25,9 @@ public abstract class BaseEntity {
 
     @CreationTimestamp
     @Column(name = "create_date", updatable = false)
-    private Timestamp createDate;
-
+    private ZonedDateTime createDate;
 
     @UpdateTimestamp
     @Column(name = "modified_date")
-    private Timestamp lastModifiedDate;
+    private ZonedDateTime lastModifiedDate;
 }

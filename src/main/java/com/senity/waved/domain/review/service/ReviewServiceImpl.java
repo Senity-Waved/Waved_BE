@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         ChallengeGroup challengeGroup = myChallenge.getChallengeGroup();
 
-        if (challengeGroup.getEndDate().isAfter(LocalDate.now())) {
+        if (challengeGroup.getEndDate().isAfter(ZonedDateTime.now())) {
             throw new ChallengeGroupNotCompletedException("종료된 챌린지 그룹에 대해서만 리뷰 작성 가능합니다.");
         }
 
@@ -46,6 +46,12 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
 
         reviewRepository.save(newReview);
+    }
+
+    @Transactional(readOnly = true)
+    public String getReviewContentForEdit(String email, Long reviewId) {
+        Review review = getReviewAndCheckPermission(email, reviewId, "리뷰 작성자만 수정 가능합니다.");
+        return review.getContent();
     }
 
     @Transactional
