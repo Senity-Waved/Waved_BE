@@ -48,6 +48,12 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.save(newReview);
     }
 
+    @Transactional(readOnly = true)
+    public String getReviewContentForEdit(String email, Long reviewId) {
+        Review review = getReviewAndCheckPermission(email, reviewId, "리뷰 작성자만 수정 가능합니다.");
+        return review.getContent();
+    }
+    
     @Transactional
     public void editChallengeReview(String email, Long reviewId, String content) {
         Review review = getReviewAndCheckPermission(email, reviewId, "리뷰 작성자만 수정 가능합니다.");

@@ -27,6 +27,14 @@ public class ReviewController {
         return new ResponseEntity<>("리뷰를 저장했습니다.", HttpStatus.OK);
     }
 
+    @GetMapping("/{reviewId}")
+    public String getReviewForEdit(
+            @AuthenticationPrincipal User user,
+            @PathVariable("reviewId") Long reviewId
+    ) {
+        return reviewService.getReviewContentForEdit(user.getUsername(), reviewId);
+    }
+
     @PatchMapping("/{reviewId}")
     public ResponseEntity<String> editReview(
             @AuthenticationPrincipal User user,
