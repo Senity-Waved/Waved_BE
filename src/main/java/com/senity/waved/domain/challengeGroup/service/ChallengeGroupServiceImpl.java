@@ -56,7 +56,6 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .member(member)
                 .myVerifs(new int[14])
                 .deposit(deposit)
-                .isRefundRequested(false)
                 .build();
 
         myChallengeRepository.save(newMyChallenge);
