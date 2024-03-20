@@ -37,6 +37,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private final ChallengeGroupRepository challengeGroupRepository;
     private final LikedRepository likedRepository;
 
+    // TODO 테스트 종료 후 챌린지 그룹 status 확인: 대기중인 챌린지 그룹만 신청
     public void applyForChallengeGroup(String email, Long groupId) {
         Member member = getMemberByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
