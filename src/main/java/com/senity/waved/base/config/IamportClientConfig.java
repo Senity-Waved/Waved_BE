@@ -9,13 +9,15 @@ import org.springframework.context.annotation.Configuration;
 public class IamportClientConfig {
 
     @Value("${iamPort.rest.api.key}")
-    private String apiKey;
+    private String key;
 
     @Value("${iamPort.rest.api.secret}")
-    private String apiSecret;
+    private String secret;
+
 
     @Bean
     public IamportClient iamportClient() {
-        return new IamportClient(apiKey, apiSecret);
+        return new IamportClient(key, secret);
     }
 }
+

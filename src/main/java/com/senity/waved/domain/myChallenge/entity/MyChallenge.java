@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -32,6 +33,16 @@ public class MyChallenge extends BaseEntity {
 
     @Column(name = "is_verified")
     private Boolean isVerified;
+
+    @Column(name = "deposit")
+    private Long deposit;
+
+    @Column(name = "imp_urd")
+    private Long impUid;
+
+    @ColumnDefault("FALSE")
+    @Column(nullable = false)
+    private Boolean isDeleted; // true -> 삭제
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -63,6 +74,10 @@ public class MyChallenge extends BaseEntity {
 
     public void setSuccessCount(Long successCount) {
         this.successCount = successCount;
+    }
+
+    public void markAsDeleted(Boolean b) {
+        this.isDeleted = b;
     }
 
     public void setMyVerifs(int[] myVerifs) {

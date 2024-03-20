@@ -66,7 +66,7 @@ azure:
 iamPort:
   rest:
     api:
-      key: '${iamPort.rest.api.key}'
+      key: '$iamPort.rest.api.key}'
       secret: '${iamPort.rest.api.secret}'
 
 logging:

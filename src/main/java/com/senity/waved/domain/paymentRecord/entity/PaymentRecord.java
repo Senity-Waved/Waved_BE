@@ -25,4 +25,14 @@ public class PaymentRecord extends BaseEntity {
     private Member member;
 
     private Long myChallengeId;
+
+    public static PaymentRecord of(PaymentStatus status, Long deposit, Member member, Long myChallengeId) {
+        return PaymentRecord.builder()
+                .deposit(deposit)
+                .paymentStatus(status)
+                .member(member)
+                .myChallengeId(myChallengeId)
+                .build();
+    }
+
 }
