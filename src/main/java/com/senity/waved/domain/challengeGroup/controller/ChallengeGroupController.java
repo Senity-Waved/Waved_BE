@@ -31,10 +31,12 @@ public class ChallengeGroupController {
 
     @PostMapping("/apply")
     public Long applyChallengeGroup(
+            @AuthenticationPrincipal User user,
             @PathVariable("challengeGroupId") Long groupId,
-            @AuthenticationPrincipal User user
+            @RequestParam("deposit") Long deposit
+
     ) {
-        return challengeGroupService.applyForChallengeGroup(user.getUsername(), groupId);
+        return challengeGroupService.applyForChallengeGroup(user.getUsername(), groupId, deposit);
     }
 
     @GetMapping("/dates")

@@ -15,14 +15,11 @@ import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
-import com.siot.IamportRestClient.response.IamportResponse;
-import com.siot.IamportRestClient.response.Payment;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 @Service
 @AllArgsConstructor
@@ -32,7 +29,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     private final MyChallengeRepository myChallengeRepository;
     private final PaymentRecordRepository paymentRecordRepository;
     private final IamportClient api;
-    
+
     @Override
     @Transactional
     public void validateAndSavePaymentRecord(String email, Long myChallengeId, PaymentRequestDto requestDto) {
@@ -46,9 +43,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
 
             throw new DepositAmountNotMatchException("마이 챌린지의 예치금과 결제 금액이 일치하지 않습니다.");
         }
-
-        PaymentRecord paymentRecord = PaymentRecord.of(PaymentStatus.APPLIED, myChallenge.getDeposit(), member, myChallengeId);
-        paymentRecordRepository.save(paymentRecord);
+        savePaymentRecord(myChallenge, member, PaymentStatus.APPLIED);
     }
 
     @Override
@@ -59,20 +54,13 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         validateMember(member, myChallenge);
 
         try {
-            IamportResponse<Payment> iamportResponse = api.paymentByImpUid(String.valueOf(myChallenge.getImpUid()));
-            BigDecimal paidAmount = iamportResponse.getResponse().getAmount(); // 사용자가 실제 결제한 금액
-
-            CancelData cancelData = new CancelData(String.valueOf(myChallenge.getImpUid()), true);;
+            CancelData cancelData = new CancelData(String.valueOf(myChallenge.getImpUid()), true);
             api.cancelPaymentByImpUid(cancelData);
-
-            PaymentRecord paymentRecord = PaymentRecord.of(PaymentStatus.CANCELED, myChallenge.getDeposit(), member, myChallengeId);
-            paymentRecordRepository.save(paymentRecord);
-        }
-        catch (IamportResponseException | IOException e) {
-            throw new RuntimeException("결제 취소 중 오류가 발생했습니다.");
-
+        } catch (IamportResponseException | IOException e) {
+            throw new RuntimeException("결제 취소 중 오류가 발생했습니다.", e);
         }
 
+        savePaymentRecord(myChallenge, member, PaymentStatus.CANCELED);
         myChallenge.markAsDeleted(true);
         myChallengeRepository.save(myChallenge);
     }
@@ -82,21 +70,32 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     public String checkRefundDepositOrNot(String email, Long myChallengeId) {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallenge(myChallengeId);
-        PaymentStatus status;
-        StringBuilder msg = new StringBuilder();
 
-        if (myChallenge.getSuccessCount() < 11) {
-            status = PaymentStatus.FAIL;
-            msg.append("챌린지 성공률을 달성하지 못해 예치금을 환급받지 못했습니다.");
-        } else {
-            status = PaymentStatus.SUCCESS;
+        PaymentStatus status = myChallenge.getSuccessCount() < 11 ?
+                PaymentStatus.FAIL :
+                PaymentStatus.SUCCESS;
+
+        String message = myChallenge.getSuccessCount() < 11 ?
+                "챌린지 성공률을 달성하지 못해 예치금을 환급받지 못했습니다." :
+                "챌린지 성공률을 달성해 예치금을 환급받았습니다.";
+
+        if (status == PaymentStatus.SUCCESS) {
             cancelChallengePayment(email, myChallengeId);
-            msg.append("챌린지 성공률을 달성해 예치금을 환급받았습니다.");
         }
 
-        PaymentRecord paymentRecord = PaymentRecord.of(status, myChallenge.getDeposit(), member, myChallengeId);
+        savePaymentRecord(myChallenge, member, status);
+        return message;
+    }
+
+    private void savePaymentRecord(MyChallenge myChallenge, Member member, PaymentStatus status) {
+        String groupTitle = myChallenge.getChallengeGroup().getGroupTitle();
+        PaymentRecord paymentRecord = PaymentRecord.of(
+                status,
+                myChallenge.getDeposit(),
+                member,
+                myChallenge.getId(),
+                groupTitle);
         paymentRecordRepository.save(paymentRecord);
-        return String.valueOf(msg);
     }
 
     private Member getMemberByEmail(String email) {
