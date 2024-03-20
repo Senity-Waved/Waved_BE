@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ChallengeGroupServiceImpl implements ChallengeGroupService {
 
@@ -38,7 +37,9 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private final LikedRepository likedRepository;
 
     // TODO 테스트 종료 후 챌린지 그룹 status 확인: 대기중인 챌린지 그룹만 신청
-    public void applyForChallengeGroup(String email, Long groupId) {
+    @Override
+    @Transactional
+    public Long applyForChallengeGroup(String email, Long groupId) {
         Member member = getMemberByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
 
@@ -51,6 +52,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .challengeGroup(group)
                 .successCount(0L)
                 .isReviewed(false)
+                .isDeleted(false)
                 .member(member)
                 .myVerifs(new int[14])
                 .build();
@@ -58,8 +60,11 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         myChallengeRepository.save(newMyChallenge);
         group.addMyChallenge(newMyChallenge);
         challengeGroupRepository.save(group);
+        return newMyChallenge.getId();
     }
 
+    @Override
+    @Transactional(readOnly = true)
     public ChallengeGroupResponseDto getGroupDetail(String email, Long groupId) {
         ChallengeGroup group = getGroupById(groupId);
         Member member = getMemberByEmail(email);
@@ -70,6 +75,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<VerificationListResponseDto> getVerifications(String email, Long challengeGroupId, Timestamp verificationDate) {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
