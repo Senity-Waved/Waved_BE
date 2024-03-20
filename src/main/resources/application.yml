@@ -63,6 +63,12 @@ azure:
     connection-string: '${azure.storage.connection-string}'
     container-name: '${azure.storage.container-name}'
 
+iamPort:
+  rest:
+    api:
+      key: '${iamPort.rest.api.key}'
+      secret: '${iamPort.rest.api.secret}'
+
 logging:
   level:
     root: INFO
