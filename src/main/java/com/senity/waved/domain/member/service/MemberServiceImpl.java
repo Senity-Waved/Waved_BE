@@ -57,8 +57,8 @@ public class MemberServiceImpl implements MemberService {
         redisUtil.deleteByEmail(email);
     }
 
-    @Transactional
-    public void deleteMember(String email) {
+    @Transactionalㅣ;ㄴ
+    public void deleㅁteMember(String email) {
         memberRepository.deleteByEmail(email);
         redisUtil.deleteByEmail(email);
     }

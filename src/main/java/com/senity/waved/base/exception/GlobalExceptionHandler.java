@@ -136,7 +136,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DepositAmountNotMatchException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public String handleDepositAmountNotMatchException(MemberAndMyChallengeNotMatch e) {
+    public String handleDepositAmountNotMatchException(DepositAmountNotMatchException e) {
         return e.getMessage();
     }
 }
