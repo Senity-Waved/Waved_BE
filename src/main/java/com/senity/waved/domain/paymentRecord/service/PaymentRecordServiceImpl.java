@@ -41,7 +41,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         validateMember(member, myChallenge);
 
         if (!myChallenge.getDeposit().equals(requestDto.getDeposit())) {
-            // TODO cancelPayment()
+            cancelChallengePayment(email, myChallengeId);
             myChallengeRepository.deleteById(myChallengeId);
 
             throw new DepositAmountNotMatchException("마이 챌린지의 예치금과 결제 금액이 일치하지 않습니다.");
@@ -90,7 +90,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
             msg.append("챌린지 성공률을 달성하지 못해 예치금을 환급받지 못했습니다.");
         } else {
             status = PaymentStatus.SUCCESS;
-            // TODO cancelPayment()
+            cancelChallengePayment(email, myChallengeId);
             msg.append("챌린지 성공률을 달성해 예치금을 환급받았습니다.");
         }
 
