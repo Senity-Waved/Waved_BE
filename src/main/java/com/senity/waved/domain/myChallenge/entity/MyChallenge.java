@@ -41,7 +41,7 @@ public class MyChallenge extends BaseEntity {
     private String impUid;
 
     @ColumnDefault("FALSE")
-    @Column(nullable = true)
+    @Column(nullable = false)
     private Boolean isDeleted; // true -> 삭제
 
     @ManyToOne(fetch = FetchType.LAZY)

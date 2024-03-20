@@ -19,24 +19,9 @@ public class AzureBlobStorageService {
     private final BlobServiceClient blobServiceClient;
 
     public String uploadPicture(byte[] pictureData, String fileName) {
-        String fileExtension = getFileExtension(fileName);
-
-        // 확장자가 없는 경우 기본적으로 jpg로
-        if (fileExtension.isEmpty()) {
-            fileName += ".jpg";
-        }
-
         BlobContainerClient containerClient = blobServiceClient.getBlobContainerClient(containerName);
-        BlobClient blobClient = containerClient.getBlobClient(fileName + "." + fileExtension);
+        BlobClient blobClient = containerClient.getBlobClient(fileName);
         blobClient.upload(new ByteArrayInputStream(pictureData), pictureData.length);
         return blobClient.getBlobUrl();
-    }
-
-    private String getFileExtension(String fileName) {
-        int dotIndex = fileName.lastIndexOf('.');
-        if (dotIndex == -1) {
-            return "";
-        }
-        return fileName.substring(dotIndex + 1);
     }
 }
