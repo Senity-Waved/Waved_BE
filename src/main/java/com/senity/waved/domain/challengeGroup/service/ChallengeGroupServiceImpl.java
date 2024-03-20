@@ -39,7 +39,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     // TODO 테스트 종료 후 챌린지 그룹 status 확인: 대기중인 챌린지 그룹만 신청
     @Override
     @Transactional
-    public Long applyForChallengeGroup(String email, Long groupId) {
+    public Long applyForChallengeGroup(String email, Long groupId, Long deposit) {
         Member member = getMemberByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
 
@@ -55,6 +55,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .isDeleted(false)
                 .member(member)
                 .myVerifs(new int[14])
+                .deposit(deposit)
                 .build();
 
         myChallengeRepository.save(newMyChallenge);

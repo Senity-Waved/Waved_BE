@@ -5,6 +5,8 @@ import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
 import com.senity.waved.domain.member.service.MemberService;
+import com.senity.waved.domain.paymentRecord.dto.response.PaymentRecordResponseDto;
+import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -90,6 +92,15 @@ public class MemberController {
             @RequestParam(value = "limit", defaultValue = "5") int pageSize
     ) {
         return memberService.getReviewsPaged(user.getUsername(), pageNumber, pageSize);
+    }
+
+    @GetMapping("/paymentRecords")
+    public Page<PaymentRecordResponseDto> getMyPaymentRecords(
+            @AuthenticationPrincipal User user,
+            @RequestParam(value = "page", defaultValue = "0") int pageNumber,
+            @RequestParam(value = "limit", defaultValue = "5") int pageSize
+    ) {
+        return memberService.getMyPaymentRecordsPaged(user.getUsername(), pageNumber, pageSize);
     }
 }
 

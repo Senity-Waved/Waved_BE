@@ -9,6 +9,8 @@ import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
+import com.senity.waved.domain.paymentRecord.dto.response.PaymentRecordResponseDto;
+import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
@@ -102,7 +104,7 @@ public class MemberServiceImpl implements MemberService {
         member.updateGithubInfo(GithubInfoDto.builder().build());
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<ReviewResponseDto> getReviewsPaged(String email, int pageNumber, int pageSize) {
         Member member = getMemberByEmail(email);
         List<Review> reviews = member.getReviews();
@@ -113,6 +115,17 @@ public class MemberServiceImpl implements MemberService {
         return new PageImpl<>(responseDtoList, pageable, reviews.size());
     }
 
+    @Transactional(readOnly = true)
+    public Page<PaymentRecordResponseDto> getMyPaymentRecordsPaged(String email, int pageNumber, int pageSize) {
+        Member member = getMemberByEmail(email);
+        List<PaymentRecord> paymentRecords = member.getPaymentRecords();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        List<PaymentRecordResponseDto> responseDtoList = getPaginatedPaymentResponseDtoList(paymentRecords, pageable);
+
+        return new PageImpl<>(responseDtoList, pageable, paymentRecords.size());
+    }
+
     private List<ReviewResponseDto> getPaginatedReviewResponseDtoList(List<Review> reviews, Pageable pageable) {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), reviews.size());
@@ -120,6 +133,16 @@ public class MemberServiceImpl implements MemberService {
         return reviews.subList(start, end)
                 .stream()
                 .map(Review::getMemberReviewResponse)
+                .collect(Collectors.toList());
+    }
+
+    private List<PaymentRecordResponseDto> getPaginatedPaymentResponseDtoList(List<PaymentRecord> paymentRecords, Pageable pageable) {
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), paymentRecords.size());
+
+        return paymentRecords.subList(start, end)
+                .stream()
+                .map(PaymentRecord::getPaymentResponse)
                 .collect(Collectors.toList());
     }
 
