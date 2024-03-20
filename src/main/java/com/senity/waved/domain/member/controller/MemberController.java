@@ -36,9 +36,8 @@ public class MemberController {
 
     @PostMapping("/reissue")
     public ResponseEntity<String> reissue(HttpServletRequest request) {
-        //String refreshToken = memberService.resolveRefreshToken(request.getHeader("Authorization"));
-        //return tokenProvider.generateAccessToken(refreshToken);
-        return new ResponseEntity<>("/reissue commented out", HttpStatus.OK);
+        String refreshToken = memberService.resolveRefreshToken(request.getHeader("Authorization"));
+        return tokenProvider.generateAccessToken(refreshToken);
     }
 
     @PostMapping("/logout")
