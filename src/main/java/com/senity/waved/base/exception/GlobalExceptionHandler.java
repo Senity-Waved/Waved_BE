@@ -9,6 +9,8 @@ import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
+import com.senity.waved.domain.paymentRecord.exception.DepositAmountNotMatchException;
+import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatch;
 import com.senity.waved.domain.quiz.exception.QuizNotFoundException;
 import com.senity.waved.domain.review.exception.AlreadyReviewedException;
 import com.senity.waved.domain.review.exception.ReviewNotFoundException;
@@ -126,4 +128,15 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
+    @ExceptionHandler(MemberAndMyChallengeNotMatch.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleMemberAndMyChallengeNotMatch(MemberAndMyChallengeNotMatch e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(DepositAmountNotMatchException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleDepositAmountNotMatchException(MemberAndMyChallengeNotMatch e) {
+        return e.getMessage();
+    }
 }
