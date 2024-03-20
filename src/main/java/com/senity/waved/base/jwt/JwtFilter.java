@@ -36,6 +36,11 @@ public class JwtFilter extends GenericFilterBean {
         String jwt = resolveToken(httpServletRequest);
         String requestURI = httpServletRequest.getRequestURI();
 
+        if ("/api/v1/challenges/waiting".equals(requestURI)) {
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
+
         if (StringUtils.hasText(jwt)) {
             try {
                 tokenProvider.validateToken(jwt);
