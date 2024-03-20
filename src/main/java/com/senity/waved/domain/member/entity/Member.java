@@ -5,6 +5,7 @@ import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
+import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.review.entity.Review;
 import com.senity.waved.domain.verification.entity.Verification;
 import jakarta.persistence.*;
@@ -62,6 +63,9 @@ public class Member extends BaseEntity {
     @Builder.Default
     private List<Verification> verification = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
+    private List<PaymentRecord> paymentRecords = new ArrayList<>();
 
     public void updateInfo(ProfileEditDto editDto) {
         nickname = editDto.getNickname();
