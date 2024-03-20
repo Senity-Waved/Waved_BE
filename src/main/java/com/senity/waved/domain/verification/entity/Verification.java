@@ -40,7 +40,7 @@ public class Verification extends BaseEntity {
     private Long likesCount = 0L;
 
     @ColumnDefault("FALSE")
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Boolean isDeleted; // true -> 삭제
 
     @ManyToOne(fetch = FetchType.LAZY)

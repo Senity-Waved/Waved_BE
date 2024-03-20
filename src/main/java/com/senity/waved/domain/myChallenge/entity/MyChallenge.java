@@ -38,7 +38,7 @@ public class MyChallenge extends BaseEntity {
     private Long deposit;
 
     @Column(name = "imp_urd")
-    private Long impUid;
+    private String impUid;
 
     @ColumnDefault("FALSE")
     @Column(nullable = false)
