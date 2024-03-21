@@ -28,9 +28,10 @@ public class ChallengeGroupController {
             @AuthenticationPrincipal User user,
             @PathVariable("challengeGroupId") Long groupId
     ) {
-        String email = Objects.isNull(user)? null : user.getUsername();
+        String email = Objects.isNull(user) ? null : user.getUsername();
         return challengeGroupService.getGroupDetail(email, groupId);
     }
+
 
     @PostMapping("/{challengeGroupId}")
     public ResponseEntity<String> applyChallengeGroup(

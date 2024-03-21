@@ -141,6 +141,7 @@ public class VerificationServiceImpl implements VerificationService {
                     .challengeGroup(challengeGroup)
                     .verificationType(VerificationType.PICTURE)
                     .imageUrl(imageUrl)
+                    .isDeleted(false)
                     .build();
             verificationRepository.save(verification);
 

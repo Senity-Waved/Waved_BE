@@ -17,5 +17,6 @@ public interface VerificationRepository extends JpaRepository<Verification, Long
     List<Verification> findByCreateDateBetweenAndChallengeGroupAndIsDeletedFalse (
             @Param("startOfDay") ZonedDateTime startOfDay,
             @Param("endOfDay") ZonedDateTime endOfDay,
-            @Param("challengeGroup") ChallengeGroup challengeGroup);
+            @Param("challengeGroup") ChallengeGroup challengeGroup
+    );
 }

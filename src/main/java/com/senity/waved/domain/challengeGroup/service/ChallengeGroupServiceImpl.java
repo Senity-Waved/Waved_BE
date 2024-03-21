@@ -64,13 +64,13 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     public ChallengeGroupResponseDto getGroupDetail(String email, Long groupId) {
         ChallengeGroup group = getGroupById(groupId);
         if (Objects.isNull(email))
-            return ChallengeGroup.getGroupResponse(group, null);
+            return ChallengeGroup.getGroupResponse(group, -1L);
 
         Member member = getMemberByEmail(email);
         Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberAndChallengeGroup(member, group);
 
-        Boolean isApplied = myChallenge.isPresent()? true : false;
-        return ChallengeGroup.getGroupResponse(group, isApplied);
+        Long myChallengeId = myChallenge.isPresent() ? myChallenge.get().getId() : -1L;
+        return ChallengeGroup.getGroupResponse(group, myChallengeId);
     }
 
     @Override

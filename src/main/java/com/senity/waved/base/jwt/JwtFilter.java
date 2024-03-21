@@ -36,13 +36,6 @@ public class JwtFilter extends GenericFilterBean {
         String jwt = resolveToken(httpServletRequest);
         String requestURI = httpServletRequest.getRequestURI();
 
-        if ("/api/v1/challenges/waiting".equals(requestURI) ||
-                requestURI.startsWith("/api/v1/challenges/") ||
-                requestURI.startsWith("/api/v1/challengeGroups/info/")) {
-            filterChain.doFilter(servletRequest, servletResponse);
-            return;
-        }
-
         if (StringUtils.hasText(jwt)) {
             try {
                 tokenProvider.validateToken(jwt);
@@ -51,6 +44,7 @@ public class JwtFilter extends GenericFilterBean {
                 logger.debug("Security Context에 '{}' 인증 정보를 저장했습니다, uri: {}",
                         authentication.getName(), requestURI);
             } catch (ExpiredJwtException e) {
+                logger.error("인증 과정에서 예외 발생, uri: {}", requestURI, e);
                 writeErrorResponse(servletResponse, e.getMessage());
                 return;
             } catch (BlackListedTokenException e) {
@@ -70,10 +64,18 @@ public class JwtFilter extends GenericFilterBean {
                 return;
             }
         } else {
-            writeErrorResponse(servletResponse, "인증정보가 없습니다.");
-            return;
+            if (!isPathExempted(requestURI)) {
+                writeErrorResponse(servletResponse, "인증정보가 없습니다.");
+                return;
+            }
         }
         filterChain.doFilter(servletRequest, servletResponse);
+    }
+
+    private boolean isPathExempted(String requestURI) {
+        return requestURI.startsWith("/api/v1/challenges/waiting") ||
+                requestURI.startsWith("/api/v1/challenges/") ||
+                requestURI.startsWith("/api/v1/challengeGroups/info/");
     }
 
     private void writeErrorResponse(ServletResponse response, String message) throws IOException {

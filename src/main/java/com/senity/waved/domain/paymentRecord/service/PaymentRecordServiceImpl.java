@@ -55,8 +55,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
 //        }
 
         savePaymentRecord(myChallenge, member, PaymentStatus.CANCELED);
-        myChallenge.markAsDeleted(true);
-        myChallengeRepository.save(myChallenge);
+        myChallengeRepository.delete(myChallenge);
     }
 
     @Override

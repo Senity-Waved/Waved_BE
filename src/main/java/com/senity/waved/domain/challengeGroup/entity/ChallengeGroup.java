@@ -64,8 +64,9 @@ public class ChallengeGroup extends BaseEntity {
         participantCount--;
     }
 
-    public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group, Boolean isApplied) {
+    public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group, Long myChallengeId) {
         Challenge challenge = group.getChallenge();
+        Boolean isApplied = myChallengeId > 0 ? true : false;
         return ChallengeGroupResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .participantCount(group.getParticipantCount())
@@ -75,6 +76,8 @@ public class ChallengeGroup extends BaseEntity {
                 .description(challenge.getDescription())
                 .verificationDescription(challenge.getVerificationDescription())
                 .isApplied(isApplied)
+                .isFree(challenge.getIsFree())
+                .myChallengeId(myChallengeId)
                 .challengeId(challenge.getId())
                 .build();
     }
