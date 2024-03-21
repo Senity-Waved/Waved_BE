@@ -37,21 +37,21 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         challengeGroupRepository.save(group);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status) {
         Long memberId = getMemberByEmail(email).getId();
         List<MyChallenge> myChallengesListed;
 
         switch (status) {
             case PROGRESS:
-                    myChallengesListed = myChallengeRepository.findMyChallengesInProgress(memberId, ZonedDateTime.now());
-                    break;
+                myChallengesListed = myChallengeRepository.findMyChallengesInProgress(memberId, ZonedDateTime.now());
+                break;
             case WAITING:
-                    myChallengesListed = myChallengeRepository.findMyChallengesWaiting(memberId, ZonedDateTime.now());
-                    break;
+                myChallengesListed = myChallengeRepository.findMyChallengesWaiting(memberId, ZonedDateTime.now());
+                break;
             case COMPLETED:
-                    myChallengesListed = myChallengeRepository.findMyChallengesCompleted(memberId, ZonedDateTime.now());
-                    break;
+                myChallengesListed = myChallengeRepository.findMyChallengesCompleted(memberId, ZonedDateTime.now());
+                break;
             default:
                 throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");
         }

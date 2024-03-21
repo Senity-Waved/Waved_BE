@@ -27,12 +27,9 @@ public class MyChallenge extends BaseEntity {
 
     @Column(name = "success_count")
     private Long successCount;
-  
+
     @Column(name = "is_reviewed")
     private Boolean isReviewed;
-
-    @Column(name = "is_verified")
-    private Boolean isVerified;
 
     @Column(name = "deposit")
     private Long deposit;
