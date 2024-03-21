@@ -28,6 +28,7 @@ public class PaymentRecord extends BaseEntity {
     @Column(name = "group_title")
     private String groupTitle;
 
+    @Column(name = "my_challenge_id")
     private Long myChallengeId;
 
     public static PaymentRecord of(PaymentStatus status, Long deposit, Member member, Long myChallengeId, String groupTitle) {
