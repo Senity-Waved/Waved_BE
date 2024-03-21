@@ -1,6 +1,7 @@
 package com.senity.waved.domain.myChallenge.entity;
 
 import com.senity.waved.common.BaseEntity;
+import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
@@ -9,7 +10,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -31,15 +31,14 @@ public class MyChallenge extends BaseEntity {
     @Column(name = "is_reviewed")
     private Boolean isReviewed;
 
+    @Column(name = "is_refund_requested")
+    private Boolean isRefundRequested;
+
     @Column(name = "deposit")
     private Long deposit;
 
     @Column(name = "imp_urd")
     private String impUid;
-
-    @ColumnDefault("FALSE")
-    @Column(nullable = true)
-    private Boolean isDeleted; // true -> 삭제
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -73,10 +72,6 @@ public class MyChallenge extends BaseEntity {
         this.successCount = successCount;
     }
 
-    public void markAsDeleted(Boolean b) {
-        this.isDeleted = b;
-    }
-
     public void setMyVerifs(int[] myVerifs) {
         this.myVerifs = myVerifs;
         Arrays.fill(this.myVerifs, 0);
@@ -106,6 +101,7 @@ public class MyChallenge extends BaseEntity {
 
     public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified, Boolean isGithubConnected) {
         ChallengeGroup group = myChallenge.getChallengeGroup();
+        Challenge challenge = group.getChallenge();
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
@@ -115,6 +111,7 @@ public class MyChallenge extends BaseEntity {
                 .challengeGroupId(group.getId())
                 .isVerified(isVerified)
                 .isGithubConnected(isGithubConnected)
+                .verificationType(challenge.getVerificationType())
                 .build();
     }
 
@@ -130,6 +127,7 @@ public class MyChallenge extends BaseEntity {
 
     public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge) {
         ChallengeGroup group = myChallenge.getChallengeGroup();
+        Boolean isSuccessed = myChallenge.getSuccessCount() > 10 ? true : false;
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
@@ -137,6 +135,9 @@ public class MyChallenge extends BaseEntity {
                 .challengeGroupId(group.getId())
                 .myChallengeId(myChallenge.getId())
                 .isReviewed(myChallenge.getIsReviewed())
+                .isRefundRequested(myChallenge.getIsRefundRequested())
+                .deposit(myChallenge.getDeposit())
+                .isSuccessed(isSuccessed)
                 .build();
     }
 }
