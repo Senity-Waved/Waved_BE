@@ -5,7 +5,6 @@ import com.senity.waved.domain.challengeGroup.dto.response.VerificationListRespo
 import com.senity.waved.domain.challengeGroup.service.ChallengeGroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -34,12 +33,11 @@ public class ChallengeGroupController {
 
 
     @PostMapping("/{challengeGroupId}")
-    public ResponseEntity<String> applyChallengeGroup(
+    public Long applyChallengeGroup(
             @PathVariable("challengeGroupId") Long groupId,
             @AuthenticationPrincipal User user
     ) {
-        challengeGroupService.applyForChallengeGroup(user.getUsername(), groupId);
-        return new ResponseEntity<>("챌린지 그룹 참여 신청을 완료했습니다.", HttpStatus.OK);
+        return challengeGroupService.applyForChallengeGroup(user.getUsername(), groupId);
     }
 
     @GetMapping("/{challengeGroupId}")
