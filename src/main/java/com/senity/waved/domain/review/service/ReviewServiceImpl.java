@@ -38,13 +38,14 @@ public class ReviewServiceImpl implements ReviewService {
             throw new ChallengeGroupNotCompletedException("종료된 챌린지 그룹에 대해서만 리뷰 작성 가능합니다.");
         }
 
-        checkReviewExist(myChallengeId, member.getId());
+        checkReviewExist(myChallengeId);
         Review newReview = Review.builder()
                 .content(content)
                 .member(member)
                 .challengeGroup(challengeGroup)
                 .build();
 
+        myChallenge.updateIsReviewed();
         reviewRepository.save(newReview);
     }
 
@@ -79,7 +80,7 @@ public class ReviewServiceImpl implements ReviewService {
         return review;
     }
 
-    private void checkReviewExist(Long myChallengeId, Long memberId) {
+    private void checkReviewExist(Long myChallengeId) {
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         if (myChallenge.getIsReviewed()) {
             throw new AlreadyReviewedException("해당 챌린지에 이미 리뷰를 남기셨습니다.");
@@ -93,7 +94,7 @@ public class ReviewServiceImpl implements ReviewService {
 
     private MyChallenge getMyChallengeById(Long id) {
         return myChallengeRepository.findById(id)
-                .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이챌린지를 찾을 수 없습니다."));
 
     }
 }

@@ -55,6 +55,10 @@ public class MyChallenge extends BaseEntity {
         }
     }
 
+    public void updateIsReviewed() {
+        isReviewed = true;
+    }
+
     public boolean isValidChallengePeriod(ZonedDateTime startDate, ZonedDateTime currentDate) {
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
         return daysFromStart >= 0 && daysFromStart < 14;
