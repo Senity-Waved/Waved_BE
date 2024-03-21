@@ -20,7 +20,10 @@ public class ChallengeGroupResponseDto {
     private String description;
     private String verificationDescription;
     private Boolean isApplied;
+    private Boolean isFree;
 
     // 챌린지(전체 그룹) 리뷰 paged 조회를 위한 id값
     private Long challengeId;
+    // 챌린지 그룹 조회 시, 신청된 경우 신청 취소에 사용
+    private Long myChallengeId;
 }
