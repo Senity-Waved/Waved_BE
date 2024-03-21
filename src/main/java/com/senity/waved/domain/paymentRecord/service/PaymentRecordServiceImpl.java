@@ -12,14 +12,9 @@ import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import com.senity.waved.domain.paymentRecord.exception.DepositAmountNotMatchException;
 import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatch;
 import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
-import com.siot.IamportRestClient.IamportClient;
-import com.siot.IamportRestClient.exception.IamportResponseException;
-import com.siot.IamportRestClient.request.CancelData;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.IOException;
 
 @Service
 @AllArgsConstructor
@@ -28,7 +23,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     private final MemberRepository memberRepository;
     private final MyChallengeRepository myChallengeRepository;
     private final PaymentRecordRepository paymentRecordRepository;
-    private final IamportClient api;
 
     @Override
     @Transactional
@@ -53,12 +47,12 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         MyChallenge myChallenge = getMyChallenge(myChallengeId);
         validateMember(member, myChallenge);
 
-        try {
-            CancelData cancelData = new CancelData(String.valueOf(myChallenge.getImpUid()), true);
-            api.cancelPaymentByImpUid(cancelData);
-        } catch (IamportResponseException | IOException e) {
-            throw new RuntimeException("결제 취소 중 오류가 발생했습니다.", e);
-        }
+//        try {
+//            CancelData cancelData = new CancelData(String.valueOf(myChallenge.getImpUid()), true);
+//            api.cancelPaymentByImpUid(cancelData);
+//        } catch (IamportResponseException | IOException e) {
+//            throw new RuntimeException("결제 취소 중 오류가 발생했습니다.", e);
+//        }
 
         savePaymentRecord(myChallenge, member, PaymentStatus.CANCELED);
         myChallenge.markAsDeleted(true);

@@ -51,7 +51,7 @@ dependencies {
 
 	implementation 'com.azure:azure-storage-blob:12.25.2'
 
-	implementation 'com.github.iamport:iamport-rest-client-java:0.2.14'
+//	implementation 'com.github.iamport:iamport-rest-client-java:0.2.14'
 
 }
 
