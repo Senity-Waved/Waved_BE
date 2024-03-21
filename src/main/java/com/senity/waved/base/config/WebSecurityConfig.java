@@ -36,7 +36,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-                        .requestMatchers("/oauth2/**", "/api/v1/challenges/waiting").permitAll()
+                        .requestMatchers("/oauth2/**",
+                                "/api/v1/challenges/**",
+                                "/api/v1/challengeGroups/info/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->

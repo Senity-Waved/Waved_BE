@@ -23,10 +23,12 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class ChallengeGroupServiceImpl implements ChallengeGroupService {
 
@@ -36,10 +38,8 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private final ChallengeGroupRepository challengeGroupRepository;
     private final LikedRepository likedRepository;
 
-    // TODO 테스트 종료 후 챌린지 그룹 status 확인: 대기중인 챌린지 그룹만 신청
-    @Override
-    @Transactional
-    public Long applyForChallengeGroup(String email, Long groupId, Long deposit) {
+    // TODO 대기중인 챌린지만 신청 가능
+    public void applyForChallengeGroup(String email, Long groupId) {
         Member member = getMemberByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
 
@@ -52,22 +52,20 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .challengeGroup(group)
                 .successCount(0L)
                 .isReviewed(false)
-                .isDeleted(false)
                 .member(member)
                 .myVerifs(new int[14])
-                .deposit(deposit)
                 .build();
 
         myChallengeRepository.save(newMyChallenge);
         group.addMyChallenge(newMyChallenge);
         challengeGroupRepository.save(group);
-        return newMyChallenge.getId();
     }
 
-    @Override
-    @Transactional(readOnly = true)
     public ChallengeGroupResponseDto getGroupDetail(String email, Long groupId) {
         ChallengeGroup group = getGroupById(groupId);
+        if (Objects.isNull(email))
+            return ChallengeGroup.getGroupResponse(group, null);
+
         Member member = getMemberByEmail(email);
         Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberAndChallengeGroup(member, group);
 
@@ -76,7 +74,6 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<VerificationListResponseDto> getVerifications(String email, Long challengeGroupId, Timestamp verificationDate) {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
