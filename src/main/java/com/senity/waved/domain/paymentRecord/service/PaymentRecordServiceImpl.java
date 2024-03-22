@@ -40,10 +40,11 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         if (!myChallenge.getDeposit().equals(requestDto.getDeposit())) {
             cancelChallengePayment(email, myChallengeId);
             myChallengeRepository.deleteById(myChallengeId);
-
             throw new DepositAmountNotMatchException("마이 챌린지의 예치금과 결제 금액이 일치하지 않습니다.");
         }
         savePaymentRecord(myChallenge, member, PaymentStatus.APPLIED);
+        myChallenge.updateImpUid(requestDto.getImp_uid());
+        myChallengeRepository.save(myChallenge);
     }
 
     @Override
@@ -56,6 +57,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         try {
             CancelData cancelData = new CancelData(String.valueOf(myChallenge.getImpUid()), true);
             api.cancelPaymentByImpUid(cancelData);
+
         } catch (IamportResponseException | IOException e) {
             throw new RuntimeException("결제 취소 중 오류가 발생했습니다.", e);
         }
@@ -71,8 +73,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         MyChallenge myChallenge = getMyChallenge(myChallengeId);
 
         PaymentStatus status = myChallenge.getSuccessCount() < 11 ?
-                PaymentStatus.FAIL :
-                PaymentStatus.SUCCESS;
+                PaymentStatus.FAIL : PaymentStatus.SUCCESS;
 
         String message = myChallenge.getSuccessCount() < 11 ?
                 "챌린지 성공률을 달성하지 못해 예치금을 환급받지 못했습니다." :
@@ -88,12 +89,16 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
 
     private void savePaymentRecord(MyChallenge myChallenge, Member member, PaymentStatus status) {
         String groupTitle = myChallenge.getChallengeGroup().getGroupTitle();
+        Long deposit = status.equals(PaymentStatus.APPLIED)?
+                myChallenge.getDeposit() * (-1) : myChallenge.getDeposit();
+
         PaymentRecord paymentRecord = PaymentRecord.of(
                 status,
-                myChallenge.getDeposit(),
+                deposit,
                 member,
                 myChallenge.getId(),
-                groupTitle);
+                groupTitle
+        );
         paymentRecordRepository.save(paymentRecord);
     }
 
