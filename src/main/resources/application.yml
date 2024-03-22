@@ -63,13 +63,14 @@ azure:
     connection-string: '${azure.storage.connection-string}'
     container-name: '${azure.storage.container-name}'
 
-iamPort:
+iamport:
   rest:
-    api:
-      key: '${iamPort.rest.api.key}'
-      secret: '${iamPort.rest.api.secret}'
+    apiKey: '${iamport.rest.apiKey}'
+    apiSecret: '${iamport.rest.apiSecret}'
 
 logging:
   level:
     root: INFO
     org.hibernate.orm.jdbc.bind: trace
+
+
