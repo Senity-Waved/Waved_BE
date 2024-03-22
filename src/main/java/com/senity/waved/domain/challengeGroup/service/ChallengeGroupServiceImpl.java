@@ -39,7 +39,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private final LikedRepository likedRepository;
 
     // TODO 대기중인 챌린지만 신청 가능
-    public Long applyForChallengeGroup(String email, Long groupId) {
+    public Long applyForChallengeGroup(String email, Long groupId, Long deposit) {
         Member member = getMemberByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
 
@@ -54,6 +54,8 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .isReviewed(false)
                 .member(member)
                 .myVerifs(new int[14])
+                .deposit(deposit)
+                .isRefundRequested(false)
                 .build();
 
         myChallengeRepository.save(newMyChallenge);

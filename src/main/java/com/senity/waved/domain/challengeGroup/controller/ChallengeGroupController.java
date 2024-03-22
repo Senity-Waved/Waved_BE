@@ -35,9 +35,10 @@ public class ChallengeGroupController {
     @PostMapping("/{challengeGroupId}")
     public Long applyChallengeGroup(
             @PathVariable("challengeGroupId") Long groupId,
-            @AuthenticationPrincipal User user
+            @AuthenticationPrincipal User user,
+            @RequestParam("deposit") Long deposit
     ) {
-        return challengeGroupService.applyForChallengeGroup(user.getUsername(), groupId);
+        return challengeGroupService.applyForChallengeGroup(user.getUsername(), groupId, deposit);
     }
 
     @GetMapping("/{challengeGroupId}")
