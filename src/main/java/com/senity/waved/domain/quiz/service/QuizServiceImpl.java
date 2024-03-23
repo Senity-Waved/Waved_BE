@@ -20,12 +20,23 @@ public class QuizServiceImpl implements QuizService {
     private final QuizRepository quizRepository;
     private final VerificationService verificationService;
 
-    public Quiz findValidQuizByChallengeGroupId(Long challengeGroupId) {
+    @Override
+    public Quiz getTodaysQuiz(Long challengeGroupId) {
         verificationService.challengeGroupIsTextType(challengeGroupId);
 
         ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
         return quizRepository.findByChallengeGroupIdAndDate(challengeGroupId, today)
                 .orElseThrow(() -> new QuizNotFoundException("오늘의 퀴즈를 찾을 수 없습니다."));
+    }
+
+    @Override
+    public Quiz getQuizByDate(Long challengeGroupId, ZonedDateTime quizDate) {
+        verificationService.challengeGroupIsTextType(challengeGroupId);
+
+        ZonedDateTime requestedQuizDate = quizDate.truncatedTo(ChronoUnit.DAYS);
+
+        return quizRepository.findQuizByChallengeGroupIdAndRequestDate(challengeGroupId, requestedQuizDate)
+                .orElseThrow(() -> new QuizNotFoundException("해당 날짜의 퀴즈를 찾을 수 없습니다."));
     }
 }
 
