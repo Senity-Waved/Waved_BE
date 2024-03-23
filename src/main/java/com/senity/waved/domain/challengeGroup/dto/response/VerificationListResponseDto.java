@@ -19,6 +19,7 @@ public class VerificationListResponseDto {
     private ZonedDateTime verificationDate;
     private Long likesCount;
     private String nickname;
+    private Long memberId;
 
     @JsonProperty("isLiked")
     private boolean isLiked;
@@ -31,6 +32,7 @@ public class VerificationListResponseDto {
         this.isLiked = isLiked;
         this.likesCount = verification.getLikesCount();
         this.nickname = verification.getMember().getNickname();
+        this.memberId = verification.getMember().getId();
 
         if (verification.getCreateDate() != null) {
             LocalDateTime localDateTime = verification.getCreateDate().toLocalDateTime();
