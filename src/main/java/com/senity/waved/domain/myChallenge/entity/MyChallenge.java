@@ -135,6 +135,7 @@ public class MyChallenge extends BaseEntity {
 
     public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge) {
         ChallengeGroup group = myChallenge.getChallengeGroup();
+        Challenge challenge = group.getChallenge();
         Boolean isSuccessed = myChallenge.getSuccessCount() > 10 ? true : false;
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
@@ -146,6 +147,7 @@ public class MyChallenge extends BaseEntity {
                 .isRefundRequested(myChallenge.getIsRefundRequested())
                 .deposit(myChallenge.getDeposit())
                 .isSuccessed(isSuccessed)
+                .verificationType(challenge.getVerificationType())
                 .build();
     }
 }
