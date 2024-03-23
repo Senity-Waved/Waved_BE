@@ -1,6 +1,7 @@
 package com.senity.waved.domain.verification.repository;
 
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.verification.entity.Verification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,4 +20,7 @@ public interface VerificationRepository extends JpaRepository<Verification, Long
             @Param("endOfDay") ZonedDateTime endOfDay,
             @Param("challengeGroup") ChallengeGroup challengeGroup
     );
+
+    List<Verification> findByMemberAndChallengeGroupAndCreateDateBetweenAndIsDeletedFalse(
+            Member member, ChallengeGroup challengeGroup, ZonedDateTime start, ZonedDateTime end);
 }

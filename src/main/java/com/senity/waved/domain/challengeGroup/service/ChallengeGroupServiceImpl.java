@@ -85,6 +85,15 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         return convertToDtoList(verifications, member);
     }
 
+    @Override
+    public List<VerificationListResponseDto> getUserVerifications(String email, Long challengeGroupId, Timestamp verificationDate) {
+        Member member = getMemberByEmail(email);
+        ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
+        ZonedDateTime[] dateRange = calculateStartAndEndDate(verificationDate);
+        List<Verification> verifications = findVerificationsByMemberAndGroupAndDateRange(member, challengeGroup, dateRange);
+        return convertToDtoList(verifications, member);
+    }
+
     private ChallengeGroup getGroupById(Long id) {
         return challengeGroupRepository.findById(id)
                 .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
@@ -107,6 +116,15 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 ZonedDateTime.of(dateRange[0].toLocalDate(), dateRange[0].toLocalTime(), dateRange[0].getZone()),
                 ZonedDateTime.of(dateRange[1].toLocalDate(), dateRange[1].toLocalTime(), dateRange[1].getZone()),
                 challengeGroup
+        );
+    }
+
+    private List<Verification> findVerificationsByMemberAndGroupAndDateRange(Member member, ChallengeGroup challengeGroup, ZonedDateTime[] dateRange) {
+        return verificationRepository.findByMemberAndChallengeGroupAndCreateDateBetweenAndIsDeletedFalse(
+                member,
+                challengeGroup,
+                dateRange[0],
+                dateRange[1]
         );
     }
 
