@@ -79,8 +79,8 @@ public class VerificationServiceImpl implements VerificationService {
 
         Verification verification = Verification.builder()
                 .content(requestDto.getContent())
-                .member(member)
-                .challengeGroup(challengeGroup)
+                .memberId(member.getId())
+                .challengeGroupId(challengeGroup.getId())
                 .verificationType(VerificationType.TEXT)
                 .isDeleted(false)
                 .build();
@@ -99,8 +99,8 @@ public class VerificationServiceImpl implements VerificationService {
         Verification verification = Verification.builder()
                 .content(requestDto.getContent())
                 .link(requestDto.getLink())
-                .member(member)
-                .challengeGroup(challengeGroup)
+                .memberId(member.getId())
+                .challengeGroupId(challengeGroup.getId())
                 .verificationType(VerificationType.LINK)
                 .isDeleted(false)
                 .build();
@@ -137,8 +137,8 @@ public class VerificationServiceImpl implements VerificationService {
             String imageUrl = azureBlobStorageService.uploadPicture(pictureData, fileName);
 
             Verification verification = Verification.builder()
-                    .member(member)
-                    .challengeGroup(challengeGroup)
+                    .memberId(member.getId())
+                    .challengeGroupId(challengeGroup.getId())
                     .verificationType(VerificationType.PICTURE)
                     .imageUrl(imageUrl)
                     .isDeleted(false)
@@ -180,7 +180,7 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     private MyChallenge findMyChallenge(Member member, ChallengeGroup challengeGroup) {
-        return myChallengeRepository.findByMemberAndChallengeGroup(member, challengeGroup)
+        return myChallengeRepository.findByMemberIdAndChallengeGroupId(member.getId(), challengeGroup.getId())
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 

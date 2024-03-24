@@ -43,19 +43,21 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         Member member = getMemberByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
 
-        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberAndChallengeGroup(member, group);
+        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupId(member.getId(), group.getId());
         if (myChallenge.isPresent()) {
             throw new AlreadyMyChallengeExistsException("이미 신청되어있는 챌린지 그룹 입니다.");
         }
 
         MyChallenge newMyChallenge = MyChallenge.builder()
-                .challengeGroup(group)
+                .challengeGroupId(groupId)
                 .successCount(0L)
                 .isReviewed(false)
-                .member(member)
+                .memberId(member.getId())
                 .myVerifs(300000000000000L)
                 .deposit(deposit)
                 .isRefundRequested(false)
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
                 .build();
 
         myChallengeRepository.save(newMyChallenge);
@@ -70,7 +72,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
             return ChallengeGroup.getGroupResponse(group, -1L);
 
         Member member = getMemberByEmail(email);
-        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberAndChallengeGroup(member, group);
+        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupId(member.getId(), group.getId());
 
         Long myChallengeId = myChallenge.isPresent() ? myChallenge.get().getId() : -1L;
         return ChallengeGroup.getGroupResponse(group, myChallengeId);
@@ -115,14 +117,14 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         return verificationRepository.findByCreateDateBetweenAndChallengeGroupAndIsDeletedFalse (
                 ZonedDateTime.of(dateRange[0].toLocalDate(), dateRange[0].toLocalTime(), dateRange[0].getZone()),
                 ZonedDateTime.of(dateRange[1].toLocalDate(), dateRange[1].toLocalTime(), dateRange[1].getZone()),
-                challengeGroup
+                challengeGroup.getId()
         );
     }
 
     private List<Verification> findVerificationsByMemberAndGroupAndDateRange(Member member, ChallengeGroup challengeGroup, ZonedDateTime[] dateRange) {
-        return verificationRepository.findByMemberAndChallengeGroupAndCreateDateBetweenAndIsDeletedFalse(
-                member,
-                challengeGroup,
+        return verificationRepository.findByMemberIdAndChallengeGroupIdAndCreateDateBetweenAndIsDeletedFalse(
+                member.getId(),
+                challengeGroup.getId(),
                 dateRange[0],
                 dateRange[1]
         );
@@ -133,7 +135,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
             throw new VerifyExistenceOnDate("해당 날짜에 존재하는 인증내역이 없습니다.");
         }
         return verifications.stream()
-                .map(verification -> new VerificationListResponseDto(verification, isLikedByMember(verification, member)))
+                .map(verification -> new VerificationListResponseDto(verification, member, isLikedByMember(verification, member)))
                 .collect(Collectors.toList());
     }
 

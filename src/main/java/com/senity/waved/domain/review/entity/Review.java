@@ -1,8 +1,8 @@
 package com.senity.waved.domain.review.entity;
 
 import com.senity.waved.common.BaseEntity;
-import com.senity.waved.domain.member.entity.Member;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -16,18 +16,11 @@ public class Review extends BaseEntity {
     @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(name = "member_id")
+    private Long memberId;
 
     @Column(name = "group_title")
     private String groupTitle;
-
-/*
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "challenge_group_id")
-    private ChallengeGroup challengeGroup;
-*/
 
     @Column(name = "challenge_id")
     private Long challengeId;

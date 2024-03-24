@@ -18,8 +18,7 @@ public class ChallengeReviewResponseDto {
     private String content;
     private ZonedDateTime createDate;
 
-    public static ChallengeReviewResponseDto getChallengeReviewResponseDto(Review review) {
-        Member member = review.getMember();
+    public static ChallengeReviewResponseDto getChallengeReviewResponseDto(Review review, Member member) {
         return ChallengeReviewResponseDto.builder()
                 .nickname(member.getNickname())
                 .jobTitle(member.getJobTitle())

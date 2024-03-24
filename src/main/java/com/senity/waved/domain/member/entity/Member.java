@@ -4,18 +4,13 @@ import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
-import com.senity.waved.domain.myChallenge.entity.MyChallenge;
-import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
-import com.senity.waved.domain.review.entity.Review;
-import com.senity.waved.domain.verification.entity.Verification;
-import jakarta.persistence.*;
-import lombok.Builder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -50,22 +45,6 @@ public class Member extends BaseEntity {
 
     @Column(name="has_info")
     private Boolean hasInfo;
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<MyChallenge> myChallenges = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Review> reviews = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Verification> verification = new ArrayList<>();
-
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<PaymentRecord> paymentRecords = new ArrayList<>();
 
     public void updateInfo(ProfileEditDto editDto) {
         nickname = editDto.getNickname();

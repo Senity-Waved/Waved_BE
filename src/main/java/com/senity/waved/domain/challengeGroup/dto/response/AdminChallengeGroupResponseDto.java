@@ -12,12 +12,14 @@ import java.time.ZonedDateTime;
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AdminChallengeGroupResponseDto {
+    private Long challengeGroupId;
     private String groupTitle;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
 
     public static AdminChallengeGroupResponseDto fromChallengeGroup(ChallengeGroup challengeGroup) {
         return AdminChallengeGroupResponseDto.builder()
+                .challengeGroupId(challengeGroup.getId())
                 .groupTitle(challengeGroup.getGroupTitle())
                 .startDate(challengeGroup.getStartDate())
                 .endDate(challengeGroup.getEndDate())

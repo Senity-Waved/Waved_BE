@@ -11,8 +11,10 @@ import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.paymentRecord.dto.response.PaymentRecordResponseDto;
 import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
+import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.senity.waved.domain.review.dto.response.MemberReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
+import com.senity.waved.domain.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
@@ -33,6 +35,8 @@ import java.util.stream.Collectors;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final ReviewRepository reviewRepository;
+    private final PaymentRecordRepository paymentRecordRepository;
     private final RedisUtil redisUtil;
     private GitHub github;
 
@@ -107,7 +111,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public Page<MemberReviewResponseDto> getReviewsPaged(String email, int pageNumber, int pageSize) {
         Member member = getMemberByEmail(email);
-        List<Review> reviews = member.getReviews();
+        List<Review> reviews = reviewRepository.getReviewByMemberId(member.getId());
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         List<MemberReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
@@ -118,7 +122,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public Page<PaymentRecordResponseDto> getMyPaymentRecordsPaged(String email, int pageNumber, int pageSize) {
         Member member = getMemberByEmail(email);
-        List<PaymentRecord> paymentRecords = member.getPaymentRecords();
+        List<PaymentRecord> paymentRecords = paymentRecordRepository.getPaymentRecordByMemberId(member.getId());
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         List<PaymentRecordResponseDto> responseDtoList = getPaginatedPaymentResponseDtoList(paymentRecords, pageable);

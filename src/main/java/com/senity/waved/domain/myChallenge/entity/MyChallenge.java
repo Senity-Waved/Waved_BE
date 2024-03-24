@@ -3,10 +3,10 @@ package com.senity.waved.domain.myChallenge.entity;
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -38,13 +38,17 @@ public class MyChallenge extends BaseEntity {
     @Column(name = "imp_urd")
     private String impUid;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(name = "start_date")
+    private ZonedDateTime startDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "challenge_group_id")
-    private ChallengeGroup challengeGroup;
+    @Column(name = "end_date")
+    private ZonedDateTime endDate;
+
+    @Column(name = "member_id")
+    private Long memberId;
+
+    @Column(name = "challenge_group_id")
+    private Long challengeGroupId;
 
     // 성공(2), 실패(1), 제출 안함(0)
     public void updateVerificationStatus(int dayIndex, boolean isSuccess) {
@@ -76,7 +80,7 @@ public class MyChallenge extends BaseEntity {
 
     public boolean isVerified() {
         ZonedDateTime currentDate = ZonedDateTime.now();
-        ZonedDateTime startDate = this.challengeGroup.getStartDate();
+        ZonedDateTime startDate = getStartDate();
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate); //startDate부터 오늘 날짜 차이 계산
 
         if (daysFromStart > 0 && daysFromStart < 15) {
@@ -92,34 +96,33 @@ public class MyChallenge extends BaseEntity {
         }
     }
 
-    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, Boolean isVerified, Boolean isGithubConnected) {
-        ChallengeGroup group = myChallenge.getChallengeGroup();
+    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, ChallengeGroup group, Boolean isGithubConnected) {
         Challenge challenge = group.getChallenge();
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
                 .endDate(group.getEndDate())
                 .successCount(myChallenge.getSuccessCount())
+                .deposit(myChallenge.getDeposit())
                 .myChallengeId(myChallenge.getId())
                 .challengeGroupId(group.getId())
-                .isVerified(isVerified)
+                .isVerified(myChallenge.isVerified())
                 .isGithubConnected(isGithubConnected)
                 .verificationType(challenge.getVerificationType())
                 .build();
     }
 
-    public static MyChallengeResponseDto getMyChallengesWaiting(MyChallenge myChallenge) {
-        ChallengeGroup group = myChallenge.getChallengeGroup();
+    public static MyChallengeResponseDto getMyChallengesWaiting(MyChallenge myChallenge, ChallengeGroup group) {
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
+                .deposit(myChallenge.getDeposit())
                 .endDate(group.getEndDate())
                 .challengeGroupId(group.getId())
                 .build();
     }
 
-    public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge) {
-        ChallengeGroup group = myChallenge.getChallengeGroup();
+    public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge, ChallengeGroup group) {
         Challenge challenge = group.getChallenge();
         Boolean isSuccessed = myChallenge.getSuccessCount() > 10 ? true : false;
         return MyChallengeResponseDto.builder()
