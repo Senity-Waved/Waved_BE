@@ -3,18 +3,19 @@ package com.senity.waved.domain.myChallenge.service;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
 import com.senity.waved.domain.myChallenge.dto.response.MyVerifsResponseDto;
 import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,16 +42,17 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     public List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status) {
         Long memberId = getMemberByEmail(email).getId();
         List<MyChallenge> myChallengesListed;
+        ZonedDateTime todayStart = ZonedDateTime.now().toLocalDate().atStartOfDay(ZoneId.systemDefault());
 
         switch (status) {
             case PROGRESS:
-                myChallengesListed = myChallengeRepository.findMyChallengesInProgress(memberId, ZonedDateTime.now());
+                myChallengesListed = myChallengeRepository.findMyChallengesInProgress(memberId, todayStart);
                 break;
             case WAITING:
-                myChallengesListed = myChallengeRepository.findMyChallengesWaiting(memberId, ZonedDateTime.now());
+                myChallengesListed = myChallengeRepository.findMyChallengesWaiting(memberId, todayStart);
                 break;
             case COMPLETED:
-                myChallengesListed = myChallengeRepository.findMyChallengesCompleted(memberId, ZonedDateTime.now());
+                myChallengesListed = myChallengeRepository.findMyChallengesCompleted(memberId, todayStart);
                 break;
             default:
                 throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");
