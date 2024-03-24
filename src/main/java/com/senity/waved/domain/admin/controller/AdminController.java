@@ -1,14 +1,16 @@
 package com.senity.waved.domain.admin.controller;
 
 import com.senity.waved.domain.admin.service.AdminService;
+import com.senity.waved.domain.challengeGroup.dto.response.AdminChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.dto.response.AdminVerificationListDto;
-import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -19,12 +21,9 @@ public class AdminController {
     private final AdminService adminService;
 
     @GetMapping("/groups")
-    public Page<ChallengeGroupResponseDto> getGroupsPaged(
-            @RequestParam(value = "page", defaultValue = "0") int pageNumber,
-            @RequestParam(value = "limit", defaultValue = "5") int pageSize
-    ){
-        return adminService.getGroupsPaged(pageNumber, pageSize);
-    }
+    public List<AdminChallengeGroupResponseDto> getGroups() {
+        return adminService.getGroups();
+   }
 
     @GetMapping("/{challengeGroupId}/verifications")
     public Page<AdminVerificationListDto> getGroupVerificationsPaged (

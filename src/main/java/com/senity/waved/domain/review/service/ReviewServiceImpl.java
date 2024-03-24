@@ -1,11 +1,12 @@
 package com.senity.waved.domain.review.service;
 
+import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotCompletedException;
 import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.review.entity.Review;
@@ -33,6 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         ChallengeGroup challengeGroup = myChallenge.getChallengeGroup();
+        Challenge challenge = challengeGroup.getChallenge();
 
         if (challengeGroup.getEndDate().isAfter(ZonedDateTime.now())) {
             throw new ChallengeGroupNotCompletedException("종료된 챌린지 그룹에 대해서만 리뷰 작성 가능합니다.");
@@ -42,7 +44,8 @@ public class ReviewServiceImpl implements ReviewService {
         Review newReview = Review.builder()
                 .content(content)
                 .member(member)
-                .challengeGroup(challengeGroup)
+                .challengeId(challenge.getId())
+                .groupTitle(challengeGroup.getGroupTitle())
                 .build();
 
         myChallenge.updateIsReviewed();
@@ -77,6 +80,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (!review.getMember().getId().equals(member.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errMsg);
         }
+
         return review;
     }
 
@@ -95,6 +99,5 @@ public class ReviewServiceImpl implements ReviewService {
     private MyChallenge getMyChallengeById(Long id) {
         return myChallengeRepository.findById(id)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이챌린지를 찾을 수 없습니다."));
-
     }
 }

@@ -89,8 +89,9 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
 
     private void savePaymentRecord(MyChallenge myChallenge, Member member, PaymentStatus status) {
         String groupTitle = myChallenge.getChallengeGroup().getGroupTitle();
-        Long deposit = status.equals(PaymentStatus.APPLIED)?
-                myChallenge.getDeposit() * (-1) : myChallenge.getDeposit();
+        Long deposit = status.equals(PaymentStatus.APPLIED) ?
+                myChallenge.getDeposit() * (-1) :
+                status.equals(PaymentStatus.FAIL) ? 0 : myChallenge.getDeposit();
 
         PaymentRecord paymentRecord = PaymentRecord.of(
                 status,

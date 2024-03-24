@@ -6,8 +6,7 @@ import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
 import com.senity.waved.domain.member.service.MemberService;
 import com.senity.waved.domain.paymentRecord.dto.response.PaymentRecordResponseDto;
-import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
-import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
+import com.senity.waved.domain.review.dto.response.MemberReviewResponseDto;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -86,7 +85,7 @@ public class MemberController {
     }
 
     @GetMapping("/reviews")
-    public Page<ReviewResponseDto> getReviews(
+    public Page<MemberReviewResponseDto> getReviews(
             @AuthenticationPrincipal User user,
             @RequestParam(value = "page", defaultValue = "0") int pageNumber,
             @RequestParam(value = "limit", defaultValue = "5") int pageSize
