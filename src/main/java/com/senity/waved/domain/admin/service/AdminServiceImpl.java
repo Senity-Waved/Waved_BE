@@ -1,5 +1,6 @@
 package com.senity.waved.domain.admin.service;
 
+import com.senity.waved.domain.challengeGroup.dto.response.AdminChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.dto.response.AdminVerificationListDto;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,13 +31,13 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ChallengeGroupResponseDto> getGroupsPaged(int pageNumber, int pageSize) {
-        List<ChallengeGroup> groups = groupRepository.findChallengeGroupsInProgress(ZonedDateTime.now());
+    public List<AdminChallengeGroupResponseDto> getGroups() {
+        ZonedDateTime todayStart = ZonedDateTime.now().toLocalDate().atStartOfDay(ZoneId.systemDefault());
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<ChallengeGroupResponseDto> groupResponseDtoList = getPaginatedGroupResponseDtoList(groups, pageable);
-
-        return new PageImpl<>(groupResponseDtoList, pageable, groups.size());
+        List<ChallengeGroup> groups = groupRepository.findChallengeGroupsInProgress(todayStart);
+        return groups.stream()
+                .map(AdminChallengeGroupResponseDto::fromChallengeGroup)
+                .collect(Collectors.toList());
     }
 
     @Override

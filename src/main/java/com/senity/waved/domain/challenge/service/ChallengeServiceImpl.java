@@ -4,10 +4,7 @@ import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
-import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.member.repository.MemberRepository;
-import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
+import com.senity.waved.domain.review.dto.response.ChallengeReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,16 +12,11 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,23 +40,23 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Transactional
-    public Page<ReviewResponseDto> getReviewsPaged(Long challengeId, int pageNumber, int pageSize) {
+    public Page<ChallengeReviewResponseDto> getReviewsPaged(Long challengeId, int pageNumber, int pageSize) {
         Challenge challenge = getChallengeById(challengeId);
         List<Review> reviews = challenge.getReviews();
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<ReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
+        List<ChallengeReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
 
         return new PageImpl<>(responseDtoList, pageable, reviews.size());
     }
 
-    private List<ReviewResponseDto> getPaginatedReviewResponseDtoList(List<Review> reviews, Pageable pageable) {
+    private List<ChallengeReviewResponseDto> getPaginatedReviewResponseDtoList(List<Review> reviews, Pageable pageable) {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), reviews.size());
 
         return reviews.subList(start, end)
                 .stream()
-                .map(Review::getChallengeReviewResponse)
+                .map(ChallengeReviewResponseDto::getChallengeReviewResponseDto)
                 .collect(Collectors.toList());
     }
 

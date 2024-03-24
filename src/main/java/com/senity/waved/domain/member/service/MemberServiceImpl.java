@@ -6,12 +6,12 @@ import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.InvalidRefreshTokenException;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.exception.WrongGithubInfoException;
 import com.senity.waved.domain.member.repository.MemberRepository;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.paymentRecord.dto.response.PaymentRecordResponseDto;
 import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
-import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
+import com.senity.waved.domain.review.dto.response.MemberReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
 import lombok.RequiredArgsConstructor;
 import org.kohsuke.github.GHUser;
@@ -105,12 +105,12 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ReviewResponseDto> getReviewsPaged(String email, int pageNumber, int pageSize) {
+    public Page<MemberReviewResponseDto> getReviewsPaged(String email, int pageNumber, int pageSize) {
         Member member = getMemberByEmail(email);
         List<Review> reviews = member.getReviews();
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<ReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
+        List<MemberReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
 
         return new PageImpl<>(responseDtoList, pageable, reviews.size());
     }
@@ -126,13 +126,13 @@ public class MemberServiceImpl implements MemberService {
         return new PageImpl<>(responseDtoList, pageable, paymentRecords.size());
     }
 
-    private List<ReviewResponseDto> getPaginatedReviewResponseDtoList(List<Review> reviews, Pageable pageable) {
+    private List<MemberReviewResponseDto> getPaginatedReviewResponseDtoList(List<Review> reviews, Pageable pageable) {
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), reviews.size());
 
         return reviews.subList(start, end)
                 .stream()
-                .map(Review::getMemberReviewResponse)
+                .map(MemberReviewResponseDto::getMemberReviewResponseDto)
                 .collect(Collectors.toList());
     }
 

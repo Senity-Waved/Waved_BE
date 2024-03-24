@@ -12,6 +12,6 @@ import java.util.Optional;
 public interface ChallengeGroupRepository extends JpaRepository<ChallengeGroup, Long> {
     Optional<ChallengeGroup> findById(Long id);
 
-    @Query("SELECT cg FROM ChallengeGroup cg WHERE cg.startDate < :today AND cg.endDate > :today")
-    List<ChallengeGroup> findChallengeGroupsInProgress(@Param("today") ZonedDateTime today);
+    @Query("SELECT cg FROM ChallengeGroup cg WHERE cg.startDate < :todayStart AND cg.endDate >= :todayStart")
+    List<ChallengeGroup> findChallengeGroupsInProgress(@Param("todayStart") ZonedDateTime todayStart);
 }

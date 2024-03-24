@@ -2,8 +2,7 @@ package com.senity.waved.domain.challenge.controller;
 
 import com.senity.waved.domain.challenge.service.ChallengeService;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
-import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
-import com.senity.waved.domain.review.dto.response.ReviewResponseDto;
+import com.senity.waved.domain.review.dto.response.ChallengeReviewResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,7 +24,7 @@ public class ChallengeController {
     }
 
     @GetMapping("/{challengeId}/reviews")
-    public Page<ReviewResponseDto> getReviews(
+    public Page<ChallengeReviewResponseDto> getReviews(
             @PathVariable("challengeId") Long challengeId,
             @RequestParam(value = "page", defaultValue = "0") int pageNumber,
             @RequestParam(value = "limit", defaultValue = "5") int pageSize

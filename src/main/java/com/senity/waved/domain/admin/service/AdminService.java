@@ -1,12 +1,14 @@
 package com.senity.waved.domain.admin.service;
 
-import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
+import com.senity.waved.domain.challengeGroup.dto.response.AdminChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.dto.response.AdminVerificationListDto;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface AdminService {
 
-    Page<ChallengeGroupResponseDto> getGroupsPaged(int pageNumber, int pageSize);
+    List<AdminChallengeGroupResponseDto> getGroups();
 
     Page<AdminVerificationListDto> getGroupVerificationsPaged(Long challengeGroupId, int pageNumber, int pageSize);
 
