@@ -18,7 +18,7 @@ public interface MyChallengeRepository extends JpaRepository<MyChallenge, Long> 
     @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.member.id = :memberId AND cg.startDate > :todayStart")
     List<MyChallenge> findMyChallengesWaiting(@Param("memberId") Long memberId, @Param("todayStart") ZonedDateTime todayStart);
 
-    @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.member.id = :memberId AND cg.startDate < :todayStart AND cg.endDate >= :todayStart")
+    @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.member.id = :memberId AND cg.startDate <= :todayStart AND cg.endDate >= :todayStart")
     List<MyChallenge> findMyChallengesInProgress(@Param("memberId") Long memberId, @Param("todayStart") ZonedDateTime todayStart);
 
     @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.member.id = :memberId AND cg.endDate < :todayStart")
