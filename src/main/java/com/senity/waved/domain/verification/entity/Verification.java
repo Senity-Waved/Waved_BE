@@ -2,7 +2,6 @@ package com.senity.waved.domain.verification.entity;
 
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challenge.entity.VerificationType;
-import com.senity.waved.domain.challengeGroup.dto.response.AdminVerificationListDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.liked.entity.Liked;
 import com.senity.waved.domain.member.entity.Member;
@@ -43,13 +42,11 @@ public class Verification extends BaseEntity {
     @Column(nullable = true)
     private Boolean isDeleted; // true -> 삭제
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(name = "member_id")
+    private Long memberId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "challenge_group_id")
-    private ChallengeGroup challengeGroup;
+    @Column(name = "challenge_group_id")
+    private Long challengeGroupId;
 
     @Builder.Default
     @OneToMany(mappedBy = "verification", cascade = CascadeType.ALL)
@@ -58,8 +55,8 @@ public class Verification extends BaseEntity {
     public static Verification createGithubVerification(Member member, ChallengeGroup challengeGroup, boolean hasCommitsToday) {
         return Verification.builder()
                 .content(String.valueOf(hasCommitsToday))
-                .member(member)
-                .challengeGroup(challengeGroup)
+                .memberId(member.getId())
+                .challengeGroupId(challengeGroup.getId())
                 .verificationType(VerificationType.GITHUB)
                 .isDeleted(false)
                 .build();
@@ -81,16 +78,4 @@ public class Verification extends BaseEntity {
         this.isDeleted = b;
     }
 
-    public static AdminVerificationListDto getAdminVerifications(Verification verification) {
-        Member member = verification.getMember();
-        return AdminVerificationListDto.builder()
-                .nickname(member.getNickname())
-                .content(verification.getContent())
-                .imageUrl(verification.getImageUrl())
-                .link(verification.getLink())
-                .verificationId(verification.getId())
-                .verificationDate(verification.getCreateDate())
-                .isDeleted(verification.getIsDeleted())
-                .build();
-    }
 }

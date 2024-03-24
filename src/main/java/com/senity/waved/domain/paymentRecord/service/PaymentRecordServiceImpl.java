@@ -1,5 +1,8 @@
 package com.senity.waved.domain.paymentRecord.service;
 
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
+import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -28,6 +31,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     private final MemberRepository memberRepository;
     private final MyChallengeRepository myChallengeRepository;
     private final PaymentRecordRepository paymentRecordRepository;
+    private final ChallengeGroupRepository challengeGroupRepository;
     private IamportClient api;
 
     @Override
@@ -42,7 +46,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
             myChallengeRepository.deleteById(myChallengeId);
             throw new DepositAmountNotMatchException("마이 챌린지의 예치금과 결제 금액이 일치하지 않습니다.");
         }
-        savePaymentRecord(myChallenge, member, PaymentStatus.APPLIED);
+        savePaymentRecord(myChallenge, member.getId(), PaymentStatus.APPLIED);
         myChallenge.updateImpUid(requestDto.getImp_uid());
         myChallengeRepository.save(myChallenge);
     }
@@ -62,7 +66,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
             throw new RuntimeException("결제 취소 중 오류가 발생했습니다.", e);
         }
 
-        savePaymentRecord(myChallenge, member, PaymentStatus.CANCELED);
+        savePaymentRecord(myChallenge, member.getId(), PaymentStatus.CANCELED);
         myChallengeRepository.delete(myChallenge);
     }
 
@@ -83,12 +87,15 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
             cancelChallengePayment(email, myChallengeId);
         }
 
-        savePaymentRecord(myChallenge, member, status);
+        savePaymentRecord(myChallenge, member.getId(), status);
         return message;
     }
 
-    private void savePaymentRecord(MyChallenge myChallenge, Member member, PaymentStatus status) {
-        String groupTitle = myChallenge.getChallengeGroup().getGroupTitle();
+    private void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
+        ChallengeGroup group = challengeGroupRepository.findById(myChallenge.getChallengeGroupId())
+                .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
+
+        String groupTitle = group.getGroupTitle();
         Long deposit = status.equals(PaymentStatus.APPLIED) ?
                 myChallenge.getDeposit() * (-1) :
                 status.equals(PaymentStatus.FAIL) ? 0 : myChallenge.getDeposit();
@@ -96,7 +103,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         PaymentRecord paymentRecord = PaymentRecord.of(
                 status,
                 deposit,
-                member,
+                memberId,
                 myChallenge.getId(),
                 groupTitle
         );
@@ -114,7 +121,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     }
 
     private void validateMember(Member member, MyChallenge myChallenge) {
-        if(!myChallenge.getMember().equals(member))
+        if(!myChallenge.getMemberId().equals(member.getId()))
             throw new MemberAndMyChallengeNotMatch("해당 멤버의 마이 챌린지가 아닙니다.");
     }
 }

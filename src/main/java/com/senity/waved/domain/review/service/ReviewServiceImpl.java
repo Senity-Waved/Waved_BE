@@ -3,6 +3,8 @@ package com.senity.waved.domain.review.service;
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotCompletedException;
+import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
+import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -10,7 +12,6 @@ import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.review.entity.Review;
-import com.senity.waved.domain.review.exception.AlreadyReviewedException;
 import com.senity.waved.domain.review.exception.ReviewNotFoundException;
 import com.senity.waved.domain.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +29,16 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final MyChallengeRepository myChallengeRepository;
+    private final ChallengeGroupRepository challengeGroupRepository;
 
     @Transactional
     public void createChallengeReview(String email, Long myChallengeId, String content) {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
-        ChallengeGroup challengeGroup = myChallenge.getChallengeGroup();
+
+        ChallengeGroup challengeGroup = challengeGroupRepository.findById(myChallenge.getChallengeGroupId())
+                .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
+
         Challenge challenge = challengeGroup.getChallenge();
 
         if (challengeGroup.getEndDate().isAfter(ZonedDateTime.now())) {
@@ -43,7 +48,7 @@ public class ReviewServiceImpl implements ReviewService {
         checkReviewExist(myChallengeId);
         Review newReview = Review.builder()
                 .content(content)
-                .member(member)
+                .memberId(member.getId())
                 .challengeId(challenge.getId())
                 .groupTitle(challengeGroup.getGroupTitle())
                 .build();
@@ -77,7 +82,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewNotFoundException("해당 리뷰를 찾을 수 없습니다."));
 
-        if (!review.getMember().getId().equals(member.getId())) {
+        if (!review.getMemberId().equals(member.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, errMsg);
         }
 
@@ -86,9 +91,6 @@ public class ReviewServiceImpl implements ReviewService {
 
     private void checkReviewExist(Long myChallengeId) {
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
-        if (myChallenge.getIsReviewed()) {
-            throw new AlreadyReviewedException("해당 챌린지에 이미 리뷰를 남기셨습니다.");
-        }
     }
 
     private Member getMemberByEmail(String email) {

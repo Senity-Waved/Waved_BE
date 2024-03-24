@@ -1,6 +1,5 @@
 package com.senity.waved.domain.liked.entity;
 
-
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.verification.entity.Verification;
@@ -28,7 +27,4 @@ public class Liked extends BaseEntity {
         this.verification = verification;
     }
 
-    public void setMember(Member member) {
-        this.verification = verification;
-    }
 }

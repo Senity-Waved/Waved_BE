@@ -7,10 +7,7 @@ import org.springframework.data.domain.Page;
 import java.util.List;
 
 public interface AdminService {
-
     List<AdminChallengeGroupResponseDto> getGroups();
-
     Page<AdminVerificationListDto> getGroupVerificationsPaged(Long challengeGroupId, int pageNumber, int pageSize);
-
-    void deleteVerification(Long groupId, Long verifId);
+    void deleteVerification(Long groupId, Long verificationId);
 }

@@ -2,10 +2,12 @@ package com.senity.waved.domain.admin.service;
 
 import com.senity.waved.domain.challengeGroup.dto.response.AdminChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.dto.response.AdminVerificationListDto;
-import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
+import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
+import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.VerificationNotFoundException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
@@ -28,6 +30,7 @@ public class AdminServiceImpl implements AdminService {
 
     private final ChallengeGroupRepository groupRepository;
     private final VerificationRepository verificationRepository;
+    private final MemberRepository memberRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -54,8 +57,8 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional
-    public void deleteVerification(Long groupId, Long verifId) {
-        Verification verification = verificationRepository.findById(verifId)
+    public void deleteVerification(Long groupId, Long verificationId) {
+        Verification verification = verificationRepository.findById(verificationId)
                 .orElseThrow(() -> new VerificationNotFoundException("해당 인증 내역을 찾을 수 없습니다."));
         verification.markAsDeleted(true);
         verificationRepository.save(verification);
@@ -67,22 +70,20 @@ public class AdminServiceImpl implements AdminService {
 
         return verifs.subList(start, end)
                 .stream()
-                .map(Verification::getAdminVerifications)
+                .map(verification -> {
+                    Member member = findMemberByIdOrThrow(verification.getMemberId());
+                    return AdminVerificationListDto.getAdminVerifications(verification, member);
+                })
                 .collect(Collectors.toList());
     }
 
-    private List<ChallengeGroupResponseDto> getPaginatedGroupResponseDtoList(List<ChallengeGroup> groups, Pageable pageable) {
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), groups.size());
-
-        return groups.subList(start, end)
-                .stream()
-                .map(ChallengeGroup::getGroupAdminResponse)
-                .collect(Collectors.toList());
+    private Member findMemberByIdOrThrow(Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다."));
     }
 
     private List<Verification> findVerificationsByGroup(ChallengeGroup challengeGroup) {
-        return verificationRepository.findByChallengeGroup(challengeGroup);
+        return verificationRepository.findByChallengeGroupId(challengeGroup.getId());
     }
 
     private ChallengeGroup getGroupById(Long id) {
@@ -90,3 +91,4 @@ public class AdminServiceImpl implements AdminService {
                 .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
     }
 }
+

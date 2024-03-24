@@ -79,8 +79,8 @@ public class VerificationServiceImpl implements VerificationService {
 
         Verification verification = Verification.builder()
                 .content(requestDto.getContent())
-                .member(member)
-                .challengeGroup(challengeGroup)
+                .memberId(member.getId())
+                .challengeGroupId(challengeGroup.getId())
                 .verificationType(VerificationType.TEXT)
                 .isDeleted(false)
                 .build();
@@ -99,8 +99,8 @@ public class VerificationServiceImpl implements VerificationService {
         Verification verification = Verification.builder()
                 .content(requestDto.getContent())
                 .link(requestDto.getLink())
-                .member(member)
-                .challengeGroup(challengeGroup)
+                .memberId(member.getId())
+                .challengeGroupId(challengeGroup.getId())
                 .verificationType(VerificationType.LINK)
                 .isDeleted(false)
                 .build();
@@ -137,8 +137,8 @@ public class VerificationServiceImpl implements VerificationService {
             String imageUrl = azureBlobStorageService.uploadPicture(pictureData, fileName);
 
             Verification verification = Verification.builder()
-                    .member(member)
-                    .challengeGroup(challengeGroup)
+                    .memberId(member.getId())
+                    .challengeGroupId(challengeGroup.getId())
                     .verificationType(VerificationType.PICTURE)
                     .imageUrl(imageUrl)
                     .isDeleted(false)
@@ -174,29 +174,20 @@ public class VerificationServiceImpl implements VerificationService {
         MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
 
         if (myChallenge.isValidChallengePeriod(challengeGroup.getStartDate(), currentDate)) {
-            initVerification(myChallenge);
             updateVerificationAndSuccessCount(myChallenge, challengeGroup.getStartDate(), currentDate, isSuccess);
-
             myChallengeRepository.save(myChallenge);
         }
     }
 
     private MyChallenge findMyChallenge(Member member, ChallengeGroup challengeGroup) {
-        return myChallengeRepository.findByMemberAndChallengeGroup(member, challengeGroup)
+        return myChallengeRepository.findByMemberIdAndChallengeGroupId(member.getId(), challengeGroup.getId())
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
-    }
-
-    private void initVerification(MyChallenge myChallenge) {
-        if (myChallenge.getMyVerifs() == null || myChallenge.getMyVerifs().length == 0) {
-            myChallenge.setMyVerifs(new int[14]);
-            myChallenge.setSuccessCount(0L);
-        }
     }
 
     private void updateVerificationAndSuccessCount(MyChallenge myChallenge, ZonedDateTime startDate, ZonedDateTime currentDate, boolean isSuccess) {
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
         // isSuccess 가 true일 경우 성공(1), false일 경우 실패(0)로 업데이트
-        myChallenge.updateVerificationStatus((int)daysFromStart, isSuccess);
+        myChallenge.updateVerificationStatus((int)(daysFromStart) + 1, isSuccess);
 
         if (isSuccess) {
             myChallenge.incrementSuccessCount();

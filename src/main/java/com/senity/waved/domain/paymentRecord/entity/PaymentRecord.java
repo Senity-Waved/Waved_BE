@@ -1,7 +1,6 @@
 package com.senity.waved.domain.paymentRecord.entity;
 
 import com.senity.waved.common.BaseEntity;
-import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.paymentRecord.dto.response.PaymentRecordResponseDto;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -21,9 +20,8 @@ public class PaymentRecord extends BaseEntity {
     @Column(name = "deposit")
     private Long deposit;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(name = "member_id")
+    private Long memberId;
 
     @Column(name = "group_title")
     private String groupTitle;
@@ -31,11 +29,11 @@ public class PaymentRecord extends BaseEntity {
     @Column(name = "my_challenge_id")
     private Long myChallengeId;
 
-    public static PaymentRecord of(PaymentStatus status, Long deposit, Member member, Long myChallengeId, String groupTitle) {
+    public static PaymentRecord of(PaymentStatus status, Long deposit, Long memberId, Long myChallengeId, String groupTitle) {
         return PaymentRecord.builder()
                 .deposit(deposit)
                 .paymentStatus(status)
-                .member(member)
+                .memberId(memberId)
                 .myChallengeId(myChallengeId)
                 .groupTitle(groupTitle)
                 .build();

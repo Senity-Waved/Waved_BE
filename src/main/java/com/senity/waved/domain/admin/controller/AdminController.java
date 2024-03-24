@@ -34,12 +34,12 @@ public class AdminController {
         return adminService.getGroupVerificationsPaged(challengeGroupId, pageNumber, pageSize);
     }
 
-    @DeleteMapping("/{challengeGroupId}/verifications/{verifId}")
+    @DeleteMapping("/{challengeGroupId}/verifications/{verificationId}")
     public ResponseEntity<String> deleteVerification(
             @PathVariable("challengeGroupId") Long challengeGroupId,
-            @PathVariable("verifId") Long verifId
+            @PathVariable("verificationId") Long verificationId
     ) {
-        adminService.deleteVerification(challengeGroupId, verifId);
+        adminService.deleteVerification(challengeGroupId, verificationId);
         return new ResponseEntity<>("인증 취소 처리가 되었습니다.", HttpStatus.OK);
     }
 }

@@ -4,8 +4,12 @@ import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.member.exception.MemberNotFoundException;
+import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.review.dto.response.ChallengeReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
+import com.senity.waved.domain.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,6 +29,8 @@ import java.util.stream.Collectors;
 public class ChallengeServiceImpl implements ChallengeService {
 
     private final ChallengeRepository challengeRepository;
+    private final MemberRepository memberRepository;
+    private final ReviewRepository reviewRepository;
 
     @Transactional(readOnly = true)
     public List<ChallengeGroupHomeResponseDto> getHomeChallengeGroupsListed() {
@@ -41,8 +47,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     public Page<ChallengeReviewResponseDto> getReviewsPaged(Long challengeId, int pageNumber, int pageSize) {
-        Challenge challenge = getChallengeById(challengeId);
-        List<Review> reviews = challenge.getReviews();
+        List<Review> reviews = reviewRepository.findByChallengeId(challengeId);
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         List<ChallengeReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
@@ -56,8 +61,16 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         return reviews.subList(start, end)
                 .stream()
-                .map(ChallengeReviewResponseDto::getChallengeReviewResponseDto)
+                .map(review -> {
+                    Member member = getMemberById(review.getMemberId());
+                    return ChallengeReviewResponseDto.getChallengeReviewResponseDto(review, member);
+                })
                 .collect(Collectors.toList());
+    }
+
+    private Member getMemberById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다."));
     }
 
     private Challenge getChallengeById(Long id) {
