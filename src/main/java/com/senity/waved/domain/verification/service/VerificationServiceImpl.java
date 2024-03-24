@@ -174,9 +174,7 @@ public class VerificationServiceImpl implements VerificationService {
         MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
 
         if (myChallenge.isValidChallengePeriod(challengeGroup.getStartDate(), currentDate)) {
-            initVerification(myChallenge);
             updateVerificationAndSuccessCount(myChallenge, challengeGroup.getStartDate(), currentDate, isSuccess);
-
             myChallengeRepository.save(myChallenge);
         }
     }
@@ -186,17 +184,10 @@ public class VerificationServiceImpl implements VerificationService {
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 
-    private void initVerification(MyChallenge myChallenge) {
-        if (myChallenge.getMyVerifs() == null || myChallenge.getMyVerifs().length == 0) {
-            myChallenge.setMyVerifs(new int[14]);
-            myChallenge.setSuccessCount(0L);
-        }
-    }
-
     private void updateVerificationAndSuccessCount(MyChallenge myChallenge, ZonedDateTime startDate, ZonedDateTime currentDate, boolean isSuccess) {
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
         // isSuccess 가 true일 경우 성공(1), false일 경우 실패(0)로 업데이트
-        myChallenge.updateVerificationStatus((int)daysFromStart, isSuccess);
+        myChallenge.updateVerificationStatus((int)(daysFromStart) + 1, isSuccess);
 
         if (isSuccess) {
             myChallenge.incrementSuccessCount();

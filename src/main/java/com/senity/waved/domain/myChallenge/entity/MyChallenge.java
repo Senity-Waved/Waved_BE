@@ -13,7 +13,6 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 
 @Entity
 @Getter
@@ -21,9 +20,8 @@ import java.util.Arrays;
 @SuperBuilder(toBuilder = true)
 public class MyChallenge extends BaseEntity {
 
-    @ElementCollection
     @Column(name="my_verifs")
-    private int[] myVerifs;
+    private long myVerifs;
 
     @Column(name = "success_count")
     private Long successCount;
@@ -50,8 +48,8 @@ public class MyChallenge extends BaseEntity {
 
     // 성공(2), 실패(1), 제출 안함(0)
     public void updateVerificationStatus(int dayIndex, boolean isSuccess) {
-        if (this.myVerifs != null && dayIndex >= 0 && dayIndex < this.myVerifs.length) {
-            this.myVerifs[dayIndex] = isSuccess ? 2 : 1;
+        if (dayIndex < 15 && dayIndex > 0) {
+            myVerifs += isSuccess ? 2 * Math.pow(10, 14 - dayIndex) : Math.pow(10, 14 - dayIndex);
         }
     }
 
@@ -76,28 +74,15 @@ public class MyChallenge extends BaseEntity {
         }
     }
 
-    public void setSuccessCount(Long successCount) {
-        this.successCount = successCount;
-    }
-
-    public void setMyVerifs(int[] myVerifs) {
-        this.myVerifs = myVerifs;
-        Arrays.fill(this.myVerifs, 0);
-    }
-
     public boolean isVerified() {
         ZonedDateTime currentDate = ZonedDateTime.now();
         ZonedDateTime startDate = this.challengeGroup.getStartDate();
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate); //startDate부터 오늘 날짜 차이 계산
 
-        if (this.myVerifs.length == 0) {
-            return false; // myVerifs 배열이 빈 배열이면 false
+        if (daysFromStart > 0 && daysFromStart < 15) {
+            int div = (int) (myVerifs / Math.pow(10, 14 - daysFromStart) % 10);
+            return div != 0;
         }
-
-        if (daysFromStart >= 0 && daysFromStart < this.myVerifs.length) {
-            return this.myVerifs[(int)daysFromStart] != 0; // 0이 아니면 true
-        }
-
         return false;
     }
 

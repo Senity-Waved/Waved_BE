@@ -15,7 +15,12 @@ public class MyVerifsResponseDto {
     private ZonedDateTime endDate;
 
     public MyVerifsResponseDto(MyChallenge myChallenge) {
-        this.myVerifs = myChallenge.getMyVerifs();
+        myVerifs = new int[14];
+        long longMyVerifs = myChallenge.getMyVerifs();
+
+        for (int i = 1; i < 15; i++) {
+            myVerifs[i-1]  = (int) (longMyVerifs / Math.pow(10, 14 - i) % 10);
+        }
         this.groupTitle = myChallenge.getChallengeGroup().getGroupTitle();
         this.startDate = myChallenge.getChallengeGroup().getStartDate();
         this.endDate = myChallenge.getChallengeGroup().getEndDate();

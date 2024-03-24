@@ -53,7 +53,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .successCount(0L)
                 .isReviewed(false)
                 .member(member)
-                .myVerifs(new int[14])
+                .myVerifs(300000000000000L)
                 .deposit(deposit)
                 .isRefundRequested(false)
                 .build();
