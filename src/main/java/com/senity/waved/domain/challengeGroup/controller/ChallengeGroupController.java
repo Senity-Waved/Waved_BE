@@ -31,7 +31,6 @@ public class ChallengeGroupController {
         return challengeGroupService.getGroupDetail(email, groupId);
     }
 
-
     @PostMapping("/{challengeGroupId}")
     public Long applyChallengeGroup(
             @PathVariable("challengeGroupId") Long groupId,
@@ -51,4 +50,15 @@ public class ChallengeGroupController {
                 challengeGroupService.getVerifications(user.getUsername(), challengeGroupId, verificationDate);
         return ResponseEntity.ok(verifications);
     }
+
+    @GetMapping("/{challengeGroupId}/myVerifies")
+    public ResponseEntity<List<VerificationListResponseDto>> getVerificationsByDateAndMember(
+            @PathVariable("challengeGroupId") Long challengeGroupId,
+            @RequestParam("verificationDate") Timestamp verificationDate,
+            @AuthenticationPrincipal User user) {
+        List<VerificationListResponseDto> verifications =
+                challengeGroupService.getUserVerifications(user.getUsername(), challengeGroupId, verificationDate);
+        return ResponseEntity.ok(verifications);
+    }
+
 }

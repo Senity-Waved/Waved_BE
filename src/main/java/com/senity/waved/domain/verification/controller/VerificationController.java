@@ -12,6 +12,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -23,9 +27,21 @@ public class VerificationController {
 
     @GetMapping("/{challengeGroupId}")
     public ResponseEntity<QuizResponseDto> getTodaysQuiz(@PathVariable("challengeGroupId") Long challengeGroupId) {
-        Quiz quiz = quizService.findValidQuizByChallengeGroupId(challengeGroupId);
+        Quiz quiz = quizService.getTodaysQuiz(challengeGroupId);
 
         QuizResponseDto quizResponseDto = new QuizResponseDto(quiz);
+        return ResponseEntity.ok().body(quizResponseDto);
+    }
+
+    @GetMapping("/{challengeGroupId}/dates")
+    public ResponseEntity<QuizResponseDto> getQuizByDate(
+            @PathVariable("challengeGroupId") Long challengeGroupId,
+            @RequestParam("quizDate") Timestamp quizDate) {
+
+        ZonedDateTime requestQuizDate = quizDate.toInstant().atZone(ZoneId.systemDefault());
+        Quiz quiz = quizService.getQuizByDate(challengeGroupId, requestQuizDate);
+        QuizResponseDto quizResponseDto = new QuizResponseDto(quiz);
+
         return ResponseEntity.ok().body(quizResponseDto);
     }
 
