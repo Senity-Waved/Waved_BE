@@ -103,7 +103,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private MyChallenge getMyChallengeByGroupAndMemberId(ChallengeGroup group, Long memberId) {
-        return myChallengeRepository.findByChallengeGroupAndMemberId(group, memberId)
+        return myChallengeRepository.findByChallengeGroupIdAndMemberId(group.getId(), memberId)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
     }
 }

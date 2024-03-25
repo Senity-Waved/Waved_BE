@@ -39,7 +39,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     public void cancelAppliedMyChallenge(String email, Long myChallengeId) {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
-        ChallengeGroup group = myChallenge.getChallengeGroup();
+        ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
 
         validateMember(member, myChallenge);
 
@@ -74,13 +74,13 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
     public MyVerifsResponseDto getMyVerifications(Long myChallengeId) {
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
-        ChallengeGroup group = myChallenge.getChallengeGroup();
+        ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
         return new MyVerifsResponseDto(myChallenge, group);
     }
 
     private MyChallengeResponseDto mapToResponseDto(MyChallenge myChallenge, ChallengeStatus status, Member member) {
         boolean isGithubConnected = member.isGithubConnected();
-        ChallengeGroup group = myChallenge.getChallengeGroup();
+        ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
         Challenge challenge = getChallengeById(group.getChallengeId());
 
         switch (status) {

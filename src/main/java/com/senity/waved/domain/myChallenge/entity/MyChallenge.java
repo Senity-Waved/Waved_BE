@@ -48,9 +48,8 @@ public class MyChallenge extends BaseEntity {
     @Column(name = "member_id")
     private Long memberId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "challenge_group_id")
-    private ChallengeGroup challengeGroup;
+    @Column(name = "challenge_group_id")
+    private Long challengeGroupId;
 
     // 성공(2), 실패(1), 제출 안함(0)
     public void updateVerificationStatus(int dayIndex, boolean isSuccess) {

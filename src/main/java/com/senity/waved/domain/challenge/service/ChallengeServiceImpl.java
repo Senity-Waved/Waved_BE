@@ -4,9 +4,11 @@ import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.review.dto.response.ChallengeReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
 import com.senity.waved.domain.review.repository.ReviewRepository;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
 public class ChallengeServiceImpl implements ChallengeService {
 
     private final ChallengeRepository challengeRepository;
+    private final ChallengeGroupRepository challengeGroupRepository;
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
 
@@ -34,9 +37,11 @@ public class ChallengeServiceImpl implements ChallengeService {
         List<ChallengeGroupHomeResponseDto> homeGroups = new ArrayList<>();
         for (int i = 1; i <= 4; i++) {
             Challenge challenge = getChallengeById(i * 1L);
-            int groupSize = challenge.getGroups().size();
+            //int groupSize = challenge.getGroups().size();
 
-            ChallengeGroup group = challenge.getGroups().get(groupSize - 1);
+            //ChallengeGroup group = challenge.getGroups().get(groupSize - 1);
+            ChallengeGroup group = challengeGroupRepository.findById(i*3L - 1L)
+                    .orElseThrow(() -> new MyChallengeNotFoundException(""));
             homeGroups.add(ChallengeGroup.getHomeGroupResponse(group, challenge));
         }
         return homeGroups;

@@ -1,16 +1,13 @@
 package com.senity.waved.domain.challenge.entity;
 
 import com.senity.waved.common.BaseEntity;
-import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.review.entity.Review;
-import jakarta.persistence.*;
-import lombok.Builder;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -34,11 +31,13 @@ public class Challenge extends BaseEntity {
     @Column(name="is_free")
     private Boolean isFree;
 
+/*
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
-
+*/
+/*
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<ChallengeGroup> groups = new ArrayList<>();
+    private List<ChallengeGroup> groups = new ArrayList<>();*/
 }

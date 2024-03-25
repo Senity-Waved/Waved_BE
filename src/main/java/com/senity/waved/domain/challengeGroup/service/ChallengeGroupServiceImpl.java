@@ -53,7 +53,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         }
 
         MyChallenge newMyChallenge = MyChallenge.builder()
-                .challengeGroup(group)
+                .challengeGroupId(group.getId())
                 .successCount(0L)
                 .isReviewed(false)
                 .memberId(member.getId())
