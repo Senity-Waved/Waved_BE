@@ -8,6 +8,9 @@ import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepositor
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.myChallenge.entity.MyChallenge;
+import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
+import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.VerificationNotFoundException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
@@ -30,6 +33,7 @@ public class AdminServiceImpl implements AdminService {
 
     private final ChallengeGroupRepository groupRepository;
     private final VerificationRepository verificationRepository;
+    private final MyChallengeRepository myChallengeRepository;
     private final MemberRepository memberRepository;
 
     @Override
@@ -61,6 +65,13 @@ public class AdminServiceImpl implements AdminService {
         Verification verification = verificationRepository.findById(verificationId)
                 .orElseThrow(() -> new VerificationNotFoundException("해당 인증 내역을 찾을 수 없습니다."));
         verification.markAsDeleted(true);
+
+        Member member = findMemberByIdOrThrow(verification.getMemberId());
+        ChallengeGroup group = getGroupById(verification.getChallengeGroupId());
+
+        MyChallenge myChallenge = getMyChallengeByGroupAndMemberId(group, member.getId());
+        myChallenge.deleteVerification(verification.getCreateDate());
+
         verificationRepository.save(verification);
     }
 
@@ -89,6 +100,11 @@ public class AdminServiceImpl implements AdminService {
     private ChallengeGroup getGroupById(Long id) {
         return groupRepository.findById(id)
                 .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
+    }
+
+    private MyChallenge getMyChallengeByGroupAndMemberId(ChallengeGroup group, Long memberId) {
+        return myChallengeRepository.findByChallengeGroupAndMemberId(group, memberId)
+                .orElseThrow(() -> new MyChallengeNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
     }
 }
 

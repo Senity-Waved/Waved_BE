@@ -48,8 +48,8 @@ public class Verification extends BaseEntity {
     @Column(name = "challenge_group_id")
     private Long challengeGroupId;
 
-    @Builder.Default
     @OneToMany(mappedBy = "verification", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<Liked> likes = new ArrayList<>();
 
     public static Verification createGithubVerification(Member member, ChallengeGroup challengeGroup, boolean hasCommitsToday) {
@@ -77,5 +77,4 @@ public class Verification extends BaseEntity {
     public void markAsDeleted(Boolean b) {
         this.isDeleted = b;
     }
-
 }

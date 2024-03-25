@@ -5,8 +5,9 @@ import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import com.senity.waved.domain.verification.exception.FailedVerificationException;
+import com.senity.waved.domain.verification.exception.VerifyNonexistenceOnDateException;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -47,8 +48,9 @@ public class MyChallenge extends BaseEntity {
     @Column(name = "member_id")
     private Long memberId;
 
-    @Column(name = "challenge_group_id")
-    private Long challengeGroupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_group_id")
+    private ChallengeGroup challengeGroup;
 
     // 성공(2), 실패(1), 제출 안함(0)
     public void updateVerificationStatus(int dayIndex, boolean isSuccess) {
@@ -81,11 +83,10 @@ public class MyChallenge extends BaseEntity {
     public boolean isVerified() {
         ZonedDateTime currentDate = ZonedDateTime.now();
         ZonedDateTime startDate = getStartDate();
-        long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate); //startDate부터 오늘 날짜 차이 계산
+        long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
 
-        if (daysFromStart > 0 && daysFromStart < 15) {
-            int div = (int) (myVerifs / Math.pow(10, 14 - daysFromStart) % 10);
-            return div != 0;
+        if (daysFromStart > -1 && daysFromStart < 14) {
+            return (int) (myVerifs / Math.pow(10, 13 - daysFromStart) % 10) != 0;
         }
         return false;
     }
@@ -96,8 +97,23 @@ public class MyChallenge extends BaseEntity {
         }
     }
 
-    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, ChallengeGroup group, Boolean isGithubConnected) {
-        Challenge challenge = group.getChallenge();
+    public void deleteVerification(ZonedDateTime createDate) {
+        long daysFromStart = ChronoUnit.DAYS.between(startDate, createDate);
+
+        if (daysFromStart > -1 && daysFromStart < 14) {
+            if ((int)(myVerifs / Math.pow(10, 13 - daysFromStart) % 10) == 2) {
+                myVerifs -= Math.pow(10, 13 - daysFromStart);
+                successCount--;
+            } else {
+                if ((int)(myVerifs / Math.pow(10, 13 - daysFromStart) % 10) == 1) {
+                    throw new FailedVerificationException("실패한 인증 내역은 취소할 수 없습니다.");
+                }
+                else throw new VerifyNonexistenceOnDateException("해당 날짜에 인증내역이 존재하지 않습니다.");
+            }
+        }
+    }
+
+    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge, Boolean isGithubConnected) {
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
@@ -122,8 +138,7 @@ public class MyChallenge extends BaseEntity {
                 .build();
     }
 
-    public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge, ChallengeGroup group) {
-        Challenge challenge = group.getChallenge();
+    public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge) {
         Boolean isSuccessed = myChallenge.getSuccessCount() > 10 ? true : false;
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())

@@ -2,6 +2,8 @@ package com.senity.waved.domain.verification.service;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.entity.VerificationType;
+import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
+import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
@@ -13,6 +15,7 @@ import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundExceptio
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.entity.Verification;
+import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ import java.time.temporal.ChronoUnit;
 public class VerificationServiceImpl implements VerificationService {
 
     private final ChallengeGroupRepository challengeGroupRepository;
+    private final ChallengeRepository challengeRepository;
     private final VerificationRepository verificationRepository;
     private final MemberRepository memberRepository;
     private final GithubService githubService;
@@ -38,12 +42,10 @@ public class VerificationServiceImpl implements VerificationService {
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
+        verifyMyChallenge(member, challengeGroup);
 
-        MyChallenge myChallenge = verifyMyChallenge(member, challengeGroup);
-
-        Challenge challenge = challengeGroup.getChallenge();
+        Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
         VerificationType verificationType = challenge.getVerificationType();
-
         boolean isSuccess = false;
 
         switch (verificationType) {
@@ -68,8 +70,9 @@ public class VerificationServiceImpl implements VerificationService {
 
     public void challengeGroupIsTextType(Long challengeGroupId) throws ChallengeGroupVerificationException {
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
+        Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
 
-        if (challengeGroup.getChallenge().getVerificationType() != VerificationType.TEXT) {
+        if (challenge.getVerificationType() != VerificationType.TEXT) {
             throw new ChallengeGroupVerificationException("이 챌린지는 글 인증이 아닙니다.");
         }
     }
@@ -84,8 +87,8 @@ public class VerificationServiceImpl implements VerificationService {
                 .verificationType(VerificationType.TEXT)
                 .isDeleted(false)
                 .build();
-        verificationRepository.save(verification);
 
+        verificationRepository.save(verification);
         return true;
     }
 
@@ -104,8 +107,8 @@ public class VerificationServiceImpl implements VerificationService {
                 .verificationType(VerificationType.LINK)
                 .isDeleted(false)
                 .build();
-        verificationRepository.save(verification);
 
+        verificationRepository.save(verification);
         return true;
     }
 
@@ -184,19 +187,27 @@ public class VerificationServiceImpl implements VerificationService {
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 
+    private Challenge getChallengeById(Long id) {
+        return challengeRepository.findById(id)
+                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
+    }
+
     private void updateVerificationAndSuccessCount(MyChallenge myChallenge, ZonedDateTime startDate, ZonedDateTime currentDate, boolean isSuccess) {
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
-        // isSuccess 가 true일 경우 성공(1), false일 경우 실패(0)로 업데이트
-        myChallenge.updateVerificationStatus((int)(daysFromStart) + 1, isSuccess);
+
+        if (!myChallenge.isVerified()) {
+            myChallenge.updateVerificationStatus((int)(daysFromStart) + 1, isSuccess);
+        } else {
+            throw new AlreadyVerifiedException("이미 오늘의 인증을 완료했습니다.");
+        }
 
         if (isSuccess) {
             myChallenge.incrementSuccessCount();
         }
     }
 
-    private MyChallenge verifyMyChallenge(Member member, ChallengeGroup challengeGroup) {
+    private void verifyMyChallenge(Member member, ChallengeGroup challengeGroup) {
         MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
         myChallenge.verify();
-        return myChallenge;
     }
 }

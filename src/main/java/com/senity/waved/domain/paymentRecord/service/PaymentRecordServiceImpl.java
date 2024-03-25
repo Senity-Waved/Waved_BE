@@ -1,8 +1,6 @@
 package com.senity.waved.domain.paymentRecord.service;
 
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
-import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -13,7 +11,7 @@ import com.senity.waved.domain.paymentRecord.dto.request.PaymentRequestDto;
 import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import com.senity.waved.domain.paymentRecord.exception.DepositAmountNotMatchException;
-import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatch;
+import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatchException;
 import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -31,7 +29,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     private final MemberRepository memberRepository;
     private final MyChallengeRepository myChallengeRepository;
     private final PaymentRecordRepository paymentRecordRepository;
-    private final ChallengeGroupRepository challengeGroupRepository;
     private IamportClient api;
 
     @Override
@@ -92,10 +89,9 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     }
 
     private void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
-        ChallengeGroup group = challengeGroupRepository.findById(myChallenge.getChallengeGroupId())
-                .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
-
+        ChallengeGroup group = myChallenge.getChallengeGroup();
         String groupTitle = group.getGroupTitle();
+
         Long deposit = status.equals(PaymentStatus.APPLIED) ?
                 myChallenge.getDeposit() * (-1) :
                 status.equals(PaymentStatus.FAIL) ? 0 : myChallenge.getDeposit();
@@ -122,6 +118,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
 
     private void validateMember(Member member, MyChallenge myChallenge) {
         if(!myChallenge.getMemberId().equals(member.getId()))
-            throw new MemberAndMyChallengeNotMatch("해당 멤버의 마이 챌린지가 아닙니다.");
+            throw new MemberAndMyChallengeNotMatchException("해당 멤버의 마이 챌린지가 아닙니다.");
     }
 }

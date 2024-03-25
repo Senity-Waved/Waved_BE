@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface MyChallengeService {
     MyVerifsResponseDto getMyVerifications(Long myChallengeId);
-    void cancelAppliedMyChallenge(Long myChallengeId);
+    void cancelAppliedMyChallenge(String email, Long myChallengeId);
     List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status);
 }

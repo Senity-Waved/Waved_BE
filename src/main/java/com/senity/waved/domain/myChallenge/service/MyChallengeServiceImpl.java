@@ -1,5 +1,8 @@
 package com.senity.waved.domain.myChallenge.service;
 
+import com.senity.waved.domain.challenge.entity.Challenge;
+import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
+import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
@@ -12,6 +15,7 @@ import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatchException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,15 +33,18 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     private final MyChallengeRepository myChallengeRepository;
     private final MemberRepository memberRepository;
     private final ChallengeGroupRepository challengeGroupRepository;
+    private final ChallengeRepository challengeRepository;
 
     @Transactional
-    public void cancelAppliedMyChallenge(Long myChallengeId) {
+    public void cancelAppliedMyChallenge(String email, Long myChallengeId) {
+        Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
-        ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
+        ChallengeGroup group = myChallenge.getChallengeGroup();
 
+        validateMember(member, myChallenge);
+
+        group.deleteGroupParticipantCount();
         myChallengeRepository.delete(myChallenge);
-        group.deleteMyChallenge(myChallenge);
-        challengeGroupRepository.save(group);
     }
 
     @Transactional
@@ -67,24 +74,30 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
     public MyVerifsResponseDto getMyVerifications(Long myChallengeId) {
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
-        ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
+        ChallengeGroup group = myChallenge.getChallengeGroup();
         return new MyVerifsResponseDto(myChallenge, group);
     }
 
     private MyChallengeResponseDto mapToResponseDto(MyChallenge myChallenge, ChallengeStatus status, Member member) {
         boolean isGithubConnected = member.isGithubConnected();
-        ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
+        ChallengeGroup group = myChallenge.getChallengeGroup();
+        Challenge challenge = getChallengeById(group.getChallengeId());
 
         switch (status) {
             case PROGRESS:
-                return myChallenge.getMyChallengesInProgress(myChallenge, group, isGithubConnected);
+                return myChallenge.getMyChallengesInProgress(myChallenge, group, challenge, isGithubConnected);
             case WAITING:
                 return myChallenge.getMyChallengesWaiting(myChallenge, group);
             case COMPLETED:
-                return myChallenge.getMyChallengesCompleted(myChallenge, group);
+                return myChallenge.getMyChallengesCompleted(myChallenge, group, challenge);
             default:
                 throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");
         }
+    }
+
+    private Challenge getChallengeById(Long id) {
+        return challengeRepository.findById(id)
+                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
     }
 
     private Member getMemberByEmail(String email) {
@@ -100,5 +113,10 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     private ChallengeGroup getChallengeGroupById(Long id) {
         return challengeGroupRepository.findById(id)
                 .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
+    }
+
+    private void validateMember(Member member, MyChallenge myChallenge) {
+        if(!myChallenge.getMemberId().equals(member.getId()))
+            throw new MemberAndMyChallengeNotMatchException("해당 멤버의 마이 챌린지가 아닙니다.");
     }
 }

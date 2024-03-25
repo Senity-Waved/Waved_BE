@@ -37,7 +37,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             int groupSize = challenge.getGroups().size();
 
             ChallengeGroup group = challenge.getGroups().get(groupSize - 1);
-            homeGroups.add(ChallengeGroup.getHomeGroupResponse(group));
+            homeGroups.add(ChallengeGroup.getHomeGroupResponse(group, challenge));
         }
         return homeGroups;
     }
