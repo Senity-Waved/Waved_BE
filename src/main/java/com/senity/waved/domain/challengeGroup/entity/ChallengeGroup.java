@@ -35,14 +35,6 @@ public class ChallengeGroup extends BaseEntity {
     @Column(name = "challenge_id")
     private Long challengeId;
 
-/*    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<MyChallenge> myChallenges = new ArrayList<>();*/
-
-/*    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Quiz> quizzes = new ArrayList<>();*/
-
     public void addGroupParticipantCount() {
         participantCount++;
     }
@@ -64,17 +56,6 @@ public class ChallengeGroup extends BaseEntity {
                 .isApplied(isApplied)
                 .isFree(challenge.getIsFree())
                 .myChallengeId(myChallengeId)
-                .challengeId(challenge.getId())
-                .build();
-    }
-
-    public static ChallengeGroupResponseDto getGroupAdminResponse(ChallengeGroup group, Challenge challenge) {
-        return ChallengeGroupResponseDto.builder()
-                .groupTitle(group.getGroupTitle())
-                .participantCount(group.getParticipantCount())
-                .startDate(group.getStartDate())
-                .endDate(group.getEndDate())
-                .verificationType(challenge.getVerificationType())
                 .challengeId(challenge.getId())
                 .build();
     }

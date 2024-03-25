@@ -15,10 +15,7 @@ import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMa
 import com.senity.waved.domain.quiz.exception.QuizNotFoundException;
 import com.senity.waved.domain.review.exception.AlreadyReviewedException;
 import com.senity.waved.domain.review.exception.ReviewNotFoundException;
-import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
-import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
-import com.senity.waved.domain.verification.exception.VerificationNotFoundException;
-import com.senity.waved.domain.verification.exception.VerifyExistenceOnDateException;
+import com.senity.waved.domain.verification.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -129,6 +126,12 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
+    @ExceptionHandler(VerifyNonexistenceOnDateException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleVerifyNonexistenceOnDateException(VerifyNonexistenceOnDateException e) {
+        return e.getMessage();
+    }
+
     @ExceptionHandler(MemberAndMyChallengeNotMatchException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleMemberAndMyChallengeNotMatch(MemberAndMyChallengeNotMatchException e) {
@@ -144,6 +147,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ChallengeNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleChallengeNotFoundException(ChallengeNotFoundException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(FailedVerificationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleFailedVerificationException(FailedVerificationException e) {
         return e.getMessage();
     }
 }

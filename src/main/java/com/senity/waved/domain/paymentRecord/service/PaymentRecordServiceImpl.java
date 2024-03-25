@@ -1,7 +1,6 @@
 package com.senity.waved.domain.paymentRecord.service;
 
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -30,7 +29,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     private final MemberRepository memberRepository;
     private final MyChallengeRepository myChallengeRepository;
     private final PaymentRecordRepository paymentRecordRepository;
-    private final ChallengeGroupRepository challengeGroupRepository;
     private IamportClient api;
 
     @Override

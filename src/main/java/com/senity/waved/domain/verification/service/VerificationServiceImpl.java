@@ -42,7 +42,7 @@ public class VerificationServiceImpl implements VerificationService {
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
-        MyChallenge myChallenge = verifyMyChallenge(member, challengeGroup);
+        verifyMyChallenge(member, challengeGroup);
 
         Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
         VerificationType verificationType = challenge.getVerificationType();
@@ -206,9 +206,8 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
-    private MyChallenge verifyMyChallenge(Member member, ChallengeGroup challengeGroup) {
+    private void verifyMyChallenge(Member member, ChallengeGroup challengeGroup) {
         MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
         myChallenge.verify();
-        return myChallenge;
     }
 }
