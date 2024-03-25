@@ -36,6 +36,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         http
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
+                        .requestMatchers("/api/v2/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/oauth2/**",
                                 "/api/v1/challenges/**",
                                 "/api/v1/challengeGroups/info/**").permitAll()

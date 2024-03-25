@@ -17,11 +17,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Component
 public class TokenProvider implements InitializingBean {
@@ -99,17 +95,25 @@ public class TokenProvider implements InitializingBean {
     }
 
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts
-                .parserBuilder()
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
 
         String username = claims.getSubject();
-        Collection<SimpleGrantedAuthority> authorities = Arrays.stream(new String[]{"ROLE_USER"})
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+
+        List<String> adminMembers = Arrays.asList(
+                "waved7777@gmail.com", "imholy96@gmail.com",
+                "vywns9978@gmail.com", "waved8888@gmail.com", "fetest1228@gmail.com"
+        );
+
+        Collection<SimpleGrantedAuthority> authorities;
+        if (adminMembers.contains(username)) {
+            authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        } else {
+            authorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
+        }
 
         User principal = new User(username, "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, token, authorities);
