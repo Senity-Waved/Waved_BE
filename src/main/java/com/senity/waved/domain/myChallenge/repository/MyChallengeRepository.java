@@ -12,13 +12,13 @@ import java.util.Optional;
 public interface MyChallengeRepository extends JpaRepository<MyChallenge, Long> {
     Optional<MyChallenge> findByMemberIdAndChallengeGroupId(Long memberId, Long challengeGroupId);
 
-    @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroupId = cg.id WHERE mc.memberId = :memberId AND cg.startDate > :todayStart")
+    @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.memberId = :memberId AND cg.startDate > :todayStart")
     List<MyChallenge> findMyChallengesWaiting(@Param("memberId") Long memberId, @Param("todayStart") ZonedDateTime todayStart);
 
-    @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroupId = cg.id WHERE mc.memberId = :memberId AND cg.startDate <= :todayStart AND cg.endDate >= :todayStart")
+    @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.memberId = :memberId AND cg.startDate <= :todayStart AND cg.endDate >= :todayStart")
     List<MyChallenge> findMyChallengesInProgress(@Param("memberId") Long memberId, @Param("todayStart") ZonedDateTime todayStart);
 
-    @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroupId = cg.id WHERE mc.memberId = :memberId AND cg.endDate < :todayStart")
+    @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroup.id = cg.id WHERE mc.memberId = :memberId AND cg.endDate < :todayStart")
     List<MyChallenge> findMyChallengesCompleted(@Param("memberId") Long memberId, @Param("todayStart") ZonedDateTime todayStart);
 
 }

@@ -5,8 +5,7 @@ import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -47,8 +46,9 @@ public class MyChallenge extends BaseEntity {
     @Column(name = "member_id")
     private Long memberId;
 
-    @Column(name = "challenge_group_id")
-    private Long challengeGroupId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "challenge_group_id")
+    private ChallengeGroup challengeGroup;
 
     // 성공(2), 실패(1), 제출 안함(0)
     public void updateVerificationStatus(int dayIndex, boolean isSuccess) {
@@ -96,8 +96,8 @@ public class MyChallenge extends BaseEntity {
         }
     }
 
-    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, ChallengeGroup group, Boolean isGithubConnected) {
-        Challenge challenge = group.getChallenge();
+    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge, Boolean isGithubConnected) {
+        // Challenge challenge = group.getChallenge();
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
@@ -122,8 +122,8 @@ public class MyChallenge extends BaseEntity {
                 .build();
     }
 
-    public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge, ChallengeGroup group) {
-        Challenge challenge = group.getChallenge();
+    public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge) {
+        // Challenge challenge = group.getChallenge();
         Boolean isSuccessed = myChallenge.getSuccessCount() > 10 ? true : false;
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())

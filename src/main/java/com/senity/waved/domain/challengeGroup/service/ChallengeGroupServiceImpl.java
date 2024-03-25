@@ -1,5 +1,8 @@
 package com.senity.waved.domain.challengeGroup.service;
 
+import com.senity.waved.domain.challenge.entity.Challenge;
+import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
+import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
 import com.senity.waved.domain.challengeGroup.dto.response.VerificationListResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
@@ -13,7 +16,7 @@ import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.entity.Verification;
-import com.senity.waved.domain.verification.exception.VerifyExistenceOnDate;
+import com.senity.waved.domain.verification.exception.VerifyExistenceOnDateException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,6 +39,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private final MyChallengeRepository myChallengeRepository;
     private final VerificationRepository verificationRepository;
     private final ChallengeGroupRepository challengeGroupRepository;
+    private final ChallengeRepository challengeRepository;
     private final LikedRepository likedRepository;
 
     // TODO 대기중인 챌린지만 신청 가능
@@ -49,7 +53,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         }
 
         MyChallenge newMyChallenge = MyChallenge.builder()
-                .challengeGroupId(groupId)
+                .challengeGroup(group)
                 .successCount(0L)
                 .isReviewed(false)
                 .memberId(member.getId())
@@ -61,21 +65,20 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .build();
 
         myChallengeRepository.save(newMyChallenge);
-        group.addMyChallenge(newMyChallenge);
-        challengeGroupRepository.save(group);
         return newMyChallenge.getId();
     }
 
     public ChallengeGroupResponseDto getGroupDetail(String email, Long groupId) {
         ChallengeGroup group = getGroupById(groupId);
+        Challenge challenge = getChallengeById(group.getChallengeId());
         if (Objects.isNull(email))
-            return ChallengeGroup.getGroupResponse(group, -1L);
+            return ChallengeGroup.getGroupResponse(group, challenge, -1L);
 
         Member member = getMemberByEmail(email);
         Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupId(member.getId(), group.getId());
 
         Long myChallengeId = myChallenge.isPresent() ? myChallenge.get().getId() : -1L;
-        return ChallengeGroup.getGroupResponse(group, myChallengeId);
+        return ChallengeGroup.getGroupResponse(group, challenge, myChallengeId);
     }
 
     @Override
@@ -99,6 +102,11 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private ChallengeGroup getGroupById(Long id) {
         return challengeGroupRepository.findById(id)
                 .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
+    }
+
+    private Challenge getChallengeById(Long id) {
+        return challengeRepository.findById(id)
+                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
     }
 
     private Member getMemberByEmail(String email) {
@@ -132,7 +140,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
 
     private List<VerificationListResponseDto> convertToDtoList(List<Verification> verifications, Member member) {
         if (verifications.isEmpty()) {
-            throw new VerifyExistenceOnDate("해당 날짜에 존재하는 인증내역이 없습니다.");
+            throw new VerifyExistenceOnDateException("해당 날짜에 존재하는 인증내역이 없습니다.");
         }
         return verifications.stream()
                 .map(verification -> new VerificationListResponseDto(verification, member, isLikedByMember(verification, member)))

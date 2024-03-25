@@ -1,10 +1,10 @@
 package com.senity.waved.domain.review.service;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
+import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
+import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotCompletedException;
-import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
-import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -29,17 +29,15 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final MemberRepository memberRepository;
     private final MyChallengeRepository myChallengeRepository;
-    private final ChallengeGroupRepository challengeGroupRepository;
+    private final ChallengeRepository challengeRepository;
 
     @Transactional
     public void createChallengeReview(String email, Long myChallengeId, String content) {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
 
-        ChallengeGroup challengeGroup = challengeGroupRepository.findById(myChallenge.getChallengeGroupId())
-                .orElseThrow(() -> new ChallengeGroupNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
-
-        Challenge challenge = challengeGroup.getChallenge();
+        ChallengeGroup challengeGroup = myChallenge.getChallengeGroup();
+        Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
 
         if (challengeGroup.getEndDate().isAfter(ZonedDateTime.now())) {
             throw new ChallengeGroupNotCompletedException("종료된 챌린지 그룹에 대해서만 리뷰 작성 가능합니다.");
@@ -96,6 +94,11 @@ public class ReviewServiceImpl implements ReviewService {
     private Member getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
+    }
+
+    private Challenge getChallengeById(Long id) {
+        return challengeRepository.findById(id)
+                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
     }
 
     private MyChallenge getMyChallengeById(Long id) {

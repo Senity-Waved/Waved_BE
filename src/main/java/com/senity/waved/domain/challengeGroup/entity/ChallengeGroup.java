@@ -4,17 +4,12 @@ import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
-import com.senity.waved.domain.myChallenge.entity.MyChallenge;
-import com.senity.waved.domain.quiz.entity.Quiz;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -37,30 +32,31 @@ public class ChallengeGroup extends BaseEntity {
     @Column(name = "end_date")
     private ZonedDateTime endDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+/*    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "challenge_id")
-    private Challenge challenge;
+    private Challenge challenge;*/
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Column(name = "challenge_id")
+    private Long challengeId;
+
+/*    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<MyChallenge> myChallenges = new ArrayList<>();
+    private List<MyChallenge> myChallenges = new ArrayList<>();*/
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+/*    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
-    private List<Quiz> quizzes = new ArrayList<>();
+    private List<Quiz> quizzes = new ArrayList<>();*/
 
-    public void addMyChallenge(MyChallenge myChallenge) {
-        myChallenges.add(myChallenge);
+    public void addMyChallenge() {
         participantCount++;
     }
 
-    public void deleteMyChallenge(MyChallenge myChallenge) {
-        myChallenges.remove(myChallenge);
-        participantCount--;
+    public void deleteMyChallenge() {
+        if (participantCount < 0) participantCount--;
     }
 
-    public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group, Long myChallengeId) {
-        Challenge challenge = group.getChallenge();
+    public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group, Challenge challenge, Long myChallengeId) {
+        //Challenge challenge = group.getChallenge();
         Boolean isApplied = myChallengeId > 0 ? true : false;
         return ChallengeGroupResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
@@ -77,8 +73,8 @@ public class ChallengeGroup extends BaseEntity {
                 .build();
     }
 
-    public static ChallengeGroupResponseDto getGroupAdminResponse(ChallengeGroup group) {
-        Challenge challenge = group.getChallenge();
+    public static ChallengeGroupResponseDto getGroupAdminResponse(ChallengeGroup group, Challenge challenge) {
+        // Challenge challenge = group.getChallenge();
         return ChallengeGroupResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .participantCount(group.getParticipantCount())
@@ -89,8 +85,8 @@ public class ChallengeGroup extends BaseEntity {
                 .build();
     }
 
-    public static ChallengeGroupHomeResponseDto getHomeGroupResponse(ChallengeGroup group) {
-        Challenge challenge = group.getChallenge();
+    public static ChallengeGroupHomeResponseDto getHomeGroupResponse(ChallengeGroup group, Challenge challenge) {
+        // Challenge challenge = group.getChallenge();
         return ChallengeGroupHomeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .verificationType(challenge.getVerificationType())

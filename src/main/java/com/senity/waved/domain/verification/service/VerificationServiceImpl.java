@@ -2,6 +2,8 @@ package com.senity.waved.domain.verification.service;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.entity.VerificationType;
+import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
+import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
@@ -29,6 +31,7 @@ import java.time.temporal.ChronoUnit;
 public class VerificationServiceImpl implements VerificationService {
 
     private final ChallengeGroupRepository challengeGroupRepository;
+    private final ChallengeRepository challengeRepository;
     private final VerificationRepository verificationRepository;
     private final MemberRepository memberRepository;
     private final GithubService githubService;
@@ -41,7 +44,7 @@ public class VerificationServiceImpl implements VerificationService {
 
         MyChallenge myChallenge = verifyMyChallenge(member, challengeGroup);
 
-        Challenge challenge = challengeGroup.getChallenge();
+        Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
         VerificationType verificationType = challenge.getVerificationType();
 
         boolean isSuccess = false;
@@ -68,8 +71,9 @@ public class VerificationServiceImpl implements VerificationService {
 
     public void challengeGroupIsTextType(Long challengeGroupId) throws ChallengeGroupVerificationException {
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
+        Challenge challenge = getChallengeById(challengeGroup.getId());
 
-        if (challengeGroup.getChallenge().getVerificationType() != VerificationType.TEXT) {
+        if (challenge.getVerificationType() != VerificationType.TEXT) {
             throw new ChallengeGroupVerificationException("이 챌린지는 글 인증이 아닙니다.");
         }
     }
@@ -182,6 +186,11 @@ public class VerificationServiceImpl implements VerificationService {
     private MyChallenge findMyChallenge(Member member, ChallengeGroup challengeGroup) {
         return myChallengeRepository.findByMemberIdAndChallengeGroupId(member.getId(), challengeGroup.getId())
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
+    }
+
+    private Challenge getChallengeById(Long id) {
+        return challengeRepository.findById(id)
+                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
     }
 
     private void updateVerificationAndSuccessCount(MyChallenge myChallenge, ZonedDateTime startDate, ZonedDateTime currentDate, boolean isSuccess) {
