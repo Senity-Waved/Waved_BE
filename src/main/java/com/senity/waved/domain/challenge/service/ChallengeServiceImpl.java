@@ -11,10 +11,7 @@ import com.senity.waved.domain.review.dto.response.ChallengeReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
 import com.senity.waved.domain.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,25 +44,18 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     public Page<ChallengeReviewResponseDto> getReviewsPaged(Long challengeId, int pageNumber, int pageSize) {
-        List<Review> reviews = reviewRepository.findByChallengeId(challengeId);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createDate").descending());
+        Page<Review> reviewPage = reviewRepository.findByChallengeId(challengeId, pageable);
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<ChallengeReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
-
-        return new PageImpl<>(responseDtoList, pageable, reviews.size());
-    }
-
-    private List<ChallengeReviewResponseDto> getPaginatedReviewResponseDtoList(List<Review> reviews, Pageable pageable) {
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), reviews.size());
-
-        return reviews.subList(start, end)
+        List<ChallengeReviewResponseDto> responseDtoList = reviewPage.getContent()
                 .stream()
                 .map(review -> {
                     Member member = getMemberById(review.getMemberId());
                     return ChallengeReviewResponseDto.getChallengeReviewResponseDto(review, member);
                 })
                 .collect(Collectors.toList());
+
+        return new PageImpl<>(responseDtoList, pageable, reviewPage.getTotalElements());
     }
 
     private Member getMemberById(Long id) {

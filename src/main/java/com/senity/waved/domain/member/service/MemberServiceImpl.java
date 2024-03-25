@@ -19,10 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.kohsuke.github.GHUser;
 import org.kohsuke.github.GitHub;
 import org.kohsuke.github.GitHubBuilder;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,43 +108,29 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     public Page<MemberReviewResponseDto> getReviewsPaged(String email, int pageNumber, int pageSize) {
         Member member = getMemberByEmail(email);
-        List<Review> reviews = reviewRepository.getReviewByMemberId(member.getId());
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createDate").descending());
+        Page<Review> reviewPage = reviewRepository.getReviewByMemberId(member.getId(), pageable);
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<MemberReviewResponseDto> responseDtoList = getPaginatedReviewResponseDtoList(reviews, pageable);
+        List<MemberReviewResponseDto> responseDtoList = reviewPage.getContent()
+                .stream()
+                .map(review -> MemberReviewResponseDto.getMemberReviewResponseDto(review))
+                .collect(Collectors.toList());
 
-        return new PageImpl<>(responseDtoList, pageable, reviews.size());
+        return new PageImpl<>(responseDtoList, pageable, reviewPage.getTotalElements());
     }
 
     @Transactional(readOnly = true)
     public Page<PaymentRecordResponseDto> getMyPaymentRecordsPaged(String email, int pageNumber, int pageSize) {
         Member member = getMemberByEmail(email);
-        List<PaymentRecord> paymentRecords = paymentRecordRepository.getPaymentRecordByMemberId(member.getId());
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createDate").descending());
+        Page<PaymentRecord> paymentRecordPage = paymentRecordRepository.getPaymentRecordByMemberId(member.getId(), pageable);
 
-        Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        List<PaymentRecordResponseDto> responseDtoList = getPaginatedPaymentResponseDtoList(paymentRecords, pageable);
-
-        return new PageImpl<>(responseDtoList, pageable, paymentRecords.size());
-    }
-
-    private List<MemberReviewResponseDto> getPaginatedReviewResponseDtoList(List<Review> reviews, Pageable pageable) {
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), reviews.size());
-
-        return reviews.subList(start, end)
+        List<PaymentRecordResponseDto> responseDtoList = paymentRecordPage.getContent()
                 .stream()
-                .map(MemberReviewResponseDto::getMemberReviewResponseDto)
+                .map(PaymentRecordResponseDto::getPaymentResponse)
                 .collect(Collectors.toList());
-    }
 
-    private List<PaymentRecordResponseDto> getPaginatedPaymentResponseDtoList(List<PaymentRecord> paymentRecords, Pageable pageable) {
-        int start = (int) pageable.getOffset();
-        int end = Math.min(start + pageable.getPageSize(), paymentRecords.size());
-
-        return paymentRecords.subList(start, end)
-                .stream()
-                .map(PaymentRecord::getPaymentResponse)
-                .collect(Collectors.toList());
+        return new PageImpl<>(responseDtoList, pageable, paymentRecordPage.getTotalElements());
     }
 
     private GHUser checkCredentials(GithubInfoDto githubDto) {
