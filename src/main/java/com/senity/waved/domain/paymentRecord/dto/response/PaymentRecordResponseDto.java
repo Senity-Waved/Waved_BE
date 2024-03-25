@@ -1,5 +1,6 @@
 package com.senity.waved.domain.paymentRecord.dto.response;
 
+import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -16,4 +17,13 @@ public class PaymentRecordResponseDto {
     private PaymentStatus status;
     private Long deposit;
     private ZonedDateTime createDate;
+
+    public static PaymentRecordResponseDto getPaymentResponse(PaymentRecord paymentRecord) {
+        return PaymentRecordResponseDto.builder()
+                .groupTitle(paymentRecord.getGroupTitle())
+                .status(paymentRecord.getPaymentStatus())
+                .deposit(paymentRecord.getDeposit())
+                .createDate(paymentRecord.getCreateDate())
+                .build();
+    }
 }
