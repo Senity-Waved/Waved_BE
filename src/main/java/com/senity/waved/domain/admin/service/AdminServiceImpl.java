@@ -61,6 +61,9 @@ public class AdminServiceImpl implements AdminService {
         Verification verification = verificationRepository.findById(verificationId)
                 .orElseThrow(() -> new VerificationNotFoundException("해당 인증 내역을 찾을 수 없습니다."));
         verification.markAsDeleted(true);
+        verification.getMemberId();
+        verification.getChallengeGroupId();
+        // 삭제시 successCount랑 myVerifs 업데이트(해당 myVerifs 1로 업데이트)
         verificationRepository.save(verification);
     }
 

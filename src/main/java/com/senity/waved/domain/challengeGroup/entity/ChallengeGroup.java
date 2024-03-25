@@ -32,10 +32,6 @@ public class ChallengeGroup extends BaseEntity {
     @Column(name = "end_date")
     private ZonedDateTime endDate;
 
-/*    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "challenge_id")
-    private Challenge challenge;*/
-
     @Column(name = "challenge_id")
     private Long challengeId;
 
@@ -47,16 +43,15 @@ public class ChallengeGroup extends BaseEntity {
     @Builder.Default
     private List<Quiz> quizzes = new ArrayList<>();*/
 
-    public void addMyChallenge() {
+    public void addGroupParticipantCount() {
         participantCount++;
     }
 
-    public void deleteMyChallenge() {
+    public void deleteGroupParticipantCount() {
         if (participantCount < 0) participantCount--;
     }
 
     public static ChallengeGroupResponseDto getGroupResponse(ChallengeGroup group, Challenge challenge, Long myChallengeId) {
-        //Challenge challenge = group.getChallenge();
         Boolean isApplied = myChallengeId > 0 ? true : false;
         return ChallengeGroupResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
@@ -74,7 +69,6 @@ public class ChallengeGroup extends BaseEntity {
     }
 
     public static ChallengeGroupResponseDto getGroupAdminResponse(ChallengeGroup group, Challenge challenge) {
-        // Challenge challenge = group.getChallenge();
         return ChallengeGroupResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .participantCount(group.getParticipantCount())
@@ -86,7 +80,6 @@ public class ChallengeGroup extends BaseEntity {
     }
 
     public static ChallengeGroupHomeResponseDto getHomeGroupResponse(ChallengeGroup group, Challenge challenge) {
-        // Challenge challenge = group.getChallenge();
         return ChallengeGroupHomeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .verificationType(challenge.getVerificationType())

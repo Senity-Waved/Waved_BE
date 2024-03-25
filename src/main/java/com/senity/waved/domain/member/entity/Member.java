@@ -46,22 +46,6 @@ public class Member extends BaseEntity {
     @Column(name="has_info")
     private Boolean hasInfo;
 
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @Builder.Default
-//    private List<MyChallenge> myChallenges = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @Builder.Default
-//    private List<Review> reviews = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @Builder.Default
-//    private List<Verification> verification = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    @Builder.Default
-//    private List<PaymentRecord> paymentRecords = new ArrayList<>();
-
     public void updateInfo(ProfileEditDto editDto) {
         nickname = editDto.getNickname();
         birthYear = editDto.getBirthYear();

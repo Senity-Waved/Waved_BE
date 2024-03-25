@@ -43,7 +43,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
         validateMember(member, myChallenge);
 
-        group.deleteMyChallenge();
+        group.deleteGroupParticipantCount();
         myChallengeRepository.delete(myChallenge);
     }
 

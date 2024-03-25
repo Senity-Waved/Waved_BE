@@ -65,6 +65,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .build();
 
         myChallengeRepository.save(newMyChallenge);
+        group.addGroupParticipantCount();
         return newMyChallenge.getId();
     }
 

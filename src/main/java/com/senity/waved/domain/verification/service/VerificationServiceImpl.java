@@ -15,6 +15,7 @@ import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundExceptio
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.entity.Verification;
+import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -41,12 +42,10 @@ public class VerificationServiceImpl implements VerificationService {
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
-
         MyChallenge myChallenge = verifyMyChallenge(member, challengeGroup);
 
         Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
         VerificationType verificationType = challenge.getVerificationType();
-
         boolean isSuccess = false;
 
         switch (verificationType) {
@@ -71,7 +70,7 @@ public class VerificationServiceImpl implements VerificationService {
 
     public void challengeGroupIsTextType(Long challengeGroupId) throws ChallengeGroupVerificationException {
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
-        Challenge challenge = getChallengeById(challengeGroup.getId());
+        Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
 
         if (challenge.getVerificationType() != VerificationType.TEXT) {
             throw new ChallengeGroupVerificationException("이 챌린지는 글 인증이 아닙니다.");
@@ -88,8 +87,8 @@ public class VerificationServiceImpl implements VerificationService {
                 .verificationType(VerificationType.TEXT)
                 .isDeleted(false)
                 .build();
-        verificationRepository.save(verification);
 
+        verificationRepository.save(verification);
         return true;
     }
 
@@ -108,8 +107,8 @@ public class VerificationServiceImpl implements VerificationService {
                 .verificationType(VerificationType.LINK)
                 .isDeleted(false)
                 .build();
-        verificationRepository.save(verification);
 
+        verificationRepository.save(verification);
         return true;
     }
 
@@ -195,8 +194,12 @@ public class VerificationServiceImpl implements VerificationService {
 
     private void updateVerificationAndSuccessCount(MyChallenge myChallenge, ZonedDateTime startDate, ZonedDateTime currentDate, boolean isSuccess) {
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
-        // isSuccess 가 true일 경우 성공(1), false일 경우 실패(0)로 업데이트
-        myChallenge.updateVerificationStatus((int)(daysFromStart) + 1, isSuccess);
+
+        if (!myChallenge.isVerified()) {
+            myChallenge.updateVerificationStatus((int)(daysFromStart) + 1, isSuccess);
+        } else {
+            throw new AlreadyVerifiedException("이미 오늘의 인증을 완료했습니다.");
+        }
 
         if (isSuccess) {
             myChallenge.incrementSuccessCount();

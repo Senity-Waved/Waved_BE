@@ -53,6 +53,7 @@ public class MyChallenge extends BaseEntity {
     // 성공(2), 실패(1), 제출 안함(0)
     public void updateVerificationStatus(int dayIndex, boolean isSuccess) {
         if (dayIndex < 15 && dayIndex > 0) {
+            // 오늘 인증 했는지
             myVerifs += isSuccess ? 2 * Math.pow(10, 14 - dayIndex) : Math.pow(10, 14 - dayIndex);
         }
     }
@@ -83,9 +84,8 @@ public class MyChallenge extends BaseEntity {
         ZonedDateTime startDate = getStartDate();
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate); //startDate부터 오늘 날짜 차이 계산
 
-        if (daysFromStart > 0 && daysFromStart < 15) {
-            int div = (int) (myVerifs / Math.pow(10, 14 - daysFromStart) % 10);
-            return div != 0;
+        if (daysFromStart > -1 && daysFromStart < 14) {
+            return (int) (myVerifs / Math.pow(10, 13 - daysFromStart) % 10) != 0;
         }
         return false;
     }
@@ -97,7 +97,6 @@ public class MyChallenge extends BaseEntity {
     }
 
     public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge, Boolean isGithubConnected) {
-        // Challenge challenge = group.getChallenge();
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate())
@@ -123,7 +122,6 @@ public class MyChallenge extends BaseEntity {
     }
 
     public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge) {
-        // Challenge challenge = group.getChallenge();
         Boolean isSuccessed = myChallenge.getSuccessCount() > 10 ? true : false;
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
