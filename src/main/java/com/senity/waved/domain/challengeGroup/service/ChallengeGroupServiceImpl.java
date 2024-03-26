@@ -62,6 +62,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .isRefundRequested(false)
                 .startDate(group.getStartDate())
                 .endDate(group.getEndDate())
+                .isPaid(false)
                 .build();
 
         myChallengeRepository.save(newMyChallenge);

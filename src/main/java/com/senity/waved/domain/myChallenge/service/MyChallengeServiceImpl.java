@@ -9,6 +9,8 @@ import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepositor
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.myChallenge.dto.response.MyChallengeCompletedDto;
+import com.senity.waved.domain.myChallenge.dto.response.MyChallengeProgressDto;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
 import com.senity.waved.domain.myChallenge.dto.response.MyVerifsResponseDto;
 import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
@@ -55,13 +57,13 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
         switch (status) {
             case PROGRESS:
-                myChallengesListed = myChallengeRepository.findMyChallengesInProgress(member.getId(), todayStart);
+                myChallengesListed = myChallengeRepository.findMyChallengesInProgressAndIsPaidTrue(member.getId(), todayStart);
                 break;
             case WAITING:
-                myChallengesListed = myChallengeRepository.findMyChallengesWaiting(member.getId(), todayStart);
+                myChallengesListed = myChallengeRepository.findMyChallengesWaitingAndIsPaidTrue(member.getId(), todayStart);
                 break;
             case COMPLETED:
-                myChallengesListed = myChallengeRepository.findMyChallengesCompleted(member.getId(), todayStart);
+                myChallengesListed = myChallengeRepository.findMyChallengesCompletedAndIsPaidTrue(member.getId(), todayStart);
                 break;
             default:
                 throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");
@@ -85,11 +87,11 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
         switch (status) {
             case PROGRESS:
-                return myChallenge.getMyChallengesInProgress(myChallenge, group, challenge, isGithubConnected);
+                return MyChallengeProgressDto.getMyChallengesInProgress(myChallenge, group, challenge, isGithubConnected);
             case WAITING:
-                return myChallenge.getMyChallengesWaiting(myChallenge, group);
+                return MyChallengeResponseDto.getMyChallengesWaiting(myChallenge, group);
             case COMPLETED:
-                return myChallenge.getMyChallengesCompleted(myChallenge, group, challenge);
+                return MyChallengeCompletedDto.getMyChallengesCompleted(myChallenge, group, challenge);
             default:
                 throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");
         }
