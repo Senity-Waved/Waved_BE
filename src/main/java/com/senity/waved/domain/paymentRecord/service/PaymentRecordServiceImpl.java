@@ -47,6 +47,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         }
         savePaymentRecord(myChallenge, member.getId(), PaymentStatus.APPLIED);
         myChallenge.updateImpUid(requestDto.getImp_uid());
+        myChallenge.updateIsPaid(true);
         myChallengeRepository.save(myChallenge);
     }
 

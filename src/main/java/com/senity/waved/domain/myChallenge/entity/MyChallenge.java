@@ -1,16 +1,15 @@
 package com.senity.waved.domain.myChallenge.entity;
 
 import com.senity.waved.common.BaseEntity;
-import com.senity.waved.domain.challenge.entity.Challenge;
-import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import com.senity.waved.domain.verification.exception.FailedVerificationException;
 import com.senity.waved.domain.verification.exception.VerifyNonexistenceOnDateException;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -36,6 +35,10 @@ public class MyChallenge extends BaseEntity {
     @Column(name = "deposit")
     private Long deposit;
 
+    @ColumnDefault("FALSE")
+    @Column(name = "is_paid")
+    private boolean isPaid;
+
     @Column(name = "imp_urd")
     private String impUid;
 
@@ -60,6 +63,10 @@ public class MyChallenge extends BaseEntity {
 
     public void updateIsReviewed() {
         isReviewed = true;
+    }
+
+    public void updateIsPaid(boolean b) {
+        this.isPaid = b;
     }
 
     public void updateImpUid(String impUid) {
@@ -110,46 +117,5 @@ public class MyChallenge extends BaseEntity {
                 else throw new VerifyNonexistenceOnDateException("해당 날짜에 인증내역이 존재하지 않습니다.");
             }
         }
-    }
-
-    public static MyChallengeResponseDto getMyChallengesInProgress(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge, Boolean isGithubConnected) {
-        return MyChallengeResponseDto.builder()
-                .groupTitle(group.getGroupTitle())
-                .startDate(group.getStartDate())
-                .endDate(group.getEndDate())
-                .successCount(myChallenge.getSuccessCount())
-                .deposit(myChallenge.getDeposit())
-                .myChallengeId(myChallenge.getId())
-                .challengeGroupId(group.getId())
-                .isVerified(myChallenge.isVerified())
-                .isGithubConnected(isGithubConnected)
-                .verificationType(challenge.getVerificationType())
-                .build();
-    }
-
-    public static MyChallengeResponseDto getMyChallengesWaiting(MyChallenge myChallenge, ChallengeGroup group) {
-        return MyChallengeResponseDto.builder()
-                .groupTitle(group.getGroupTitle())
-                .startDate(group.getStartDate())
-                .deposit(myChallenge.getDeposit())
-                .endDate(group.getEndDate())
-                .challengeGroupId(group.getId())
-                .build();
-    }
-
-    public static MyChallengeResponseDto getMyChallengesCompleted(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge) {
-        Boolean isSuccessed = myChallenge.getSuccessCount() > 10 ? true : false;
-        return MyChallengeResponseDto.builder()
-                .groupTitle(group.getGroupTitle())
-                .startDate(group.getStartDate())
-                .endDate(group.getEndDate())
-                .challengeGroupId(group.getId())
-                .myChallengeId(myChallenge.getId())
-                .isReviewed(myChallenge.getIsReviewed())
-                .isRefundRequested(myChallenge.getIsRefundRequested())
-                .deposit(myChallenge.getDeposit())
-                .isSuccessed(isSuccessed)
-                .verificationType(challenge.getVerificationType())
-                .build();
     }
 }

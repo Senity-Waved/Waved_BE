@@ -1,6 +1,7 @@
 package com.senity.waved.domain.myChallenge.dto.response;
 
-import com.senity.waved.domain.challenge.entity.VerificationType;
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,15 +16,16 @@ public class MyChallengeResponseDto {
     private String groupTitle;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
-    private Long successCount;
-    private Boolean isReviewed;
-    private Boolean isVerified;
-    private Boolean isGithubConnected;
-    private Boolean isRefundRequested;
     private Long deposit;
-    private Boolean isSuccessed;
-    private VerificationType verificationType;
-
     private Long challengeGroupId;
-    private Long myChallengeId;
+
+    public static MyChallengeResponseDto getMyChallengesWaiting(MyChallenge myChallenge, ChallengeGroup group) {
+        return MyChallengeResponseDto.builder()
+                .groupTitle(group.getGroupTitle())
+                .startDate(group.getStartDate())
+                .deposit(myChallenge.getDeposit())
+                .endDate(group.getEndDate())
+                .challengeGroupId(group.getId())
+                .build();
+    }
 }
