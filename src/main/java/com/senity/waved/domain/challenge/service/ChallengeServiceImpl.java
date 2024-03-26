@@ -37,10 +37,8 @@ public class ChallengeServiceImpl implements ChallengeService {
         List<ChallengeGroupHomeResponseDto> homeGroups = new ArrayList<>();
         for (int i = 1; i < 5; i++) {
             Challenge challenge = getChallengeById(i * 1L);
-            //int groupSize = challenge.getGroups().size();
+            long cnt = challengeGroupRepository.count()/4;
 
-            //ChallengeGroup group = challenge.getGroups().get(groupSize - 1);
-            long cnt = challengeRepository.count()/4;
             ChallengeGroup group = challengeGroupRepository.findById((cnt-1) * 4L + i)
                     .orElseThrow(() -> new MyChallengeNotFoundException(""));
             homeGroups.add(ChallengeGroup.getHomeGroupResponse(group, challenge));
