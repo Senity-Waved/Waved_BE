@@ -93,22 +93,6 @@ public class TokenProvider implements InitializingBean {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
     }
-        public Authentication getAuthentication(String token) {
-            Claims claims = Jwts
-                    .parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            String username = claims.getSubject();
-            Collection<SimpleGrantedAuthority> authorities = Arrays.stream(new String[]{"ROLE_USER"})
-                    .map(SimpleGrantedAuthority::new)
-                    .collect(Collectors.toList());
-
-            User principal = new User(username, "", authorities);
-            return new UsernamePasswordAuthenticationToken(principal, token, authorities);
-        }
 
     public Authentication getAuthentication(String token) {
         Claims claims = Jwts.parserBuilder()
