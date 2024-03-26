@@ -35,12 +35,13 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Transactional(readOnly = true)
     public List<ChallengeGroupHomeResponseDto> getHomeChallengeGroupsListed() {
         List<ChallengeGroupHomeResponseDto> homeGroups = new ArrayList<>();
-        for (int i = 1; i <= 4; i++) {
+        for (int i = 1; i < 5; i++) {
             Challenge challenge = getChallengeById(i * 1L);
             //int groupSize = challenge.getGroups().size();
 
             //ChallengeGroup group = challenge.getGroups().get(groupSize - 1);
-            ChallengeGroup group = challengeGroupRepository.findById(i*3L - 1L)
+            long cnt = challengeRepository.count()/4;
+            ChallengeGroup group = challengeGroupRepository.findById((cnt-1) * 4L + i)
                     .orElseThrow(() -> new MyChallengeNotFoundException(""));
             homeGroups.add(ChallengeGroup.getHomeGroupResponse(group, challenge));
         }
