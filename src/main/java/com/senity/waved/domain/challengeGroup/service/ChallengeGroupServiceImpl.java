@@ -145,8 +145,16 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
             throw new VerifyExistenceOnDateException("해당 날짜에 존재하는 인증내역이 없습니다.");
         }
         return verifications.stream()
-                .map(verification -> new VerificationListResponseDto(verification, member, isLikedByMember(verification, member)))
+                .map(verification -> {
+                    Member verificationMember = getMemberById(verification.getMemberId());
+                    return new VerificationListResponseDto(verification, verificationMember, isLikedByMember(verification, member));
+                })
                 .collect(Collectors.toList());
+    }
+
+    private Member getMemberById(Long id) {
+        return memberRepository.findById(id)
+                .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다."));
     }
 
     private boolean isLikedByMember(Verification verification, Member member) {
