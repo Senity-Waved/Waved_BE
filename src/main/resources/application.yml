@@ -10,6 +10,7 @@ spring:
           min-idle: 2
       port: 6379
       host: '${custom.redis.host}'
+      password: '${custom.redis.password}'
   transaction:
     default-timeout: '${custom.transaction.default-timeout}'
   profiles:
