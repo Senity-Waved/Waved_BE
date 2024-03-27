@@ -31,8 +31,8 @@ public class QuizServiceImpl implements QuizService {
                 .orElseThrow(() -> new QuizNotFoundException("오늘의 퀴즈를 찾을 수 없습니다."));
     }
 
-    @Override
-    public Quiz getQuizByDate(Long challengeGroupId, ZonedDateTime quizDate) {
+    //@Override
+    public Quiz getQuizByDate1(Long challengeGroupId, ZonedDateTime quizDate) {
         verificationService.challengeGroupIsTextType(challengeGroupId);
 
         for (int i=1; i<=14; i++) {
@@ -40,15 +40,33 @@ public class QuizServiceImpl implements QuizService {
                     .orElseThrow(() -> new RuntimeException("tmp"));
             log.error("-------------------------quiz id: "  + i + ", date: "+ quiz.getDate());
         }
-        ZonedDateTime requestedQuizDate = quizDate.truncatedTo(ChronoUnit.DAYS);
+//        ZonedDateTime requestedQuizDate = quizDate.truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime requestedQuizDate = quizDate.withZoneSameInstant(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
+
+
 
         log.error("requestedQuizDate: " + requestedQuizDate);
-
         ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
         log.error("today: " + today);
 
         return quizRepository.findQuizByChallengeGroupIdAndRequestDate(challengeGroupId, requestedQuizDate)
                 .orElseThrow(() -> new QuizNotFoundException("해당 날짜의 퀴즈를 찾을 수 없습니다."));
     }
+
+    @Override
+    public Quiz getQuizByDate(Long challengeGroupId, ZonedDateTime quizDate) {
+        verificationService.challengeGroupIsTextType(challengeGroupId);
+
+        // 입력된 quizDate의 타임존을 'Asia/Seoul'로 변경하고, 날짜의 정밀도를 일(day) 단위로 조정
+        ZonedDateTime requestedQuizDate = quizDate.withZoneSameInstant(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
+
+        log.error("requestedQuizDate: " + requestedQuizDate);
+        ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
+        log.error("today: " + today);
+
+        return quizRepository.findQuizByChallengeGroupIdAndRequestDate(challengeGroupId, requestedQuizDate)
+                .orElseThrow(() -> new QuizNotFoundException("해당 날짜의 퀴즈를 찾을 수 없습니다."));
+    }
+
 }
 
