@@ -13,7 +13,7 @@ public class QuizResponseDto {
     private String question;
 
     public QuizResponseDto(Quiz quiz) {
-        this.date = quiz.getDate();
+        this.date = quiz.getDate().plusHours(9);
         this.question = quiz.getQuestion();
     }
 }

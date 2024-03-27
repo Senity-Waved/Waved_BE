@@ -117,8 +117,6 @@ public class VerificationServiceImpl implements VerificationService {
             boolean hasCommitsToday = githubService.hasCommitsToday(member.getGithubId(), member.getGithubToken());
             Verification verification = Verification.createGithubVerification(member, challengeGroup, hasCommitsToday);
             verificationRepository.save(verification);
-
-            // GitHub 인증 성공 여부 반환
             return hasCommitsToday;
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,7 +125,6 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     private boolean verifyPicture(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
-
         if (requestDto.getImageUrl() == null || requestDto.getImageUrl().isEmpty()) {
             throw new IllegalArgumentException("이미지 URL을 입력해주세요.");
         }
@@ -147,7 +144,6 @@ public class VerificationServiceImpl implements VerificationService {
                     .isDeleted(false)
                     .build();
             verificationRepository.save(verification);
-
             return true;
         } catch (IOException e) {
             throw new RuntimeException("사진 데이터 변환 중 오류가 발생했습니다.", e);

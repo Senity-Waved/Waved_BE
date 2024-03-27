@@ -22,9 +22,9 @@ public class MyChallengeResponseDto {
     public static MyChallengeResponseDto getMyChallengesWaiting(MyChallenge myChallenge, ChallengeGroup group) {
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
-                .startDate(group.getStartDate())
+                .startDate(group.getStartDate().plusHours(9))
                 .deposit(myChallenge.getDeposit())
-                .endDate(group.getEndDate())
+                .endDate(group.getEndDate().plusHours(9))
                 .challengeGroupId(group.getId())
                 .build();
     }

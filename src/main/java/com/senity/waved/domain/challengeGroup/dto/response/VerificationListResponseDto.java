@@ -36,7 +36,7 @@ public class VerificationListResponseDto {
         this.memberId = member.getId();
 
         if (verification.getCreateDate() != null) {
-            LocalDateTime localDateTime = verification.getCreateDate().toLocalDateTime();
+            LocalDateTime localDateTime = verification.getCreateDate().toLocalDateTime().plusHours(9);
             this.verificationDate = ZonedDateTime.of(localDateTime, ZoneId.of("Asia/Seoul"));
         }
     }

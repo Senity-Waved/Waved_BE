@@ -34,7 +34,6 @@ public class QuizServiceImpl implements QuizService {
         verificationService.challengeGroupIsTextType(challengeGroupId);
 
         ZonedDateTime requestedQuizDate = quizDate.truncatedTo(ChronoUnit.DAYS);
-
         return quizRepository.findQuizByChallengeGroupIdAndRequestDate(challengeGroupId, requestedQuizDate)
                 .orElseThrow(() -> new QuizNotFoundException("해당 날짜의 퀴즈를 찾을 수 없습니다."));
     }

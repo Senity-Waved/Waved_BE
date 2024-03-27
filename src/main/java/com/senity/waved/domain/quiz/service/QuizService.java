@@ -6,6 +6,5 @@ import java.time.ZonedDateTime;
 
 public interface QuizService {
     Quiz getTodaysQuiz(Long challengeGroupId);
-
     Quiz getQuizByDate(Long challengeGroupId, ZonedDateTime quizDate);
 }

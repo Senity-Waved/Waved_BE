@@ -30,6 +30,8 @@ public class VerificationController {
         Quiz quiz = quizService.getTodaysQuiz(challengeGroupId);
 
         QuizResponseDto quizResponseDto = new QuizResponseDto(quiz);
+        ZonedDateTime plusNine = quizResponseDto.getDate().plusHours(9);
+        quizResponseDto.setDate(plusNine);
         return ResponseEntity.ok().body(quizResponseDto);
     }
 
@@ -42,6 +44,8 @@ public class VerificationController {
         Quiz quiz = quizService.getQuizByDate(challengeGroupId, requestQuizDate);
         QuizResponseDto quizResponseDto = new QuizResponseDto(quiz);
 
+        ZonedDateTime plusNine = quizResponseDto.getDate().plusHours(9);
+        quizResponseDto.setDate(plusNine);
         return ResponseEntity.ok().body(quizResponseDto);
     }
 

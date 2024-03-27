@@ -23,7 +23,7 @@ public class MyVerifsResponseDto {
             myVerifs[i-1]  = (int) (longMyVerifs / Math.pow(10, 14 - i) % 10);
         }
         this.groupTitle = group.getGroupTitle();
-        this.startDate = group.getStartDate();
-        this.endDate = group.getEndDate();
+        this.startDate = group.getStartDate().plusHours(9);
+        this.endDate = group.getEndDate().plusHours(9);
     }
 }

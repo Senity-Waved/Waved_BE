@@ -22,8 +22,8 @@ public class MyChallengeProgressDto extends MyChallengeResponseDto {
     public static MyChallengeProgressDto getMyChallengesInProgress(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge, Boolean isGithubConnected) {
         return MyChallengeProgressDto.builder()
                 .groupTitle(group.getGroupTitle())
-                .startDate(group.getStartDate())
-                .endDate(group.getEndDate())
+                .startDate(group.getStartDate().plusHours(9))
+                .endDate(group.getEndDate().plusHours(9))
                 .successCount(myChallenge.getSuccessCount())
                 .deposit(myChallenge.getDeposit())
                 .myChallengeId(myChallenge.getId())
