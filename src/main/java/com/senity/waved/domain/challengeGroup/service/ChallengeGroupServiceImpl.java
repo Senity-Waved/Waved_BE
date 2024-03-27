@@ -14,7 +14,11 @@ import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.AlreadyMyChallengeExistsException;
+import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
+import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
+import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.VerifyExistenceOnDateException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
@@ -39,6 +43,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private final MyChallengeRepository myChallengeRepository;
     private final VerificationRepository verificationRepository;
     private final ChallengeGroupRepository challengeGroupRepository;
+    private final PaymentRecordRepository paymentRecordRepository;
     private final ChallengeRepository challengeRepository;
     private final LikedRepository likedRepository;
 
@@ -62,9 +67,12 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .isRefundRequested(false)
                 .startDate(group.getStartDate())
                 .endDate(group.getEndDate())
-                .isPaid(false)
+                .isPaid(deposit == 0? true : false)
                 .build();
 
+        if (deposit == 0) {
+            savePaymentRecordWhenDepositZero(newMyChallenge, member.getId());
+        }
         myChallengeRepository.save(newMyChallenge);
         group.addGroupParticipantCount();
         return newMyChallenge.getId();
@@ -157,7 +165,26 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다."));
     }
 
+    private ChallengeGroup getGroup(Long id) {
+        return challengeGroupRepository.findById(id)
+                .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
+    }
+
     private boolean isLikedByMember(Verification verification, Member member) {
         return likedRepository.existsByMemberAndVerification(member, verification);
+    }
+
+    private void savePaymentRecordWhenDepositZero(MyChallenge myChallenge, Long memberId) {
+        ChallengeGroup group = getGroup(myChallenge.getChallengeGroupId());
+        String groupTitle = group.getGroupTitle();
+
+        PaymentRecord paymentRecord = PaymentRecord.of(
+                PaymentStatus.APPLIED,
+                0L,
+                memberId,
+                myChallenge.getId(),
+                groupTitle
+        );
+        paymentRecordRepository.save(paymentRecord);
     }
 }
