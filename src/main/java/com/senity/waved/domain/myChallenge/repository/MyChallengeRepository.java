@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MyChallengeRepository extends JpaRepository<MyChallenge, Long> {
-    Optional<MyChallenge> findByMemberIdAndChallengeGroupId(Long memberId, Long challengeGroupId);
-    Optional<MyChallenge> findByChallengeGroupIdAndMemberId(Long challengeGroupId, Long memberId);
+    Optional<MyChallenge> findByMemberIdAndChallengeGroupIdAndIsPaid(Long memberId, Long challengeGroupId, Boolean isPaid);
 
     @Query("SELECT mc FROM MyChallenge mc JOIN ChallengeGroup cg ON mc.challengeGroupId = cg.id WHERE mc.memberId = :memberId AND cg.startDate > :todayStart AND mc.isPaid = TRUE")
     List<MyChallenge> findMyChallengesWaitingAndIsPaidTrue(@Param("memberId") Long memberId, @Param("todayStart") ZonedDateTime todayStart);
