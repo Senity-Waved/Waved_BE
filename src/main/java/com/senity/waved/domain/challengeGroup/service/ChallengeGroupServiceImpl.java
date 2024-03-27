@@ -52,7 +52,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         Member member = getMemberByEmail(email);
         ChallengeGroup group = getGroupById(groupId);
 
-        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupId(member.getId(), group.getId());
+        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaid(member.getId(), group.getId(), true);
         if (myChallenge.isPresent()) {
             throw new AlreadyMyChallengeExistsException("이미 신청되어있는 챌린지 그룹 입니다.");
         }
@@ -73,6 +73,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         if (deposit == 0) {
             savePaymentRecordWhenDepositZero(newMyChallenge, member.getId());
         }
+
         myChallengeRepository.save(newMyChallenge);
         group.addGroupParticipantCount();
         return newMyChallenge.getId();
@@ -85,7 +86,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
             return ChallengeGroup.getGroupResponse(group, challenge, -1L);
 
         Member member = getMemberByEmail(email);
-        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupId(member.getId(), group.getId());
+        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaid(member.getId(), group.getId(), true);
 
         Long myChallengeId = myChallenge.isPresent() ? myChallenge.get().getId() : -1L;
         return ChallengeGroup.getGroupResponse(group, challenge, myChallengeId);

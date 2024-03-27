@@ -179,7 +179,7 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     private MyChallenge findMyChallenge(Member member, ChallengeGroup challengeGroup) {
-        return myChallengeRepository.findByMemberIdAndChallengeGroupId(member.getId(), challengeGroup.getId())
+        return myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaid(member.getId(), challengeGroup.getId(), true)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 
