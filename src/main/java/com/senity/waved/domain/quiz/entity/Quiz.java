@@ -19,7 +19,6 @@ public class Quiz {
     private Long id;
 
     private ZonedDateTime date;
-
     private String question;
 
     @ManyToOne(fetch = FetchType.LAZY)

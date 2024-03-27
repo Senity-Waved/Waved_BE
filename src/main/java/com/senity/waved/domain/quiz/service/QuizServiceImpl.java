@@ -33,7 +33,19 @@ public class QuizServiceImpl implements QuizService {
     public Quiz getQuizByDate(Long challengeGroupId, ZonedDateTime quizDate) {
         verificationService.challengeGroupIsTextType(challengeGroupId);
 
+        for (int i=1; i<=14; i++) {
+            Quiz quiz = quizRepository.findById(i*1L)
+                    .orElseThrow(() -> new RuntimeException("tmp"));
+            System.out.println("-------------------------quiz id: "  + i + ", date: "+ quiz.getDate());
+        }
         ZonedDateTime requestedQuizDate = quizDate.truncatedTo(ChronoUnit.DAYS);
+
+        System.out.println("-------------------------------");
+        System.out.println("requestedQuizDate: " + requestedQuizDate);
+        ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
+        System.out.println("today: " + today);
+        System.out.println("-------------------------------");
+
         return quizRepository.findQuizByChallengeGroupIdAndRequestDate(challengeGroupId, requestedQuizDate)
                 .orElseThrow(() -> new QuizNotFoundException("해당 날짜의 퀴즈를 찾을 수 없습니다."));
     }

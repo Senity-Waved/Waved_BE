@@ -48,8 +48,8 @@ public class ChallengeGroup extends BaseEntity {
         return ChallengeGroupResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .participantCount(group.getParticipantCount())
-                .startDate(group.getStartDate())
-                .endDate(group.getEndDate())
+                .startDate(group.getStartDate().plusHours(9))
+                .endDate(group.getEndDate().plusHours(9))
                 .verificationType(challenge.getVerificationType())
                 .description(challenge.getDescription())
                 .verificationDescription(challenge.getVerificationDescription())
@@ -66,7 +66,7 @@ public class ChallengeGroup extends BaseEntity {
                 .verificationType(challenge.getVerificationType())
                 .isFree(challenge.getIsFree())
                 .participantCount(group.getParticipantCount())
-                .startDate(group.getStartDate())
+                .startDate(group.getStartDate().plusHours(9))
                 .challengeGroupId(group.getId())
                 .build();
     }
