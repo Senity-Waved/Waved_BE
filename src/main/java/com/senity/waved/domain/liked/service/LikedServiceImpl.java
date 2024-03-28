@@ -28,7 +28,7 @@ public class LikedServiceImpl implements LikedService {
         Member member = getMemberByEmail(email);
         Verification verification = getVerificationById(verificationId);
 
-        boolean hasAlreadyLiked = likedRepository.existsByMemberAndVerification(member, verification);
+        boolean hasAlreadyLiked = likedRepository.existsByMemberIdAndVerification(member.getId(), verification);
 
         if (hasAlreadyLiked) {
             throw new DuplicationLikeException("이미 좋아요를 누른 인증 내역 입니다.");
@@ -36,7 +36,7 @@ public class LikedServiceImpl implements LikedService {
 
         Liked like = Liked.builder()
                 .verification(verification)
-                .member(member)
+                .memberId(member.getId())
                 .build();
 
         verification.addLikeToVerification(like);
@@ -56,7 +56,7 @@ public class LikedServiceImpl implements LikedService {
         Member member = getMemberByEmail(email);
         Verification verification = getVerificationById(verificationId);
 
-        Liked liked = likedRepository.findByMemberAndVerification(member, verification)
+        Liked liked = likedRepository.findByMemberIdAndVerification(member.getId(), verification)
                 .orElseThrow(() -> new LikeNotAuthorizedException("해당 인증 내역에 좋아요를 누르지 않았습니다."));
 
         verification.removeLikeFromVerification(liked);

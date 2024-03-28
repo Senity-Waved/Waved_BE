@@ -1,7 +1,6 @@
 package com.senity.waved.domain.liked.entity;
 
 import com.senity.waved.common.BaseEntity;
-import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.verification.entity.Verification;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -19,9 +18,8 @@ public class Liked extends BaseEntity {
     @JoinColumn(name = "verification_id")
     private Verification verification;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @Column(name = "member_id")
+    private Long memberId;
 
     public void setVerification(Verification verification) {
         this.verification = verification;

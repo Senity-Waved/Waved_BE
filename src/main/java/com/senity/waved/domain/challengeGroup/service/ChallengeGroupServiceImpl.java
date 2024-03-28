@@ -168,7 +168,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     }
 
     private boolean isLikedByMember(Verification verification, Member member) {
-        return likedRepository.existsByMemberAndVerification(member, verification);
+        return likedRepository.existsByMemberIdAndVerification(member.getId(), verification);
     }
 
     private void savePaymentRecordWhenDepositZero(MyChallenge myChallenge, Long memberId) {
