@@ -9,6 +9,7 @@ import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.liked.repository.LikedRepository;
+import com.senity.waved.domain.member.entity.AuthLevel;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
@@ -161,11 +162,6 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 .collect(Collectors.toList());
     }
 
-    private Member getMemberById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다."));
-    }
-
     private ChallengeGroup getGroup(Long id) {
         return challengeGroupRepository.findById(id)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
@@ -187,5 +183,17 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
                 groupTitle
         );
         paymentRecordRepository.save(paymentRecord);
+    }
+
+    private Member getMemberById(Long id) {
+        Optional<Member> optionalMember = memberRepository.findById(id);
+
+        if (optionalMember.isEmpty()) {
+            return Member.builder()
+                    .nickname("탈퇴한 서퍼")
+                    .email("")
+                    .authLevel(AuthLevel.MEMBER)
+                    .build();
+        } return optionalMember.get();
     }
 }

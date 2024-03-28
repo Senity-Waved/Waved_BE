@@ -5,8 +5,8 @@ import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
+import com.senity.waved.domain.member.entity.AuthLevel;
 import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.review.dto.response.ChallengeReviewResponseDto;
@@ -21,6 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -62,14 +63,21 @@ public class ChallengeServiceImpl implements ChallengeService {
         return new PageImpl<>(responseDtoList, pageable, reviewPage.getTotalElements());
     }
 
-    private Member getMemberById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다."));
-    }
-
     private Challenge getChallengeById(Long id) {
         return challengeRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 챌린지를 찾을 수 없습니다."));
+    }
+
+    private Member getMemberById(Long id) {
+        Optional<Member> optionalMember = memberRepository.findById(id);
+
+        if (optionalMember.isEmpty()) {
+            return Member.builder()
+                    .nickname("탈퇴한 서퍼")
+                    .email("")
+                    .authLevel(AuthLevel.MEMBER)
+                    .build();
+        } return optionalMember.get();
     }
 
     /* 챌린지 그룹 자동 생성 메서드: 테스트 시 사용 X
