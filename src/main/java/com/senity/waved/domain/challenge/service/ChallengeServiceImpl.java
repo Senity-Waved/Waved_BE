@@ -40,7 +40,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             Challenge challenge = getChallengeById(i * 1L);
             long cnt = challengeGroupRepository.count()/4;
 
-            ChallengeGroup group = challengeGroupRepository.findById((cnt-1) * 4L + i)
+            ChallengeGroup group = challengeGroupRepository.findById((cnt-2) * 4L + i)
                     .orElseThrow(() -> new MyChallengeNotFoundException(""));
             homeGroups.add(ChallengeGroup.getHomeGroupResponse(group, challenge));
         }
