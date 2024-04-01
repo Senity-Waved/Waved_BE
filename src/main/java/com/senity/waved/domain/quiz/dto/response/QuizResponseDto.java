@@ -1,6 +1,5 @@
 package com.senity.waved.domain.quiz.dto.response;
 
-import com.senity.waved.domain.quiz.entity.Quiz;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,8 +11,8 @@ public class QuizResponseDto {
     private ZonedDateTime date;
     private String question;
 
-    public QuizResponseDto(Quiz quiz) {
-        this.date = quiz.getDate();
-        this.question = quiz.getQuestion();
+    public QuizResponseDto(ZonedDateTime date, String question) {
+        this.date = date;
+        this.question = question;
     }
 }

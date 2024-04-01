@@ -1,7 +1,6 @@
 package com.senity.waved.domain.verification.controller;
 
 import com.senity.waved.domain.quiz.dto.response.QuizResponseDto;
-import com.senity.waved.domain.quiz.entity.Quiz;
 import com.senity.waved.domain.quiz.service.QuizService;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.service.VerificationService;
@@ -27,11 +26,7 @@ public class VerificationController {
 
     @GetMapping("/{challengeGroupId}")
     public ResponseEntity<QuizResponseDto> getTodaysQuiz(@PathVariable("challengeGroupId") Long challengeGroupId) {
-        Quiz quiz = quizService.getTodaysQuiz(challengeGroupId);
-
-        QuizResponseDto quizResponseDto = new QuizResponseDto(quiz);
-        ZonedDateTime plusNine = quizResponseDto.getDate().plusHours(9);
-        quizResponseDto.setDate(plusNine);
+        QuizResponseDto quizResponseDto = quizService.getTodaysQuiz(challengeGroupId);
         return ResponseEntity.ok().body(quizResponseDto);
     }
 
@@ -41,11 +36,7 @@ public class VerificationController {
             @RequestParam("quizDate") Timestamp quizDate) {
 
         ZonedDateTime requestQuizDate = quizDate.toInstant().atZone(ZoneId.systemDefault());
-        Quiz quiz = quizService.getQuizByDate(challengeGroupId, requestQuizDate);
-        QuizResponseDto quizResponseDto = new QuizResponseDto(quiz);
-
-        ZonedDateTime plusNine = quizResponseDto.getDate().plusHours(9);
-        quizResponseDto.setDate(plusNine);
+        QuizResponseDto quizResponseDto = quizService.getQuizByDate(challengeGroupId, requestQuizDate);
         return ResponseEntity.ok().body(quizResponseDto);
     }
 
