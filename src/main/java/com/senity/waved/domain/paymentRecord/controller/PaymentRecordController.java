@@ -1,5 +1,6 @@
 package com.senity.waved.domain.paymentRecord.controller;
 
+import com.senity.waved.common.ResponseDto;
 import com.senity.waved.domain.paymentRecord.dto.request.PaymentRequestDto;
 import com.senity.waved.domain.paymentRecord.service.PaymentRecordService;
 import lombok.RequiredArgsConstructor;
@@ -19,30 +20,30 @@ public class PaymentRecordController {
     private final PaymentRecordService paymentRecordService;
 
     @PostMapping
-    public ResponseEntity<String> validatePayment (
+    public ResponseEntity<ResponseDto> validatePayment (
             @AuthenticationPrincipal User user,
             @PathVariable("myChallengeId") Long myChallengeId,
             @RequestBody PaymentRequestDto requestDto
     ) {
         paymentRecordService.validateAndSavePaymentRecord(user.getUsername(), myChallengeId, requestDto);
-        return new ResponseEntity<>("결제 검증이 완료되었습니다.", HttpStatus.OK);
+        return ResponseDto.of(HttpStatus.OK, "결제 검증이 완료되었습니다.");
     }
 
     @PostMapping("/cancel")
-    public ResponseEntity<String> cancelChallengePayment (
+    public ResponseEntity<ResponseDto> cancelChallengePayment (
             @AuthenticationPrincipal User user,
             @PathVariable("myChallengeId") Long myChallengeId
     ) {
         paymentRecordService.cancelChallengePayment(user.getUsername(), myChallengeId);
-        return new ResponseEntity<>("결제 취소 처리되었습니다.", HttpStatus.OK);
+        return ResponseDto.of(HttpStatus.OK, "결제 취소 처리되었습니다.");
     }
 
     @PostMapping("/completed")
-    public ResponseEntity<String> completedChallenge (
+    public ResponseEntity<ResponseDto> completedChallenge (
             @AuthenticationPrincipal User user,
             @PathVariable("myChallengeId") Long myChallengeId
     ) {
-        String msg = paymentRecordService.checkRefundDepositOrNot(user.getUsername(), myChallengeId);
-        return new ResponseEntity<>(msg, HttpStatus.OK);
+        String msg = paymentRecordService.checkDepositRefundedOrNot(user.getUsername(), myChallengeId);
+        return ResponseDto.of(HttpStatus.OK, msg);
     }
 }

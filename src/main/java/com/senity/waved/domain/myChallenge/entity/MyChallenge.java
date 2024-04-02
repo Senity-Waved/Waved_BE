@@ -1,9 +1,11 @@
 package com.senity.waved.domain.myChallenge.entity;
 
 import com.senity.waved.common.BaseEntity;
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import com.senity.waved.domain.verification.exception.FailedVerificationException;
-import com.senity.waved.domain.verification.exception.VerifyNonexistenceOnDateException;
+import com.senity.waved.domain.verification.exception.VerifyNotFoundOnDateException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -114,8 +116,24 @@ public class MyChallenge extends BaseEntity {
                 if ((int)(myVerifs / Math.pow(10, 13 - daysFromStart) % 10) == 1) {
                     throw new FailedVerificationException("실패한 인증 내역은 취소할 수 없습니다.");
                 }
-                else throw new VerifyNonexistenceOnDateException("해당 날짜에 인증내역이 존재하지 않습니다.");
+                else throw new VerifyNotFoundOnDateException("해당 날짜에 인증내역이 존재하지 않습니다.");
             }
         }
+    }
+
+    public static MyChallenge of(Member member, ChallengeGroup group, Long deposit) {
+        Boolean isFree = deposit == 0;
+        return MyChallenge.builder()
+                .challengeGroupId(group.getId())
+                .successCount(0L)
+                .isReviewed(false)
+                .memberId(member.getId())
+                .myVerifs(300000000000000L)
+                .deposit(deposit)
+                .isRefundRequested(false)
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
+                .isPaid(isFree)
+                .build();
     }
 }

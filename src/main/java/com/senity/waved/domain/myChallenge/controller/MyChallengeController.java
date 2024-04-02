@@ -1,5 +1,6 @@
 package com.senity.waved.domain.myChallenge.controller;
 
+import com.senity.waved.common.ResponseDto;
 import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
 import com.senity.waved.domain.myChallenge.dto.response.MyVerifsResponseDto;
 import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
@@ -31,16 +32,16 @@ public class MyChallengeController {
     }
  
     @GetMapping("/{myChallengeId}")
-    public ResponseEntity<MyVerifsResponseDto> getMyChallengeStatus(@PathVariable("myChallengeId") Long myChallengeId) {
-        return ResponseEntity.ok().body(myChallengeService.getMyVerifications(myChallengeId));
+    public MyVerifsResponseDto getMyChallengeStatus(@PathVariable("myChallengeId") Long myChallengeId) {
+        return myChallengeService.getMyVerifications(myChallengeId);
     }
 
     @DeleteMapping("/{myChallengeId}/delete")
-    public ResponseEntity<String> cancelMyChallenge(
+    public ResponseEntity<ResponseDto> cancelMyChallenge(
             @PathVariable("myChallengeId") Long myChallengeId,
             @AuthenticationPrincipal User user
     ) {
         myChallengeService.cancelAppliedMyChallenge(user.getUsername(), myChallengeId);
-        return new ResponseEntity<>("챌린지 그룹 신청 취소 완료했습니다.", HttpStatus.OK);
+        return ResponseDto.of(HttpStatus.OK, "챌린지 그룹 신청 취소 완료했습니다.");
     }
 }

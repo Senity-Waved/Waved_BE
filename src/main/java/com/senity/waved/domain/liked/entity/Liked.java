@@ -25,4 +25,10 @@ public class Liked extends BaseEntity {
         this.verification = verification;
     }
 
+    public static Liked of(Verification verification, Long memberId) {
+        return Liked.builder()
+                .memberId(memberId)
+                .verification(verification)
+                .build();
+    }
 }

@@ -3,7 +3,6 @@ package com.senity.waved.domain.member.entity;
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
-import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -59,31 +58,15 @@ public class Member extends BaseEntity {
         this.githubToken = github.getGithubToken();
     }
 
-    public static ProfileInfoResponseDto getProfileInfoStatic(Member member) {
-        return ProfileInfoResponseDto.builder()
-                .nickname(member.getNickname())
-                .jobTitle(member.getJobTitle())
-                .githubId(member.getGithubId())
-                .build();
-    }
-
-    public static ProfileEditDto getProfileEditStatic(Member member) {
-        return ProfileEditDto.builder()
-                .nickname(member.getNickname())
-                .jobTitle(member.getJobTitle())
-                .birthYear(member.getBirthYear())
-                .gender(member.getGender())
-                .build();
-    }
-
-    public static GithubInfoDto getGithubInfoStatic(Member member) {
-        return GithubInfoDto.builder()
-                .githubId(member.getGithubId())
-                .githubToken(member.getGithubToken())
-                .build();
-    }
-
     public boolean isGithubConnected() {
-        return this.githubId != null && !this.githubId.isEmpty() && this.githubToken != null && !this.githubToken.isEmpty();
+        return this.githubId != null && this.githubToken != null;
+    }
+
+    public static Member deletedMember() {
+        return Member.builder()
+                .nickname("탈퇴한 서퍼")
+                .email("")
+                .authLevel(AuthLevel.MEMBER)
+                .build();
     }
 }

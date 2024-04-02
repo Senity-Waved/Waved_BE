@@ -1,11 +1,10 @@
 package com.senity.waved.domain.challengeGroup.controller;
 
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
-import com.senity.waved.domain.challengeGroup.dto.response.VerificationListResponseDto;
+import com.senity.waved.domain.verification.dto.response.VerificationResponseDto;
 import com.senity.waved.domain.challengeGroup.service.ChallengeGroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
@@ -41,24 +40,20 @@ public class ChallengeGroupController {
     }
 
     @GetMapping("/{challengeGroupId}")
-    public ResponseEntity<List<VerificationListResponseDto>> getVerificationsByDate (
+    public List<VerificationResponseDto> getVerificationsByDate (
             @PathVariable("challengeGroupId") Long challengeGroupId,
             @RequestParam("verificationDate") Timestamp verificationDate,
             @AuthenticationPrincipal User user
     ) {
-        List<VerificationListResponseDto> verifications =
-                challengeGroupService.getVerifications(user.getUsername(), challengeGroupId, verificationDate);
-        return ResponseEntity.ok(verifications);
+        return challengeGroupService.getVerifications(user.getUsername(), challengeGroupId, verificationDate);
     }
 
     @GetMapping("/{challengeGroupId}/myVerifies")
-    public ResponseEntity<List<VerificationListResponseDto>> getVerificationsByDateAndMember(
+    public List<VerificationResponseDto> getVerificationsByDateAndMember(
             @PathVariable("challengeGroupId") Long challengeGroupId,
             @RequestParam("verificationDate") Timestamp verificationDate,
-            @AuthenticationPrincipal User user) {
-        List<VerificationListResponseDto> verifications =
-                challengeGroupService.getUserVerifications(user.getUsername(), challengeGroupId, verificationDate);
-        return ResponseEntity.ok(verifications);
+            @AuthenticationPrincipal User user
+    ) {
+        return challengeGroupService.getUserVerifications(user.getUsername(), challengeGroupId, verificationDate);
     }
-
 }

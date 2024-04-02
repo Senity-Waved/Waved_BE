@@ -15,12 +15,11 @@ import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.review.entity.Review;
 import com.senity.waved.domain.review.exception.AlreadyReviewedException;
 import com.senity.waved.domain.review.exception.ReviewNotFoundException;
+import com.senity.waved.domain.review.exception.UnauthorizedReviewAccessException;
 import com.senity.waved.domain.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.ZonedDateTime;
 
@@ -34,36 +33,29 @@ public class ReviewServiceImpl implements ReviewService {
     private final ChallengeGroupRepository challengeGroupRepository;
     private final ChallengeRepository challengeRepository;
 
+    @Override
     @Transactional
     public void createChallengeReview(String email, Long myChallengeId, String content) {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+        checkReviewExist(myChallengeId);
 
         ChallengeGroup challengeGroup = getGroupById(myChallenge.getChallengeGroupId());
         Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
 
-        if (challengeGroup.getEndDate().isAfter(ZonedDateTime.now())) {
-            throw new ChallengeGroupNotCompletedException("종료된 챌린지 그룹에 대해서만 리뷰 작성 가능합니다.");
-        }
-
-        checkReviewExist(myChallengeId);
-        Review newReview = Review.builder()
-                .content(content)
-                .memberId(member.getId())
-                .challengeId(challenge.getId())
-                .groupTitle(challengeGroup.getGroupTitle())
-                .build();
-
+        Review newReview = Review.of(content, member.getId(), challenge.getId(), challengeGroup.getGroupTitle());
         myChallenge.updateIsReviewed();
         reviewRepository.save(newReview);
     }
 
+    @Override
     @Transactional(readOnly = true)
     public String getReviewContentForEdit(String email, Long reviewId) {
         Review review = getReviewAndCheckPermission(email, reviewId, "리뷰 작성자만 수정 가능합니다.");
         return review.getContent();
     }
 
+    @Override
     @Transactional
     public void editChallengeReview(String email, Long reviewId, String content) {
         Review review = getReviewAndCheckPermission(email, reviewId, "리뷰 작성자만 수정 가능합니다.");
@@ -71,6 +63,7 @@ public class ReviewServiceImpl implements ReviewService {
         reviewRepository.save(review);
     }
 
+    @Override
     @Transactional
     public void deleteChallengeReview(String email, Long reviewId) {
         Review review = getReviewAndCheckPermission(email, reviewId, "리뷰 작성자만 삭제 가능합니다.");
@@ -84,9 +77,8 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new ReviewNotFoundException("해당 리뷰를 찾을 수 없습니다."));
 
         if (!review.getMemberId().equals(member.getId())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, errMsg);
+            throw new UnauthorizedReviewAccessException(errMsg);
         }
-
         return review;
     }
 
@@ -113,7 +105,13 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     private ChallengeGroup getGroupById(Long id) {
-        return challengeGroupRepository.findById(id)
-                .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이챌린지를 찾을 수 없습니다."));
+        ChallengeGroup group = challengeGroupRepository.findById(id)
+                .orElseThrow(() -> new MyChallengeNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
+
+        if (group.getEndDate().isAfter(ZonedDateTime.now())) {
+            throw new ChallengeGroupNotCompletedException("종료된 챌린지 그룹에 대해서만 리뷰 작성 가능합니다.");
+        }
+
+        return group;
     }
 }

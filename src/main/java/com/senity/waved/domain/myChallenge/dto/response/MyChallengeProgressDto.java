@@ -19,7 +19,7 @@ public class MyChallengeProgressDto extends MyChallengeResponseDto {
     private VerificationType verificationType;
     private Long myChallengeId;
 
-    public static MyChallengeProgressDto getMyChallengesInProgress(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge, Boolean isGithubConnected) {
+    public static MyChallengeProgressDto of(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge, Boolean isGithubConnected) {
         return MyChallengeProgressDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate().plusHours(9))

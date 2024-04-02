@@ -15,6 +15,7 @@ import com.senity.waved.domain.myChallenge.dto.response.MyChallengeResponseDto;
 import com.senity.waved.domain.myChallenge.dto.response.MyVerifsResponseDto;
 import com.senity.waved.domain.myChallenge.entity.ChallengeStatus;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
+import com.senity.waved.domain.myChallenge.exception.InvalidChallengeStatusException;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatchException;
@@ -37,7 +38,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     private final ChallengeGroupRepository challengeGroupRepository;
     private final ChallengeRepository challengeRepository;
 
-    @Transactional
+    @Override
     public void cancelAppliedMyChallenge(String email, Long myChallengeId) {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
@@ -49,7 +50,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         myChallengeRepository.delete(myChallenge);
     }
 
-    @Transactional
+    @Override
     public List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status) {
         Member member = getMemberByEmail(email);
         List<MyChallenge> myChallengesListed;
@@ -66,7 +67,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
                 myChallengesListed = myChallengeRepository.findMyChallengesCompletedAndIsPaidTrue(member.getId(), todayStart);
                 break;
             default:
-                throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");
+                throw new InvalidChallengeStatusException("유효하지 않은 챌린지 상태 입니다.");
         }
 
         return myChallengesListed.stream()
@@ -74,6 +75,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
                 .collect(Collectors.toList());
     }
 
+    @Override
     public MyVerifsResponseDto getMyVerifications(Long myChallengeId) {
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
@@ -81,19 +83,19 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     }
 
     private MyChallengeResponseDto mapToResponseDto(MyChallenge myChallenge, ChallengeStatus status, Member member) {
-        boolean isGithubConnected = member.isGithubConnected();
+        Boolean isGithubConnected = member.isGithubConnected();
         ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
         Challenge challenge = getChallengeById(group.getChallengeId());
 
         switch (status) {
             case PROGRESS:
-                return MyChallengeProgressDto.getMyChallengesInProgress(myChallenge, group, challenge, isGithubConnected);
+                return MyChallengeProgressDto.of(myChallenge, group, challenge, isGithubConnected);
             case WAITING:
-                return MyChallengeResponseDto.getMyChallengesWaiting(myChallenge, group);
+                return MyChallengeResponseDto.of(myChallenge, group);
             case COMPLETED:
-                return MyChallengeCompletedDto.getMyChallengesCompleted(myChallenge, group, challenge);
+                return MyChallengeCompletedDto.of(myChallenge, group, challenge);
             default:
-                throw new IllegalArgumentException("유효하지 않은 챌린지 상태 입니다.");
+                throw new InvalidChallengeStatusException("유효하지 않은 챌린지 상태 입니다.");
         }
     }
 
@@ -118,7 +120,8 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     }
 
     private void validateMember(Member member, MyChallenge myChallenge) {
-        if(!myChallenge.getMemberId().equals(member.getId()))
+        if(!myChallenge.getMemberId().equals(member.getId())) {
             throw new MemberAndMyChallengeNotMatchException("해당 멤버의 마이 챌린지가 아닙니다.");
+        }
     }
 }

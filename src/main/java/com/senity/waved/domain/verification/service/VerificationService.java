@@ -4,5 +4,5 @@ import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 
 public interface VerificationService {
     void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId);
-    void challengeGroupIsTextType(Long challengeGroupId);
+    void IsChallengeGroupTextType(Long challengeGroupId);
 }

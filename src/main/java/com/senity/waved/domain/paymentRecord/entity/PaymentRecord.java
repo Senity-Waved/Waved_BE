@@ -1,6 +1,7 @@
 package com.senity.waved.domain.paymentRecord.entity;
 
 import com.senity.waved.common.BaseEntity;
+import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,12 +32,15 @@ public class PaymentRecord extends BaseEntity {
     @Column(name = "my_challenge_id")
     private Long myChallengeId;
 
-    public static PaymentRecord of(PaymentStatus status, Long deposit, Long memberId, Long myChallengeId, String groupTitle) {
+    public static PaymentRecord of(PaymentStatus status, Long memberId, MyChallenge myChallenge, String groupTitle) {
+        Long deposit = status.equals(PaymentStatus.APPLIED) ?
+                myChallenge.getDeposit() * (-1) : status.equals(PaymentStatus.FAIL) ? 0 : myChallenge.getDeposit();
+
         return PaymentRecord.builder()
                 .deposit(deposit)
                 .paymentStatus(status)
                 .memberId(memberId)
-                .myChallengeId(myChallengeId)
+                .myChallengeId(myChallenge.getId())
                 .groupTitle(groupTitle)
                 .build();
     }

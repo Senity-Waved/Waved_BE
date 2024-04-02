@@ -1,4 +1,4 @@
-package com.senity.waved.domain.challengeGroup.dto.response;
+package com.senity.waved.domain.verification.dto.response;
 
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.verification.entity.Verification;
@@ -9,7 +9,8 @@ import java.time.ZonedDateTime;
 
 @Getter
 @Builder
-public class AdminVerificationListDto {
+public class AdminVerificationDto {
+
     private Long verificationId;
     private String content;
     private String link;
@@ -18,8 +19,8 @@ public class AdminVerificationListDto {
     private String nickname;
     private Boolean isDeleted;
 
-    public static AdminVerificationListDto getAdminVerifications(Verification verification, Member member) {
-        return AdminVerificationListDto.builder()
+    public static AdminVerificationDto from(Verification verification, Member member) {
+        return AdminVerificationDto.builder()
                 .nickname(member.getNickname())
                 .content(verification.getContent())
                 .imageUrl(verification.getImageUrl())

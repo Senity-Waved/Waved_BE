@@ -39,7 +39,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/api/v2/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/oauth2/**",
                                 "/api/v1/challenges/**",
-                                "/api/v1/challengeGroups/info/**").permitAll()
+                                "/api/v1/challengeGroups/info/**")
+                        .permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
@@ -59,7 +60,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2AuthenticationSuccessHandler)
                 );
-
         return http.build();
     }
 }

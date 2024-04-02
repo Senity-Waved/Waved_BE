@@ -19,7 +19,7 @@ public class MyChallengeCompletedDto extends MyChallengeResponseDto {
     private VerificationType verificationType;
     private Long myChallengeId;
 
-    public static MyChallengeCompletedDto getMyChallengesCompleted(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge) {
+    public static MyChallengeCompletedDto of(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge) {
         Boolean isSuccessed = myChallenge.getSuccessCount() > 10 ? true : false;
         return MyChallengeCompletedDto.builder()
                 .groupTitle(group.getGroupTitle())
