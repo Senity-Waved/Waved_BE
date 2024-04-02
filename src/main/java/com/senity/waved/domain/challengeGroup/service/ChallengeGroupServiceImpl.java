@@ -21,7 +21,7 @@ import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.senity.waved.domain.verification.entity.Verification;
-import com.senity.waved.domain.verification.exception.VerifyExistenceOnDateException;
+import com.senity.waved.domain.verification.exception.VerifyNotFoundOnDateException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -152,7 +152,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
 
     private List<VerificationListResponseDto> convertToDtoList(List<Verification> verifications, Member member) {
         if (verifications.isEmpty()) {
-            throw new VerifyExistenceOnDateException("해당 날짜에 존재하는 인증내역이 없습니다.");
+            throw new VerifyNotFoundOnDateException("해당 날짜에 존재하는 인증내역이 없습니다.");
         }
         return verifications.stream()
                 .map(verification -> {

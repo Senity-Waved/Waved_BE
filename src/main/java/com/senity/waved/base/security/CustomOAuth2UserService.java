@@ -29,10 +29,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        String provider = userRequest.getClientRegistration().getRegistrationId();
-        String providerId = oAuth2User.getAttribute("sub");
         String email = oAuth2User.getAttribute("email");
-
         memberRepository.findByEmail(email).orElseGet(() -> createNewMember(email, generateRandomNickname()));
 
         return new DefaultOAuth2User(
@@ -43,8 +40,9 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private Member createNewMember(String email, String nickname) {
         AuthLevel authLevel = AuthLevel.MEMBER;
-        List<String> adminMembers = Arrays.asList("waved7777@gmail.com", "imholy96@gmail.com"
-                , "vywns9978@gmail.com", "waved8888@gmail.com", "fetest1228@gmail.com");
+        List<String> adminMembers = Arrays.asList(
+                "waved7777@gmail.com", "imholy96@gmail.com", "vywns9978@gmail.com", "waved8888@gmail.com", "fetest1228@gmail.com"
+        );
 
         if (adminMembers.contains(email)) {
             authLevel = AuthLevel.ADMIN;

@@ -3,7 +3,7 @@ package com.senity.waved.domain.myChallenge.entity;
 import com.senity.waved.common.BaseEntity;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import com.senity.waved.domain.verification.exception.FailedVerificationException;
-import com.senity.waved.domain.verification.exception.VerifyNonexistenceOnDateException;
+import com.senity.waved.domain.verification.exception.VerifyNotFoundOnDateException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import lombok.Getter;
@@ -114,7 +114,7 @@ public class MyChallenge extends BaseEntity {
                 if ((int)(myVerifs / Math.pow(10, 13 - daysFromStart) % 10) == 1) {
                     throw new FailedVerificationException("실패한 인증 내역은 취소할 수 없습니다.");
                 }
-                else throw new VerifyNonexistenceOnDateException("해당 날짜에 인증내역이 존재하지 않습니다.");
+                else throw new VerifyNotFoundOnDateException("해당 날짜에 인증내역이 존재하지 않습니다.");
             }
         }
     }

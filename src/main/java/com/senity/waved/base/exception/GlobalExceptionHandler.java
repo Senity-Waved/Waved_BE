@@ -30,36 +30,6 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(ReviewNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleReviewNotFoundException(ReviewNotFoundException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler(AlreadyReviewedException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleAlreadyReviewedException(AlreadyReviewedException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler(AlreadyMyChallengeExistsException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleAlreadyMyChallengeExistsException(AlreadyMyChallengeExistsException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler(MyChallengeNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleMyChallengeNotFoundException(MyChallengeNotFoundException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleIllegalArgumentException(IllegalArgumentException e) {
-        return e.getMessage();
-    }
-
     @ExceptionHandler(WrongGithubInfoException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleWrongGithubInfoException(WrongGithubInfoException e) {
@@ -72,6 +42,46 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
+    @ExceptionHandler(MemberAndMyChallengeNotMatchException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleMemberAndMyChallengeNotMatch(MemberAndMyChallengeNotMatchException e) {
+        return e.getMessage();
+    }
+
+
+    @ExceptionHandler(ReviewNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleReviewNotFoundException(ReviewNotFoundException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(AlreadyReviewedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleAlreadyReviewedException(AlreadyReviewedException e) {
+        return e.getMessage();
+    }
+
+
+    @ExceptionHandler(ChallengeNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleChallengeNotFoundException(ChallengeNotFoundException e) {
+        return e.getMessage();
+    }
+
+
+    @ExceptionHandler(MyChallengeNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleMyChallengeNotFoundException(MyChallengeNotFoundException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(AlreadyMyChallengeExistsException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleAlreadyMyChallengeExistsException(AlreadyMyChallengeExistsException e) {
+        return e.getMessage();
+    }
+
+
     @ExceptionHandler(ChallengeGroupNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleChallengeGroupNotFoundException(ChallengeGroupNotFoundException e) {
@@ -79,10 +89,11 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ChallengeGroupNotCompletedException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleChallengeGroupNotCompletedException(ChallengeGroupNotCompletedException e) {
         return e.getMessage();
     }
+
 
     @ExceptionHandler(QuizNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -90,17 +101,6 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(ChallengeGroupVerificationException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleChallengeGroupVerificationException(ChallengeGroupVerificationException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler(AlreadyVerifiedException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleAlreadyVerifiedException(AlreadyVerifiedException e) {
-        return e.getMessage();
-    }
 
     @ExceptionHandler(VerificationNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -108,8 +108,27 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(DuplicationLikeException.class)
+    @ExceptionHandler(VerificationNotTextException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleVerificationNotTextException(VerificationNotTextException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(AlreadyVerifiedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public String handleAlreadyVerifiedException(AlreadyVerifiedException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler(VerifyNotFoundOnDateException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleVerifyNotFoundOnDateException(VerifyNotFoundOnDateException e) {
+        return e.getMessage();
+    }
+
+
+    @ExceptionHandler(DuplicationLikeException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleDuplicationLikeException(DuplicationLikeException e) {
         return e.getMessage();
     }
@@ -120,33 +139,10 @@ public class GlobalExceptionHandler {
         return e.getMessage();
     }
 
-    @ExceptionHandler(VerifyExistenceOnDateException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleVerifyExistenceOnDateException(VerifyExistenceOnDateException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler(VerifyNonexistenceOnDateException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleVerifyNonexistenceOnDateException(VerifyNonexistenceOnDateException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler(MemberAndMyChallengeNotMatchException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public String handleMemberAndMyChallengeNotMatch(MemberAndMyChallengeNotMatchException e) {
-        return e.getMessage();
-    }
 
     @ExceptionHandler(DepositAmountNotMatchException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleDepositAmountNotMatchException(DepositAmountNotMatchException e) {
-        return e.getMessage();
-    }
-
-    @ExceptionHandler(ChallengeNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleChallengeNotFoundException(ChallengeNotFoundException e) {
         return e.getMessage();
     }
 

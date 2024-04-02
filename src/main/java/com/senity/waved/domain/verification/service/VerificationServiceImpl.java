@@ -16,7 +16,7 @@ import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
-import com.senity.waved.domain.verification.exception.ChallengeGroupVerificationException;
+import com.senity.waved.domain.verification.exception.VerificationNotTextException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -68,12 +68,12 @@ public class VerificationServiceImpl implements VerificationService {
         updateMyChallengeStatus(member, challengeGroup, isSuccess);
     }
 
-    public void challengeGroupIsTextType(Long challengeGroupId) throws ChallengeGroupVerificationException {
+    public void challengeGroupIsTextType(Long challengeGroupId) {
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
         Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
 
         if (challenge.getVerificationType() != VerificationType.TEXT) {
-            throw new ChallengeGroupVerificationException("이 챌린지는 글 인증이 아닙니다.");
+            throw new VerificationNotTextException("이 챌린지는 글 인증이 아닙니다.");
         }
     }
 
