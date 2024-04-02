@@ -18,7 +18,7 @@ public class PaymentRecordResponseDto {
     private Long deposit;
     private ZonedDateTime createDate;
 
-    public static PaymentRecordResponseDto getPaymentResponse(PaymentRecord paymentRecord) {
+    public static PaymentRecordResponseDto from(PaymentRecord paymentRecord) {
         return PaymentRecordResponseDto.builder()
                 .groupTitle(paymentRecord.getGroupTitle())
                 .status(paymentRecord.getPaymentStatus())

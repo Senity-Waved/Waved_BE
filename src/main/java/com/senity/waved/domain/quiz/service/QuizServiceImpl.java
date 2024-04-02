@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -25,24 +26,28 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public QuizResponseDto getTodaysQuiz(Long challengeGroupId) {
-        verificationService.challengeGroupIsTextType(challengeGroupId);
-
+        verificationService.IsChallengeGroupTextType(challengeGroupId);
         ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
-        Quiz quiz = quizRepository.findByChallengeGroupIdAndDate(challengeGroupId, today)
-                .orElseThrow(() -> new QuizNotFoundException("오늘의 퀴즈를 찾을 수 없습니다."));
+        Quiz quiz = findQuizByDate(challengeGroupId, today);
+
         ZonedDateTime plusDate = quiz.getDate().plusHours(9);
         return new QuizResponseDto(plusDate, quiz.getQuestion());
     }
 
     @Override
-    public QuizResponseDto getQuizByDate(Long challengeGroupId, ZonedDateTime quizDate) {
-        verificationService.challengeGroupIsTextType(challengeGroupId);
+    public QuizResponseDto getQuizByDate(Long challengeGroupId, Timestamp requestedQuizDate) {
+        ZonedDateTime quizDate = requestedQuizDate.toInstant().atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
+        verificationService.IsChallengeGroupTextType(challengeGroupId);
+        Quiz quiz = findQuizByDate(challengeGroupId, quizDate);
 
-        ZonedDateTime requestedQuizDate = quizDate.withZoneSameInstant(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
-        Quiz quiz = quizRepository.findQuizByChallengeGroupIdAndRequestDate(challengeGroupId, requestedQuizDate)
-                .orElseThrow(() -> new QuizNotFoundException("해당 날짜의 퀴즈를 찾을 수 없습니다."));
         ZonedDateTime plusDate = quiz.getDate().plusHours(9);
         return new QuizResponseDto(plusDate, quiz.getQuestion());
+    }
+
+    private Quiz findQuizByDate(Long challengeGroupId, ZonedDateTime date) {
+        return quizRepository.findByChallengeGroupIdAndDate(challengeGroupId, date)
+                .orElseThrow(() -> new QuizNotFoundException("퀴즈를 찾을 수 없습니다."));
     }
 }
 

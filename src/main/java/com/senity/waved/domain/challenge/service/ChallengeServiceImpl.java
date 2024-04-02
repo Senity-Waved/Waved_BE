@@ -1,6 +1,7 @@
 package com.senity.waved.domain.challenge.service;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
+import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
@@ -14,10 +15,8 @@ import com.senity.waved.domain.review.entity.Review;
 import com.senity.waved.domain.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +32,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
 
+    @Override
     @Transactional(readOnly = true)
     public List<ChallengeGroupHomeResponseDto> getHomeChallengeGroupsListed() {
         List<ChallengeGroupHomeResponseDto> homeGroups = new ArrayList<>();
@@ -42,41 +42,41 @@ public class ChallengeServiceImpl implements ChallengeService {
 
             ChallengeGroup group = challengeGroupRepository.findById((cnt-1) * 4L + i)
                     .orElseThrow(() -> new MyChallengeNotFoundException(""));
-            homeGroups.add(ChallengeGroup.getHomeGroupResponse(group, challenge));
+            homeGroups.add(ChallengeGroupHomeResponseDto.of(group, challenge));
         }
         return homeGroups;
     }
 
+    @Override
     @Transactional
     public Page<ChallengeReviewResponseDto> getReviewsPaged(Long challengeId, int pageNumber, int pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createDate").descending());
-        Page<Review> reviewPage = reviewRepository.findByChallengeId(challengeId, pageable);
+        Page<Review> reviewPaged = reviewRepository.findByChallengeId(challengeId, pageable);
 
-        List<ChallengeReviewResponseDto> responseDtoList = reviewPage.getContent()
+        List<ChallengeReviewResponseDto> responseDtoList = getReviewListed(reviewPaged);
+        return new PageImpl<>(responseDtoList, pageable, reviewPaged.getTotalElements());
+    }
+
+    private List<ChallengeReviewResponseDto> getReviewListed(Page<Review> reviewPaged) {
+        return reviewPaged.getContent()
                 .stream()
                 .map(review -> {
                     Member member = getMemberById(review.getMemberId());
-                    return ChallengeReviewResponseDto.getChallengeReviewResponseDto(review, member);
+                    return ChallengeReviewResponseDto.of(review, member);
                 })
                 .collect(Collectors.toList());
-
-        return new PageImpl<>(responseDtoList, pageable, reviewPage.getTotalElements());
     }
 
     private Challenge getChallengeById(Long id) {
         return challengeRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "해당 챌린지를 찾을 수 없습니다."));
+                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
     }
 
     private Member getMemberById(Long id) {
         Optional<Member> optionalMember = memberRepository.findById(id);
 
         if (optionalMember.isEmpty()) {
-            return Member.builder()
-                    .nickname("탈퇴한 서퍼")
-                    .email("")
-                    .authLevel(AuthLevel.MEMBER)
-                    .build();
+            return Member.deletedMember();
         } return optionalMember.get();
     }
 

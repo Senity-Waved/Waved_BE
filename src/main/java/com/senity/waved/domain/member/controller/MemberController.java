@@ -1,6 +1,7 @@
 package com.senity.waved.domain.member.controller;
 
 import com.senity.waved.base.jwt.TokenProvider;
+import com.senity.waved.common.ResponseDto;
 import com.senity.waved.domain.member.dto.GithubInfoDto;
 import com.senity.waved.domain.member.dto.ProfileEditDto;
 import com.senity.waved.domain.member.dto.response.ProfileInfoResponseDto;
@@ -27,12 +28,12 @@ public class MemberController {
     private final MemberService memberService;
 
     @PatchMapping("/edit")
-    public ResponseEntity<String> editProfile(
+    public ResponseEntity<ResponseDto> editProfile(
             @AuthenticationPrincipal User user,
             @RequestBody(required = false) ProfileEditDto editDto
     ) {
         memberService.editMemberProfile(user.getUsername(), editDto);
-        return new ResponseEntity<>("회원정보 등록 성공했습니다.", HttpStatus.OK);
+        return ResponseDto.of(HttpStatus.OK, "회원정보 등록 성공했습니다.");
     }
 
     @PostMapping("/reissue")
@@ -42,16 +43,16 @@ public class MemberController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<String> logout(@AuthenticationPrincipal User user, HttpServletRequest request) {
+    public ResponseEntity<ResponseDto> logout(@AuthenticationPrincipal User user, HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         memberService.logout(user.getUsername(), token);
-        return new ResponseEntity<>("로그아웃 완료했습니다.", HttpStatus.OK);
+        return ResponseDto.of(HttpStatus.OK, "로그아웃 완료했습니다.");
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<String> deleteMember(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ResponseDto> deleteMember(@AuthenticationPrincipal User user) {
         memberService.deleteMember(user.getUsername());
-        return new ResponseEntity<>("회원 탈퇴 완료했습니다.", HttpStatus.OK);
+        return ResponseDto.of(HttpStatus.OK, "회원 탈퇴 완료했습니다.");
     }
 
     @GetMapping("/profile")
@@ -65,12 +66,12 @@ public class MemberController {
     }
 
     @PostMapping("/github")
-    public ResponseEntity<String> connectGithub(
+    public ResponseEntity<ResponseDto> connectGithub(
             @AuthenticationPrincipal User user,
             @RequestBody GithubInfoDto github
     ) {
         memberService.checkGithubConnection(user.getUsername(), github);
-        return new ResponseEntity<>("github 연동 완료했습니다.", HttpStatus.OK);
+        return ResponseDto.of(HttpStatus.OK, "github 연동 완료했습니다.");
     }
 
     @GetMapping("/github")
@@ -79,9 +80,9 @@ public class MemberController {
     }
 
     @DeleteMapping("/github")
-    public ResponseEntity<String> disconnectGithub(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ResponseDto> disconnectGithub(@AuthenticationPrincipal User user) {
         memberService.deleteGithubInfo(user.getUsername());
-        return new ResponseEntity<>("github 연동 해제했습니다.", HttpStatus.OK);
+        return ResponseDto.of(HttpStatus.OK, "github 연동 해제했습니다.");
     }
 
     @GetMapping("/reviews")

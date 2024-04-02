@@ -37,7 +37,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     @Transactional
     public void validateAndSavePaymentRecord(String email, Long myChallengeId, PaymentRequestDto requestDto) {
         Member member = getMemberByEmail(email);
-        MyChallenge myChallenge = getMyChallenge(myChallengeId);
+        MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         validateMember(member, myChallenge);
 
         if (!myChallenge.getDeposit().equals(requestDto.getDeposit())) {
@@ -55,16 +55,10 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     @Transactional
     public void cancelChallengePayment(String email, Long myChallengeId) {
         Member member = getMemberByEmail(email);
-        MyChallenge myChallenge = getMyChallenge(myChallengeId);
+        MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+
         validateMember(member, myChallenge);
-
-        try {
-            CancelData cancelData = new CancelData(String.valueOf(myChallenge.getImpUid()), true);
-            api.cancelPaymentByImpUid(cancelData);
-
-        } catch (IamportResponseException | IOException e) {
-            throw new RuntimeException("결제 취소 중 오류가 발생했습니다.", e);
-        }
+        cancelImportPayment(String.valueOf(myChallenge.getImpUid()));
 
         savePaymentRecord(myChallenge, member.getId(), PaymentStatus.CANCELED);
         myChallengeRepository.delete(myChallenge);
@@ -72,16 +66,15 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
 
     @Override
     @Transactional
-    public String checkRefundDepositOrNot(String email, Long myChallengeId) {
+    public String checkDepositRefundedOrNot(String email, Long myChallengeId) {
         Member member = getMemberByEmail(email);
-        MyChallenge myChallenge = getMyChallenge(myChallengeId);
+        MyChallenge myChallenge = getMyChallengeById(myChallengeId);
 
         PaymentStatus status = myChallenge.getSuccessCount() < 11 ?
                 PaymentStatus.FAIL : PaymentStatus.SUCCESS;
 
         String message = myChallenge.getSuccessCount() < 11 ?
-                "챌린지 성공률을 달성하지 못해 예치금을 환급받지 못했습니다." :
-                "챌린지 성공률을 달성해 예치금을 환급받았습니다.";
+                "챌린지 성공률을 달성하지 못해 예치금을 환급받지 못했습니다." : "챌린지 성공률을 달성해 예치금을 환급받았습니다.";
 
         if (status == PaymentStatus.SUCCESS) {
             cancelChallengePayment(email, myChallengeId);
@@ -91,21 +84,20 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         return message;
     }
 
+    private void cancelImportPayment(String impUid) {
+        try {
+            CancelData cancelData = new CancelData(impUid, true);
+            api.cancelPaymentByImpUid(cancelData);
+        } catch (IamportResponseException | IOException e) {
+            throw new RuntimeException("결제 취소 중 오류가 발생했습니다.", e);
+        }
+    }
+
     private void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
-        ChallengeGroup group = getGroup(myChallenge.getChallengeGroupId());
+        ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
         String groupTitle = group.getGroupTitle();
 
-        Long deposit = status.equals(PaymentStatus.APPLIED) ?
-                myChallenge.getDeposit() * (-1) :
-                status.equals(PaymentStatus.FAIL) ? 0 : myChallenge.getDeposit();
-
-        PaymentRecord paymentRecord = PaymentRecord.of(
-                status,
-                deposit,
-                memberId,
-                myChallenge.getId(),
-                groupTitle
-        );
+        PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
         paymentRecordRepository.save(paymentRecord);
     }
 
@@ -114,12 +106,12 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
                 .orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
     }
 
-    private MyChallenge getMyChallenge(Long myChallengeId) {
-        return myChallengeRepository.findById(myChallengeId)
+    private MyChallenge getMyChallengeById(Long id) {
+        return myChallengeRepository.findById(id)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
 
-    private ChallengeGroup getGroup(Long id) {
+    private ChallengeGroup getGroupById(Long id) {
         return challengeGroupRepository.findById(id)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }

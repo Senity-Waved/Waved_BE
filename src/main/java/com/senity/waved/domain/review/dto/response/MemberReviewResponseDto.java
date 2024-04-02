@@ -18,7 +18,7 @@ public class MemberReviewResponseDto {
     private ZonedDateTime createDate;
     private Long challengeId;
 
-    public static MemberReviewResponseDto getMemberReviewResponseDto(Review review) {
+    public static MemberReviewResponseDto from(Review review) {
         return MemberReviewResponseDto.builder()
                 .reviewId(review.getId())
                 .groupTitle(review.getGroupTitle())

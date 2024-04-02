@@ -67,19 +67,19 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public ProfileInfoResponseDto getProfileInfo(String email) {
         Member member = getMemberByEmail(email);
-        return Member.getProfileInfoStatic(member);
+        return ProfileInfoResponseDto.from(member);
     }
 
     @Transactional(readOnly = true)
     public ProfileEditDto getProfileInfoToEdit(String email) {
         Member member = getMemberByEmail(email);
-        return Member.getProfileEditStatic(member);
+        return ProfileEditDto.from(member);
     }
 
     @Transactional(readOnly = true)
     public GithubInfoDto getGithubInfoToEdit(String email) {
         Member member = getMemberByEmail(email);
-        return Member.getGithubInfoStatic(member);
+        return GithubInfoDto.from(member);
     }
 
     @Transactional
@@ -95,6 +95,7 @@ public class MemberServiceImpl implements MemberService {
     public void saveGithubInfo(String email, GithubInfoDto githubDto) {
         Member member = getMemberByEmail(email);
         member.updateGithubInfo(githubDto);
+
         memberRepository.save(member);
         memberRepository.flush();
     }
@@ -102,7 +103,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     public void deleteGithubInfo(String email) {
         Member member = getMemberByEmail(email);
-        member.updateGithubInfo(GithubInfoDto.builder().build());
+        member.updateGithubInfo(GithubInfoDto.deleteGithubInfo());
     }
 
     @Transactional(readOnly = true)
@@ -111,11 +112,7 @@ public class MemberServiceImpl implements MemberService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createDate").descending());
         Page<Review> reviewPage = reviewRepository.getReviewByMemberId(member.getId(), pageable);
 
-        List<MemberReviewResponseDto> responseDtoList = reviewPage.getContent()
-                .stream()
-                .map(review -> MemberReviewResponseDto.getMemberReviewResponseDto(review))
-                .collect(Collectors.toList());
-
+        List<MemberReviewResponseDto> responseDtoList = getMemberReviewListed(reviewPage);
         return new PageImpl<>(responseDtoList, pageable, reviewPage.getTotalElements());
     }
 
@@ -123,14 +120,10 @@ public class MemberServiceImpl implements MemberService {
     public Page<PaymentRecordResponseDto> getMyPaymentRecordsPaged(String email, int pageNumber, int pageSize) {
         Member member = getMemberByEmail(email);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createDate").descending());
-        Page<PaymentRecord> paymentRecordPage = paymentRecordRepository.getPaymentRecordByMemberId(member.getId(), pageable);
+        Page<PaymentRecord> paymentRecordPaged = paymentRecordRepository.getPaymentRecordByMemberId(member.getId(), pageable);
 
-        List<PaymentRecordResponseDto> responseDtoList = paymentRecordPage.getContent()
-                .stream()
-                .map(PaymentRecordResponseDto::getPaymentResponse)
-                .collect(Collectors.toList());
-
-        return new PageImpl<>(responseDtoList, pageable, paymentRecordPage.getTotalElements());
+        List<PaymentRecordResponseDto> responseDtoList = getPaymentRecordsListed(paymentRecordPaged);
+        return new PageImpl<>(responseDtoList, pageable, paymentRecordPaged.getTotalElements());
     }
 
     private GHUser checkCredentials(GithubInfoDto githubDto) {
@@ -147,5 +140,19 @@ public class MemberServiceImpl implements MemberService {
     private Member getMemberByEmail(String email) {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException("회원 정보를 찾을 수 없습니다."));
+    }
+
+    private List<PaymentRecordResponseDto> getPaymentRecordsListed(Page<PaymentRecord> paymentRecordPaged) {
+        return paymentRecordPaged.getContent()
+                .stream()
+                .map(PaymentRecordResponseDto::from)
+                .collect(Collectors.toList());
+    }
+
+    private List<MemberReviewResponseDto> getMemberReviewListed(Page<Review> reviewPage) {
+        return  reviewPage.getContent()
+                .stream()
+                .map(review -> MemberReviewResponseDto.from(review))
+                .collect(Collectors.toList());
     }
 }

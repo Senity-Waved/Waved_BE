@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class LikedServiceImpl implements LikedService {
+
     private final VerificationRepository verificationRepository;
     private final MemberRepository memberRepository;
     private final LikedRepository likedRepository;
@@ -24,21 +25,11 @@ public class LikedServiceImpl implements LikedService {
     @Override
     @Transactional
     public void addLikedToVerification(String email, Long verificationId) {
-
         Member member = getMemberByEmail(email);
         Verification verification = getVerificationById(verificationId);
+        checkLikedExistence(member.getId(), verification);
 
-        boolean hasAlreadyLiked = likedRepository.existsByMemberIdAndVerification(member.getId(), verification);
-
-        if (hasAlreadyLiked) {
-            throw new DuplicationLikeException("이미 좋아요를 누른 인증 내역 입니다.");
-        }
-
-        Liked like = Liked.builder()
-                .verification(verification)
-                .memberId(member.getId())
-                .build();
-
+        Liked like = Liked.of(verification, member.getId());
         verification.addLikeToVerification(like);
         likedRepository.save(like);
     }
@@ -55,9 +46,7 @@ public class LikedServiceImpl implements LikedService {
     public void removeLikeFromVerification(String email, Long verificationId) {
         Member member = getMemberByEmail(email);
         Verification verification = getVerificationById(verificationId);
-
-        Liked liked = likedRepository.findByMemberIdAndVerification(member.getId(), verification)
-                .orElseThrow(() -> new LikeNotAuthorizedException("해당 인증 내역에 좋아요를 누르지 않았습니다."));
+        Liked liked = getLikedByMemberIdAndVerification(member.getId(), verification);
 
         verification.removeLikeFromVerification(liked);
         likedRepository.delete(liked);
@@ -68,8 +57,20 @@ public class LikedServiceImpl implements LikedService {
                 .orElseThrow(() -> new VerificationNotFoundException("해당 인증내역을 찾을 수 없습니다."));
     }
 
+    private Liked getLikedByMemberIdAndVerification(Long memberId, Verification verification) {
+        return likedRepository.findByMemberIdAndVerification(memberId, verification)
+                .orElseThrow(() -> new LikeNotAuthorizedException("해당 인증 내역에 좋아요를 누르지 않았습니다."));
+    }
+
     private Member getMemberByEmail(String email) {
         return memberRepository.getMemberByEmail(email)
                 .orElseThrow(() -> new MemberNotFoundException("해당 회원을 찾을 수 없습니다."));
+    }
+
+    private void checkLikedExistence(Long memberId, Verification verification) {
+        boolean hasAlreadyLiked = likedRepository.existsByMemberIdAndVerification(memberId, verification);
+        if (hasAlreadyLiked) {
+            throw new DuplicationLikeException("이미 좋아요를 누른 인증 내역 입니다.");
+        }
     }
 }

@@ -28,4 +28,13 @@ public class Review extends BaseEntity {
     public void updateContent(String content) {
         this.content = content;
     }
+
+    public static Review of(String content, Long memberId, Long challengeId, String groupTitle) {
+        return Review.builder()
+                .content(content)
+                .memberId(memberId)
+                .challengeId(challengeId)
+                .groupTitle(groupTitle)
+                .build();
+    }
 }

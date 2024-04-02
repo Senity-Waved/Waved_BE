@@ -16,6 +16,8 @@ import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
+import com.senity.waved.domain.verification.exception.NoVerificationFieldException;
+import com.senity.waved.domain.verification.exception.UnsupportedAuthenticationTypeException;
 import com.senity.waved.domain.verification.exception.VerificationNotTextException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +41,7 @@ public class VerificationServiceImpl implements VerificationService {
     private final MyChallengeRepository myChallengeRepository;
     private final AzureBlobStorageService azureBlobStorageService;
 
+    @Override
     public void verifyChallenge(VerificationRequestDto requestDto, String email, Long challengeGroupId) {
         Member member = getMemberByEmail(email);
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
@@ -59,16 +62,16 @@ public class VerificationServiceImpl implements VerificationService {
                 isSuccess = verifyPicture(requestDto, member, challengeGroup);
                 break;
             case GITHUB:
-                isSuccess = verifyGithub(requestDto, member, challengeGroup, challengeGroupId);
+                isSuccess = verifyGithub(member, challengeGroup);
                 break;
             default:
-                throw new IllegalArgumentException("지원하지 않는 인증 유형입니다.");
+                throw new UnsupportedAuthenticationTypeException("지원하지 않는 인증 유형입니다.");
         }
-
         updateMyChallengeStatus(member, challengeGroup, isSuccess);
     }
 
-    public void challengeGroupIsTextType(Long challengeGroupId) {
+    @Override
+    public void IsChallengeGroupTextType(Long challengeGroupId) {
         ChallengeGroup challengeGroup = getChallengeGroup(challengeGroupId);
         Challenge challenge = getChallengeById(challengeGroup.getChallengeId());
 
@@ -80,14 +83,7 @@ public class VerificationServiceImpl implements VerificationService {
     private boolean verifyText(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
         validateRequestDto(requestDto);
 
-        Verification verification = Verification.builder()
-                .content(requestDto.getContent())
-                .memberId(member.getId())
-                .challengeGroupId(challengeGroup.getId())
-                .verificationType(VerificationType.TEXT)
-                .isDeleted(false)
-                .build();
-
+        Verification verification = Verification.of(requestDto, member.getId(), challengeGroup.getId(), null, VerificationType.TEXT);
         verificationRepository.save(verification);
         return true;
     }
@@ -96,26 +92,19 @@ public class VerificationServiceImpl implements VerificationService {
         validateRequestDto(requestDto);
 
         if (requestDto.getLink() == null || requestDto.getLink().isEmpty()) {
-            throw new IllegalArgumentException("링크를 입력해주세요.");
+            throw new NoVerificationFieldException("링크를 입력해주세요.");
         }
 
-        Verification verification = Verification.builder()
-                .content(requestDto.getContent())
-                .link(requestDto.getLink())
-                .memberId(member.getId())
-                .challengeGroupId(challengeGroup.getId())
-                .verificationType(VerificationType.LINK)
-                .isDeleted(false)
-                .build();
-
+        Verification verification = Verification.of(requestDto, member.getId(), challengeGroup.getId(), null, VerificationType.LINK);
         verificationRepository.save(verification);
         return true;
     }
 
-    public boolean verifyGithub(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup, Long challengeGroupId) {
+    public boolean verifyGithub(Member member, ChallengeGroup challengeGroup) {
         try {
             boolean hasCommitsToday = githubService.hasCommitsToday(member.getGithubId(), member.getGithubToken());
             Verification verification = Verification.createGithubVerification(member, challengeGroup, hasCommitsToday);
+
             verificationRepository.save(verification);
             return hasCommitsToday;
         } catch (IOException e) {
@@ -126,23 +115,14 @@ public class VerificationServiceImpl implements VerificationService {
 
     private boolean verifyPicture(VerificationRequestDto requestDto, Member member, ChallengeGroup challengeGroup) {
         if (requestDto.getImageUrl() == null || requestDto.getImageUrl().isEmpty()) {
-            throw new IllegalArgumentException("이미지 URL을 입력해주세요.");
+            throw new NoVerificationFieldException("이미지 URL을 입력해주세요.");
         }
-
         try {
             byte[] pictureData = requestDto.getImageUrl().getBytes();
             String fileName = member.getId() + "_" + System.currentTimeMillis();
-
-            // Azure Blob Storage에 사진 업로드하고 URL 받아오기
             String imageUrl = azureBlobStorageService.uploadPicture(pictureData, fileName);
 
-            Verification verification = Verification.builder()
-                    .memberId(member.getId())
-                    .challengeGroupId(challengeGroup.getId())
-                    .verificationType(VerificationType.PICTURE)
-                    .imageUrl(imageUrl)
-                    .isDeleted(false)
-                    .build();
+            Verification verification = Verification.of(requestDto, member.getId(), challengeGroup.getId(), imageUrl, VerificationType.PICTURE);
             verificationRepository.save(verification);
             return true;
         } catch (IOException e) {
@@ -162,15 +142,15 @@ public class VerificationServiceImpl implements VerificationService {
 
     private void validateRequestDto(VerificationRequestDto requestDto) {
         if (requestDto == null || requestDto.getContent() == null || requestDto.getContent().isEmpty()) {
-            throw new IllegalArgumentException("내용을 입력해주세요.");
+            throw new NoVerificationFieldException("내용을 입력해주세요.");
         }
     }
 
-    // TODO: 제출안함(0), 실패(1), 성공(2)
+    // 제출안함(0), 실패(1), 성공(2)
     private void updateMyChallengeStatus(Member member, ChallengeGroup challengeGroup, boolean isSuccess) {
         ZonedDateTime currentDate = ZonedDateTime.now();
 
-        MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
+        MyChallenge myChallenge = getMyChallengeByMemberAndGroup(member, challengeGroup);
 
         if (myChallenge.isValidChallengePeriod(challengeGroup.getStartDate(), currentDate)) {
             updateVerificationAndSuccessCount(myChallenge, challengeGroup.getStartDate(), currentDate, isSuccess);
@@ -178,7 +158,7 @@ public class VerificationServiceImpl implements VerificationService {
         }
     }
 
-    private MyChallenge findMyChallenge(Member member, ChallengeGroup challengeGroup) {
+    private MyChallenge getMyChallengeByMemberAndGroup(Member member, ChallengeGroup challengeGroup) {
         return myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaid(member.getId(), challengeGroup.getId(), true)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이 챌린지를 찾을 수 없습니다."));
     }
@@ -203,7 +183,7 @@ public class VerificationServiceImpl implements VerificationService {
     }
 
     private void verifyMyChallenge(Member member, ChallengeGroup challengeGroup) {
-        MyChallenge myChallenge = findMyChallenge(member, challengeGroup);
+        MyChallenge myChallenge = getMyChallengeByMemberAndGroup(member, challengeGroup);
         myChallenge.verify();
     }
 }

@@ -19,7 +19,7 @@ public class MyChallengeResponseDto {
     private Long deposit;
     private Long challengeGroupId;
 
-    public static MyChallengeResponseDto getMyChallengesWaiting(MyChallenge myChallenge, ChallengeGroup group) {
+    public static MyChallengeResponseDto of(MyChallenge myChallenge, ChallengeGroup group) {
         return MyChallengeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate().plusHours(9))

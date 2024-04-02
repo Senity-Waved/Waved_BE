@@ -5,6 +5,7 @@ import com.senity.waved.domain.challenge.entity.VerificationType;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.liked.entity.Liked;
 import com.senity.waved.domain.member.entity.Member;
+import com.senity.waved.domain.verification.dto.request.VerificationRequestDto;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -77,4 +78,17 @@ public class Verification extends BaseEntity {
     public void markAsDeleted(Boolean b) {
         this.isDeleted = b;
     }
+
+    public static Verification of(VerificationRequestDto requestDto, Long memberId, Long challengeGroupId, String imageUrl, VerificationType type) {
+        return Verification.builder()
+                .challengeGroupId(challengeGroupId)
+                .content(requestDto.getContent())
+                .imageUrl(imageUrl)
+                .link(requestDto.getLink())
+                .memberId(memberId)
+                .verificationType(type)
+                .isDeleted(false)
+                .build();
+    }
+
 }

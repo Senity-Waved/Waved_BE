@@ -30,14 +30,4 @@ public class Challenge extends BaseEntity {
 
     @Column(name="is_free")
     private Boolean isFree;
-
-/*
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<Review> reviews = new ArrayList<>();
-*/
-/*
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @Builder.Default
-    private List<ChallengeGroup> groups = new ArrayList<>();*/
 }

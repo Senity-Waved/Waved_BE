@@ -1,8 +1,9 @@
 package com.senity.waved.domain.admin.controller;
 
+import com.senity.waved.common.ResponseDto;
 import com.senity.waved.domain.admin.service.AdminService;
 import com.senity.waved.domain.challengeGroup.dto.response.AdminChallengeGroupResponseDto;
-import com.senity.waved.domain.challengeGroup.dto.response.AdminVerificationListDto;
+import com.senity.waved.domain.verification.dto.response.AdminVerificationDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,7 @@ public class AdminController {
    }
 
     @GetMapping("/{challengeGroupId}/verifications")
-    public Page<AdminVerificationListDto> getGroupVerificationsPaged (
+    public Page<AdminVerificationDto> getGroupVerificationsPaged (
             @PathVariable("challengeGroupId") Long challengeGroupId,
             @RequestParam(value = "page", defaultValue = "0") int pageNumber,
             @RequestParam(value = "limit", defaultValue = "5") int pageSize
@@ -35,11 +36,11 @@ public class AdminController {
     }
 
     @DeleteMapping("/{challengeGroupId}/verifications/{verificationId}")
-    public ResponseEntity<String> deleteVerification(
+    public ResponseEntity<ResponseDto> deleteVerification(
             @PathVariable("challengeGroupId") Long challengeGroupId,
             @PathVariable("verificationId") Long verificationId
     ) {
         adminService.deleteVerification(challengeGroupId, verificationId);
-        return new ResponseEntity<>("인증 취소 처리가 되었습니다.", HttpStatus.OK);
+        return ResponseDto.of(HttpStatus.OK, "인증 취소 처리가 되었습니다.");
     }
 }

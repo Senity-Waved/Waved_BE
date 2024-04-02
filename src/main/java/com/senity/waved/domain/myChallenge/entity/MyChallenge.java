@@ -1,6 +1,8 @@
 package com.senity.waved.domain.myChallenge.entity;
 
 import com.senity.waved.common.BaseEntity;
+import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
+import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.verification.exception.AlreadyVerifiedException;
 import com.senity.waved.domain.verification.exception.FailedVerificationException;
 import com.senity.waved.domain.verification.exception.VerifyNotFoundOnDateException;
@@ -117,5 +119,21 @@ public class MyChallenge extends BaseEntity {
                 else throw new VerifyNotFoundOnDateException("해당 날짜에 인증내역이 존재하지 않습니다.");
             }
         }
+    }
+
+    public static MyChallenge of(Member member, ChallengeGroup group, Long deposit) {
+        Boolean isFree = deposit == 0;
+        return MyChallenge.builder()
+                .challengeGroupId(group.getId())
+                .successCount(0L)
+                .isReviewed(false)
+                .memberId(member.getId())
+                .myVerifs(300000000000000L)
+                .deposit(deposit)
+                .isRefundRequested(false)
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
+                .isPaid(isFree)
+                .build();
     }
 }

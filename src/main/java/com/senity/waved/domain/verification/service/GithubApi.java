@@ -1,5 +1,6 @@
 package com.senity.waved.domain.verification.service;
 
+import com.senity.waved.domain.verification.exception.GitHubConnectionException;
 import lombok.RequiredArgsConstructor;
 import org.kohsuke.github.*;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ public class GithubApi {
         try {
             connectToGithub(githubToken);
         } catch (IOException e) {
-            throw new IllegalArgumentException("gitHub 연결에 실패했습니다.");
+            throw new GitHubConnectionException("gitHub 연결에 실패했습니다.");
         }
 
         GHCommit firstCommit = null;

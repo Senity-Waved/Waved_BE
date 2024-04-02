@@ -17,7 +17,7 @@ public class AdminChallengeGroupResponseDto {
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
 
-    public static AdminChallengeGroupResponseDto fromChallengeGroup(ChallengeGroup challengeGroup) {
+    public static AdminChallengeGroupResponseDto from(ChallengeGroup challengeGroup) {
         return AdminChallengeGroupResponseDto.builder()
                 .challengeGroupId(challengeGroup.getId())
                 .groupTitle(challengeGroup.getGroupTitle())
