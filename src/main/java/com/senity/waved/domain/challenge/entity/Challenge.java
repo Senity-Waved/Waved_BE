@@ -30,4 +30,11 @@ public class Challenge extends BaseEntity {
 
     @Column(name="is_free")
     private Boolean isFree;
+
+    @Column(name = "latest_group_index")
+    private Long latestGroupIndex;
+
+    public void updateLatestGroupIndex() {
+        latestGroupIndex++;
+    }
 }
