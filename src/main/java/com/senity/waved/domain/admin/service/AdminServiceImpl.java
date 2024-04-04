@@ -10,6 +10,8 @@ import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.notification.entity.Notification;
+import com.senity.waved.domain.notification.repository.NotificationRepository;
 import com.senity.waved.domain.verification.dto.response.AdminVerificationDto;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.VerificationNotFoundException;
@@ -35,6 +37,7 @@ public class AdminServiceImpl implements AdminService {
     private final VerificationRepository verificationRepository;
     private final MyChallengeRepository myChallengeRepository;
     private final MemberRepository memberRepository;
+    private final NotificationRepository notificationRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -71,6 +74,9 @@ public class AdminServiceImpl implements AdminService {
         MyChallenge myChallenge = getMyChallengeByGroupAndMemberId(group, member.getId());
         myChallenge.deleteVerification(verification.getCreateDate());
         verificationRepository.save(verification);
+
+        createCanceledVerificationNotification(verification, group.getGroupTitle(), member.getId());
+        // TODO : 알림 호출
     }
 
     private List<AdminVerificationDto> getPaginatedVerificationDtoList(List<Verification> verifs, Pageable pageable) {
@@ -104,6 +110,15 @@ public class AdminServiceImpl implements AdminService {
     private MyChallenge getMyChallengeByGroupAndMemberId(ChallengeGroup group, Long memberId) {
         return myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaid(memberId, group.getId(), true)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이챌린지를 찾을 수 없습니다."));
+    }
+
+    private void createCanceledVerificationNotification(Verification verification, String groupTitle, Long memberId) {
+        int month = verification.getCreateDate().getMonthValue();
+        int day = verification.getCreateDate().getDayOfMonth();
+        String message = String.format("%s의 %d월 %d일 인증이 취소되었습니다.", groupTitle, month, day);
+
+        Notification newNotification = Notification.of(memberId, "인증 취소 알림", message);
+        notificationRepository.save(newNotification);
     }
 }
 

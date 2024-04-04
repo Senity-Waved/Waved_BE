@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @AllArgsConstructor
@@ -69,11 +70,15 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     public String checkDepositRefundedOrNot(String email, Long myChallengeId) {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+        ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
 
-        PaymentStatus status = myChallenge.getSuccessCount() < 11 ?
+        long days = ChronoUnit.DAYS.between(group.getStartDate(), group.getEndDate());
+        int successCount = (int) (days * 0.8);
+
+        PaymentStatus status = myChallenge.getSuccessCount() < successCount ?
                 PaymentStatus.FAIL : PaymentStatus.SUCCESS;
 
-        String message = myChallenge.getSuccessCount() < 11 ?
+        String message = myChallenge.getSuccessCount() < successCount ?
                 "챌린지 성공률을 달성하지 못해 예치금을 환급받지 못했습니다." : "챌린지 성공률을 달성해 예치금을 환급받았습니다.";
 
         if (status == PaymentStatus.SUCCESS) {
