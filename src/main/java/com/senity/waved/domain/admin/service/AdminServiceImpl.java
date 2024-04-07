@@ -16,14 +16,18 @@ import com.senity.waved.domain.verification.dto.response.AdminVerificationDto;
 import com.senity.waved.domain.verification.entity.Verification;
 import com.senity.waved.domain.verification.exception.VerificationNotFoundException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
+import com.senity.waved.domain.event.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -38,6 +42,7 @@ public class AdminServiceImpl implements AdminService {
     private final MyChallengeRepository myChallengeRepository;
     private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
+    private final EventRepository eventRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -76,7 +81,22 @@ public class AdminServiceImpl implements AdminService {
         verificationRepository.save(verification);
 
         createCanceledVerificationNotification(verification, group.getGroupTitle(), member.getId());
-        // TODO : 알림 호출
+        dispatchDeleteEvent(member.getId(), "인증삭제알림");
+
+        member.updateNewEvent(true);
+        memberRepository.flush();
+    }
+
+    private void dispatchDeleteEvent(Long memberId, String content) {
+        String eventFormatted = new JSONObject().put("content", content).toString();
+        SseEmitter sseEmitter = eventRepository.get(memberId);
+        if (sseEmitter != null) {
+            try {
+                sseEmitter.send(SseEmitter.event().name("event").data(eventFormatted));
+            } catch (IOException e) {
+                eventRepository.deleteById(memberId);
+            }
+        }
     }
 
     private List<AdminVerificationDto> getPaginatedVerificationDtoList(List<Verification> verifs, Pageable pageable) {
@@ -108,7 +128,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private MyChallenge getMyChallengeByGroupAndMemberId(ChallengeGroup group, Long memberId) {
-        return myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaid(memberId, group.getId(), true)
+        return myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaidTrue(memberId, group.getId())
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 마이챌린지를 찾을 수 없습니다."));
     }
 

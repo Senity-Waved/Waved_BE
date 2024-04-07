@@ -75,7 +75,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         }
 
         Member member = getMemberByEmail(email);
-        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaid(member.getId(), group.getId(), true);
+        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaidTrue(member.getId(), group.getId());
 
         Long myChallengeId = myChallenge.isPresent() ? myChallenge.get().getId() : -1L;
         return ChallengeGroupResponseDto.of(group, challenge, myChallengeId);
@@ -193,7 +193,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     }
 
     private void checkMyChallengeExistence(Long memberId, Long groupId) {
-        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaid(memberId, groupId, true);
+        Optional<MyChallenge> myChallenge = myChallengeRepository.findByMemberIdAndChallengeGroupIdAndIsPaidTrue(memberId, groupId);
         if (myChallenge.isPresent()) {
             throw new AlreadyMyChallengeExistsException("이미 신청되어있는 챌린지 그룹 입니다.");
         }

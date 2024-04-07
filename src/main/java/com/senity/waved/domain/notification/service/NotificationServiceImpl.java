@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @AllArgsConstructor
 public class NotificationServiceImpl implements NotificationService {
 
@@ -24,9 +24,12 @@ public class NotificationServiceImpl implements NotificationService {
     //TODO: 오래된 알림 삭제 처리
     @Override
     public List<NotificationResponseDto> getNotifications(String email) {
-       Member member = getMemberByEmail(email);
+        Member member = getMemberByEmail(email);
 
-       List<Notification> notifications = notificationRepository.findByMemberId(member.getId());
+        List<Notification> notifications = notificationRepository.findByMemberId(member.getId());
+        member.updateNewEvent(false);
+        memberRepository.flush();
+
         return notifications.stream()
                 .map(NotificationResponseDto::of)
                 .collect(Collectors.toList());

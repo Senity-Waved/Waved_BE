@@ -51,6 +51,7 @@ dependencies {
 
 	implementation 'com.github.iamport:iamport-rest-client-java:0.2.23'
 
+	implementation 'org.json:json:20200518'
 }
 
 tasks.named('test') {
