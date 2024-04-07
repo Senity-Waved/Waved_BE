@@ -8,7 +8,11 @@ import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
+import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
+import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
+import com.senity.waved.domain.notification.entity.Notification;
+import com.senity.waved.domain.notification.repository.NotificationRepository;
 import com.senity.waved.domain.review.dto.response.ChallengeReviewResponseDto;
 import com.senity.waved.domain.review.entity.Review;
 import com.senity.waved.domain.review.repository.ReviewRepository;
@@ -38,6 +42,8 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final ChallengeGroupRepository challengeGroupRepository;
     private final MemberRepository memberRepository;
     private final ReviewRepository reviewRepository;
+    private final MyChallengeRepository myChallengeRepository;
+    private final NotificationRepository notificationRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -88,9 +94,8 @@ public class ChallengeServiceImpl implements ChallengeService {
         return optionalMember.get();
     }
 
-    // 챌린지 그룹 자동 생성 메서드: 테스트 시 사용 X
     @Transactional
-    // @Scheduled(fixedDelay = 100000) // 10초 단위 (테스트용)
+//    @Scheduled(fixedDelay = 100000) // 10초 단위 (테스트용)
     @Scheduled(cron = "0 0 0 * * MON") // 매주 월요일 0시 메서드 호출
     public void makeChallengeGroupScheduled() {
         List<Challenge> challengeList = challengeRepository.findAll();
@@ -100,14 +105,43 @@ public class ChallengeServiceImpl implements ChallengeService {
             ChallengeGroup latestGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), latestGroupIndex);
 
             if (latestGroup.getStartDate().equals(ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS))) {
+                String startMessage = String.format("%s %d기가 오늘부터 시작됩니다.", challenge.getTitle(), latestGroupIndex);
+                notifyMembersAppliedGroup(latestGroupIndex, "챌린지 시작 알림", startMessage);
+
+                Long lastGroupIndex = latestGroupIndex - 1;
+                String endMessage = String.format("%s %d기가 종료되었습니다. 환급 신청해주세요.", challenge.getTitle(), lastGroupIndex);
+                notifyMembersAppliedGroup(lastGroupIndex, "챌린지 종료 알림", endMessage);
+
                 ChallengeGroup newGroup = ChallengeGroup.from(latestGroup, challenge);
                 challengeGroupRepository.save(newGroup);
                 challenge.updateLatestGroupIndex();
-                // TODO : 이전 챌린지 종료 & 환급 알림
-                // TODO : 챌린지 시작 알림
-                // push 알림까지 구현할거면 새벽 12시보다 아침 8시로 변경?
             }
         }
+    }
+
+    private void notifyMembersAppliedGroup(Long groupId, String title, String message) {
+        List<MyChallenge> myChallengeList = myChallengeRepository.findByChallengeGroupIdAndIsPaidTrue(groupId);
+
+        for(MyChallenge myChallenge: myChallengeList) {
+            Long memberId = myChallenge.getMemberId();
+            Member member = getMemberByIdWithNull(myChallenge.getMemberId());
+
+            if (member != null) {
+                Notification newNotification = Notification.of(memberId, title, message);
+                notificationRepository.save(newNotification);
+                member.updateNewEvent(true);
+                memberRepository.flush();
+            }
+        }
+    }
+
+    private Member getMemberByIdWithNull(Long id) {
+        Optional<Member> optionalMember = memberRepository.findById(id);
+
+        if (optionalMember.isEmpty()) {
+            return null;
+        }
+        return optionalMember.get();
     }
 
     private ChallengeGroup getGroupByChallengeIdAndGroupIndex(Long challengeId, Long groupIndex) {

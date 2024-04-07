@@ -45,6 +45,9 @@ public class Member extends BaseEntity {
     @Column(name="has_info")
     private Boolean hasInfo;
 
+    @Column(name="has_new_event", nullable=true)
+    private Boolean hasNewEvent;
+
     public void updateInfo(ProfileEditDto editDto) {
         nickname = editDto.getNickname();
         birthYear = editDto.getBirthYear();
@@ -56,6 +59,10 @@ public class Member extends BaseEntity {
     public void updateGithubInfo(GithubInfoDto github) {
         this.githubId = github.getGithubId();
         this.githubToken = github.getGithubToken();
+    }
+
+    public void updateNewEvent(Boolean newEvent) {
+        this.hasNewEvent = newEvent;
     }
 
     public boolean isGithubConnected() {
