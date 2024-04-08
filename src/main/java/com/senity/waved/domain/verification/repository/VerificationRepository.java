@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface VerificationRepository extends JpaRepository<Verification, Long> {
 
-    List<Verification> findByChallengeGroupId(Long challengeGroupId);
+    List<Verification> findByChallengeGroupIdAndIsDeletedFalse(Long challengeGroupId);
 
     @Query("SELECT v FROM Verification v WHERE v.createDate >= :startOfDay AND v.createDate <= :endOfDay AND v.challengeGroupId = :challengeGroupId AND v.isDeleted = FALSE")
     List<Verification> findByCreateDateBetweenAndChallengeGroupAndIsDeletedFalse (
