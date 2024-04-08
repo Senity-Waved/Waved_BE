@@ -135,6 +135,12 @@ public class GlobalExceptionHandler {
         return ResponseDto.of(HttpStatus.FORBIDDEN, e.getMessage());
     }
 
+    @ExceptionHandler(AlreadyDeletedVerificationException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ResponseDto> handleAlreadyDeletedVerificationException(AlreadyDeletedVerificationException e) {
+        return ResponseDto.of(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+
     @ExceptionHandler(VerifyNotFoundOnDateException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ResponseDto> handleVerifyNotFoundOnDateException(VerifyNotFoundOnDateException e) {

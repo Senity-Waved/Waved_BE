@@ -7,4 +7,5 @@ import java.util.List;
 public interface NotificationService {
 
     List<NotificationResponseDto> getNotifications(String email);
+    void deleteNotification(Long notificationId);
 }

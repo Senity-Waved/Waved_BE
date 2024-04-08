@@ -21,7 +21,6 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private final MemberRepository memberRepository;
 
-    //TODO: 오래된 알림 삭제 처리
     @Override
     public List<NotificationResponseDto> getNotifications(String email) {
         Member member = getMemberByEmail(email);
@@ -33,6 +32,11 @@ public class NotificationServiceImpl implements NotificationService {
         return notifications.stream()
                 .map(NotificationResponseDto::of)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteNotification(Long notificationId) {
+        notificationRepository.deleteById(notificationId);
     }
 
     private Member getMemberByEmail(String email) {

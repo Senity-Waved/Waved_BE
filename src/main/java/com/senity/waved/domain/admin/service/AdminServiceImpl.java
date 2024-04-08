@@ -4,8 +4,8 @@ import com.senity.waved.domain.challengeGroup.dto.response.AdminChallengeGroupRe
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
+import com.senity.waved.domain.event.repository.EventRepository;
 import com.senity.waved.domain.member.entity.Member;
-import com.senity.waved.domain.member.exception.MemberNotFoundException;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
@@ -14,9 +14,9 @@ import com.senity.waved.domain.notification.entity.Notification;
 import com.senity.waved.domain.notification.repository.NotificationRepository;
 import com.senity.waved.domain.verification.dto.response.AdminVerificationDto;
 import com.senity.waved.domain.verification.entity.Verification;
+import com.senity.waved.domain.verification.exception.AlreadyDeletedVerificationException;
 import com.senity.waved.domain.verification.exception.VerificationNotFoundException;
 import com.senity.waved.domain.verification.repository.VerificationRepository;
-import com.senity.waved.domain.event.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.data.domain.Page;
@@ -31,6 +31,7 @@ import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -59,7 +60,7 @@ public class AdminServiceImpl implements AdminService {
     @Transactional(readOnly = true)
     public Page<AdminVerificationDto> getGroupVerificationsPaged(Long challengeGroupId, int pageNumber, int pageSize) {
         ChallengeGroup challengeGroup = getGroupById(challengeGroupId);
-        List<Verification> verifications = verificationRepository.findByChallengeGroupId(challengeGroup.getId());
+        List<Verification> verifications = verificationRepository.findByChallengeGroupIdAndIsDeletedFalse(challengeGroup.getId());
 
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         List<AdminVerificationDto> verificationDtoList = getPaginatedVerificationDtoList(verifications, pageable);
@@ -71,20 +72,25 @@ public class AdminServiceImpl implements AdminService {
     @Transactional
     public void deleteVerification(Long groupId, Long verificationId) {
         Verification verification = getVerificationById(verificationId);
+        if (verification.getIsDeleted()) {
+            throw new AlreadyDeletedVerificationException("이미 삭제된 인증 내역입니다.");
+        }
         verification.markAsDeleted(true);
 
-        Member member = getMemberById(verification.getMemberId());
+        Member member = getMemberByIdWithNull(verification.getMemberId());
         ChallengeGroup group = getGroupById(verification.getChallengeGroupId());
 
-        MyChallenge myChallenge = getMyChallengeByGroupAndMemberId(group, member.getId());
+        MyChallenge myChallenge = getMyChallengeByGroupAndMemberId(group, verification.getMemberId());
         myChallenge.deleteVerification(verification.getCreateDate());
         verificationRepository.save(verification);
 
-        createCanceledVerificationNotification(verification, group.getGroupTitle(), member.getId());
-        dispatchDeleteEvent(member.getId(), "인증삭제알림");
+        if (member != null) {
+            createCanceledVerificationNotification(verification, group.getGroupTitle(), member.getId());
+            dispatchDeleteEvent(member.getId(), "인증삭제알림");
 
-        member.updateNewEvent(true);
-        memberRepository.flush();
+            member.updateNewEvent(true);
+            memberRepository.flush();
+        }
     }
 
     private void dispatchDeleteEvent(Long memberId, String content) {
@@ -106,15 +112,22 @@ public class AdminServiceImpl implements AdminService {
         return verifs.subList(start, end)
                 .stream()
                 .map(verification -> {
-                    Member member = getMemberById(verification.getMemberId());
+                    Member member = getMemberByIdWithNull(verification.getMemberId());
+                    if (member == null) {
+                        return AdminVerificationDto.from(verification, Member.deletedMember());
+                    }
                     return AdminVerificationDto.from(verification, member);
                 })
                 .collect(Collectors.toList());
     }
 
-    private Member getMemberById(Long id) {
-        return memberRepository.findById(id)
-                .orElseThrow(() -> new MemberNotFoundException("해당 멤버를 찾을 수 없습니다."));
+    private Member getMemberByIdWithNull(Long id) {
+        Optional<Member> optionalMember = memberRepository.findById(id);
+
+        if (optionalMember.isEmpty()) {
+            return null;
+        }
+        return optionalMember.get();
     }
 
     private Verification getVerificationById(Long id) {
