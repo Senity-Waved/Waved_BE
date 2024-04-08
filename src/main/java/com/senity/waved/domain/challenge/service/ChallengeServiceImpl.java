@@ -123,7 +123,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     // @Scheduled(fixedDelay = 100000)
     @Scheduled(cron = "0 0 3 * * MON")
     public void deleteOldNotifications() {
-        ZonedDateTime deleteBefore = ZonedDateTime.now().toLocalDate().minusDays(7).atStartOfDay(ZoneId.systemDefault());
+        ZonedDateTime deleteBefore = ZonedDateTime.now().toLocalDate().minusDays(14).atStartOfDay(ZoneId.systemDefault());
         notificationRepository.deleteNotificationsByCreateDate(deleteBefore);
     }
 
