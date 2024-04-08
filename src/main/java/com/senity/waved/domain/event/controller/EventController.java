@@ -28,5 +28,4 @@ public class EventController {
     public String checkNewEvent(@AuthenticationPrincipal User user) {
         return eventService.checkNewEvent(user.getUsername());
     }
-
 }

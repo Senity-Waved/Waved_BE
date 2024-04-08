@@ -95,9 +95,9 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Transactional
-//    @Scheduled(fixedDelay = 100000) // 10초 단위 (테스트용)
-    @Scheduled(cron = "0 0 0 * * MON") // 매주 월요일 0시 메서드 호출
-    public void makeChallengeGroupScheduled() {
+    // @Scheduled(fixedDelay = 100000) // 10초 단위 (테스트용)
+    @Scheduled(cron = "0 0 4 * * MON") // 매주 월요일 4시 메서드 호출
+    public void makeChallengeGroupScheduledAndDeleteOldNotifications() {
         List<Challenge> challengeList = challengeRepository.findAll();
 
         for (Challenge challenge : challengeList) {
@@ -117,6 +117,14 @@ public class ChallengeServiceImpl implements ChallengeService {
                 challenge.updateLatestGroupIndex();
             }
         }
+    }
+
+    @Transactional
+    // @Scheduled(fixedDelay = 100000)
+    @Scheduled(cron = "0 0 3 * * MON")
+    public void deleteOldNotifications() {
+        ZonedDateTime deleteBefore = ZonedDateTime.now().toLocalDate().minusDays(7).atStartOfDay(ZoneId.systemDefault());
+        notificationRepository.deleteNotificationsByCreateDate(deleteBefore);
     }
 
     private void notifyMembersAppliedGroup(Long groupId, String title, String message) {
