@@ -26,8 +26,8 @@ public class NotificationController {
         return notificationService.getNotifications(user.getUsername());
     }
 
-    @DeleteMapping
-    public ResponseEntity<ResponseDto> deleteNotification(@PathVariable Long notificationId) {
+    @DeleteMapping("/{notificationId}")
+    public ResponseEntity<ResponseDto> deleteNotification(@PathVariable("notificationId") Long notificationId) {
         notificationService.deleteNotification(notificationId);
         return ResponseDto.of(HttpStatus.OK, "알림이 삭제되었습니다.");
     }
