@@ -104,10 +104,10 @@ public class ChallengeServiceImpl implements ChallengeService {
             Long latestGroupIndex = challenge.getLatestGroupIndex();
             ChallengeGroup latestGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), latestGroupIndex);
 
-            log.info("----------------------------- latestGroup startDate : " + latestGroup.getStartDate());
-            log.info("----------------------------- now                   : " + ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS));
+            log.info("----------------------------- latestGroup startDate : " + latestGroup.getStartDate().truncatedTo(ChronoUnit.DAYS));
+            log.info("----------------------------- now                   : " + ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS));
 
-            if (latestGroup.getStartDate().equals(ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS))) {
+            if (latestGroup.getStartDate().truncatedTo(ChronoUnit.DAYS).equals(ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS))) {
                 Long lastGroupIndex = latestGroupIndex - 1;
                 String endMessage = String.format("%s %d기가 종료되었습니다. 환급 신청해주세요.", challenge.getTitle(), lastGroupIndex);
                 notifyMembersAppliedGroup(lastGroupIndex, "챌린지 종료 알림", endMessage);
