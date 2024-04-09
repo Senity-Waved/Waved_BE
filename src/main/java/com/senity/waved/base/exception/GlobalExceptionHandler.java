@@ -14,6 +14,7 @@ import com.senity.waved.domain.myChallenge.exception.InvalidChallengeStatusExcep
 import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.paymentRecord.exception.DepositAmountNotMatchException;
 import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatchException;
+import com.senity.waved.domain.paymentRecord.exception.PaymentRecordExistException;
 import com.senity.waved.domain.quiz.exception.QuizNotFoundException;
 import com.senity.waved.domain.review.exception.AlreadyReviewedException;
 import com.senity.waved.domain.review.exception.ReviewNotFoundException;
@@ -195,6 +196,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FailedVerificationException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ResponseEntity<ResponseDto> handleFailedVerificationException(FailedVerificationException e) {
+        return ResponseDto.of(HttpStatus.FORBIDDEN, e.getMessage());
+    }
+
+    @ExceptionHandler(PaymentRecordExistException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseEntity<ResponseDto> handlePaymentRecordExistException(PaymentRecordExistException e) {
         return ResponseDto.of(HttpStatus.FORBIDDEN, e.getMessage());
     }
 }
