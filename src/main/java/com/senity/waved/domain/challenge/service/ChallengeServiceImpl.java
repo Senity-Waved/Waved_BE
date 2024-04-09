@@ -95,25 +95,26 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Transactional
-    // @Scheduled(fixedDelay = 10000) // 10초 단위 (테스트용)
-    @Scheduled(cron = "0 0 4 * * MON") // 매주 월요일 4시 메서드 호출
-    public void makeChallengeGroupScheduled() {
+    @Scheduled(fixedDelay = 10000) // 10초 단위 (테스트용)
+    // @Scheduled(cron = "0 0 4 * * MON") // 매주 월요일 4시 메서드 호출
+    public void makeChallengeGroupAndDoNotificationScheduled() {
         List<Challenge> challengeList = challengeRepository.findAll();
 
         for (Challenge challenge : challengeList) {
             Long latestGroupIndex = challenge.getLatestGroupIndex();
             ChallengeGroup latestGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), latestGroupIndex);
 
-            log.info("----------------------------- latestGroup startDate : " + latestGroup.getStartDate().truncatedTo(ChronoUnit.DAYS));
+            log.info("----------------------------- latestGroup startDate : " + latestGroup.getStartDate().plusHours(9));
             log.info("----------------------------- now                   : " + ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS));
 
-            if (latestGroup.getStartDate().truncatedTo(ChronoUnit.DAYS).equals(ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS))) {
+            if (latestGroup.getStartDate().plusHours(9).equals(ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS))) {
                 Long lastGroupIndex = latestGroupIndex - 1;
+                ChallengeGroup lastGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);
                 String endMessage = String.format("%s %d기가 종료되었습니다. 환급 신청해주세요.", challenge.getTitle(), lastGroupIndex);
-                notifyMembersAppliedGroup(lastGroupIndex, "챌린지 종료 알림", endMessage);
+                notifyMembersAppliedGroup(lastGroup.getId(), "챌린지 종료 알림", endMessage);
 
                 String startMessage = String.format("%s %d기가 오늘부터 시작됩니다.", challenge.getTitle(), latestGroupIndex);
-                notifyMembersAppliedGroup(latestGroupIndex, "챌린지 시작 알림", startMessage);
+                notifyMembersAppliedGroup(latestGroup.getId(), "챌린지 시작 알림", startMessage);
 
                 ChallengeGroup newGroup = ChallengeGroup.from(latestGroup, challenge);
                 challengeGroupRepository.save(newGroup);
@@ -132,17 +133,10 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     private void notifyMembersAppliedGroup(Long groupId, String title, String message) {
         List<MyChallenge> myChallengeList = myChallengeRepository.findByChallengeGroupIdAndIsPaidTrue(groupId);
-        log.info("------------------------myChallengeSize : " + myChallengeList.size());
 
         for(MyChallenge myChallenge: myChallengeList) {
             Long memberId = myChallenge.getMemberId();
             Member member = getMemberByIdWithNull(myChallenge.getMemberId());
-
-            if(member == null)
-                log.info("------------------------member null ");
-            if(member!=null)
-                log.info("------------------------member id : " + member.getId());
-
 
             if (member != null) {
                 Notification newNotification = Notification.of(memberId, title, message);
@@ -165,7 +159,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     private ChallengeGroup getGroupByChallengeIdAndGroupIndex(Long challengeId, Long groupIndex) {
         List<ChallengeGroup> group = challengeGroupRepository.findByChallengeIdAndGroupIndex(challengeId, groupIndex);
         if (group.isEmpty()) {
-            log.error("challenge id {}의 마지막 기수 그룹을 찾을 수 없습니다.", challengeId);
+            log.error("challenge id {}의 {}기 그룹을 찾을 수 없습니다.", challengeId, groupIndex);
             return null;
         } return group.get(0);
     }
