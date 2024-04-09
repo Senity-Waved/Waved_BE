@@ -9,7 +9,6 @@ import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepositor
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.repository.MemberRepository;
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
-import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundException;
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.notification.entity.Notification;
 import com.senity.waved.domain.notification.repository.NotificationRepository;
@@ -49,13 +48,12 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Transactional(readOnly = true)
     public List<ChallengeGroupHomeResponseDto> getHomeChallengeGroupsListed() {
         List<ChallengeGroupHomeResponseDto> homeGroups = new ArrayList<>();
-        for (int i = 1; i < 5; i++) {
-            Challenge challenge = getChallengeById(i * 1L);
-            long cnt = challengeGroupRepository.count() / 4;
+        int cnt = Math.toIntExact(challengeRepository.count());
 
-            ChallengeGroup group = challengeGroupRepository.findById((cnt - 1) * 4L + i)
-                    .orElseThrow(() -> new MyChallengeNotFoundException(""));
-            homeGroups.add(ChallengeGroupHomeResponseDto.of(group, challenge));
+        for (int i = 1; i <= cnt; i++) {
+            Challenge challenge = getChallengeById(i * 1L);
+            List<ChallengeGroup> group = challengeGroupRepository.findByChallengeIdAndGroupIndex(challenge.getId(), challenge.getLatestGroupIndex());
+            homeGroups.add(ChallengeGroupHomeResponseDto.of(group.get(0), challenge));
         }
         return homeGroups;
     }
@@ -68,30 +66,6 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         List<ChallengeReviewResponseDto> responseDtoList = getReviewListed(reviewPaged);
         return new PageImpl<>(responseDtoList, pageable, reviewPaged.getTotalElements());
-    }
-
-    private List<ChallengeReviewResponseDto> getReviewListed(Page<Review> reviewPaged) {
-        return reviewPaged.getContent()
-                .stream()
-                .map(review -> {
-                    Member member = getMemberById(review.getMemberId());
-                    return ChallengeReviewResponseDto.of(review, member);
-                })
-                .collect(Collectors.toList());
-    }
-
-    private Challenge getChallengeById(Long id) {
-        return challengeRepository.findById(id)
-                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
-    }
-
-    private Member getMemberById(Long id) {
-        Optional<Member> optionalMember = memberRepository.findById(id);
-
-        if (optionalMember.isEmpty()) {
-            return Member.deletedMember();
-        }
-        return optionalMember.get();
     }
 
     @Transactional
@@ -142,6 +116,30 @@ public class ChallengeServiceImpl implements ChallengeService {
                 memberRepository.flush();
             }
         }
+    }
+
+    private List<ChallengeReviewResponseDto> getReviewListed(Page<Review> reviewPaged) {
+        return reviewPaged.getContent()
+                .stream()
+                .map(review -> {
+                    Member member = getMemberById(review.getMemberId());
+                    return ChallengeReviewResponseDto.of(review, member);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private Challenge getChallengeById(Long id) {
+        return challengeRepository.findById(id)
+                .orElseThrow(() -> new ChallengeNotFoundException("해당 챌린지를 찾을 수 없습니다."));
+    }
+
+    private Member getMemberById(Long id) {
+        Optional<Member> optionalMember = memberRepository.findById(id);
+
+        if (optionalMember.isEmpty()) {
+            return Member.deletedMember();
+        }
+        return optionalMember.get();
     }
 
     private Member getMemberByIdWithNull(Long id) {
