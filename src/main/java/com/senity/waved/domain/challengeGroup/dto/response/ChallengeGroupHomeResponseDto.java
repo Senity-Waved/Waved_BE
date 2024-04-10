@@ -21,6 +21,7 @@ public class ChallengeGroupHomeResponseDto {
     private Long participantCount;
     private ZonedDateTime startDate;
     private Long challengeGroupId;  // group 상세페이지 호출을 위한 id값
+    private String imageUrl;
 
     public static ChallengeGroupHomeResponseDto of(ChallengeGroup group, Challenge challenge) {
         return ChallengeGroupHomeResponseDto.builder()
@@ -30,6 +31,7 @@ public class ChallengeGroupHomeResponseDto {
                 .participantCount(group.getParticipantCount())
                 .startDate(group.getStartDate().plusHours(9))
                 .challengeGroupId(group.getId())
+                .imageUrl(challenge.getImageUrl())
                 .build();
     }
 }

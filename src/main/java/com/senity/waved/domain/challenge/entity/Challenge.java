@@ -34,6 +34,9 @@ public class Challenge extends BaseEntity {
     @Column(name = "latest_group_index")
     private Long latestGroupIndex;
 
+    @Column(name = "image_url")
+    private String imageUrl;
+
     public void updateLatestGroupIndex() {
         latestGroupIndex++;
     }

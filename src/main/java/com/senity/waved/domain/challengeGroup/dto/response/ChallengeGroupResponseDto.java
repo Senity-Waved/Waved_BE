@@ -23,6 +23,7 @@ public class ChallengeGroupResponseDto {
     private String verificationDescription;
     private Boolean isApplied;
     private Boolean isFree;
+    private String imageUrl;
 
     // 챌린지(전체 그룹) 리뷰 paged 조회를 위한 id값
     private Long challengeId;
@@ -43,6 +44,7 @@ public class ChallengeGroupResponseDto {
                 .isFree(challenge.getIsFree())
                 .myChallengeId(myChallengeId)
                 .challengeId(challenge.getId())
+                .imageUrl(challenge.getImageUrl())
                 .build();
     }
 }
