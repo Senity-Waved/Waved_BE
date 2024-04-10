@@ -147,7 +147,7 @@ public class AdminServiceImpl implements AdminService {
 
     private void createCanceledVerificationNotification(Verification verification, String groupTitle, Long memberId) {
         int month = verification.getCreateDate().getMonthValue();
-        int day = verification.getCreateDate().getDayOfMonth();
+        int day = verification.getCreateDate().plusHours(9).getDayOfMonth();
         String message = String.format("%s의 %d월 %d일 인증이 취소되었습니다.", groupTitle, month, day);
 
         Notification newNotification = Notification.of(memberId, "인증 취소 알림", message);

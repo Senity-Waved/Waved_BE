@@ -21,8 +21,8 @@ public class AdminChallengeGroupResponseDto {
         return AdminChallengeGroupResponseDto.builder()
                 .challengeGroupId(challengeGroup.getId())
                 .groupTitle(challengeGroup.getGroupTitle())
-                .startDate(challengeGroup.getStartDate())
-                .endDate(challengeGroup.getEndDate())
+                .startDate(challengeGroup.getStartDate().plusHours(9))
+                .endDate(challengeGroup.getEndDate().plusHours(9))
                 .build();
     }
 }
