@@ -15,11 +15,11 @@ public class NotificationResponseDto {
     private String title;
     private String message;
     private ZonedDateTime createDate;
-    private Long notificaitonId;
+    private Long notificationId;
 
     public static NotificationResponseDto of(Notification notification) {
         return NotificationResponseDto.builder()
-                .notificaitonId(notification.getId())
+                .notificationId(notification.getId())
                 .title(notification.getTitle())
                 .message(notification.getMessage())
                 .createDate(notification.getCreateDate().plusHours(9))
