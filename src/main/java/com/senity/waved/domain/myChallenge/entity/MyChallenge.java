@@ -41,7 +41,7 @@ public class MyChallenge extends BaseEntity {
     @Column(name = "is_paid")
     private boolean isPaid;
 
-    @Column(name = "imp_urd")
+    @Column(name = "imp_uid")
     private String impUid;
 
     @Column(name = "start_date")

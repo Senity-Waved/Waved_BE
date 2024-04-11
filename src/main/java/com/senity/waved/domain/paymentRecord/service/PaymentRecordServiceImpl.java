@@ -48,7 +48,8 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
             myChallengeRepository.deleteById(myChallengeId);
             throw new DepositAmountNotMatchException("마이 챌린지의 예치금과 결제 금액이 일치하지 않습니다.");
         }
-        checkIfPaymentRecordExist(member.getId(), myChallengeId);
+
+        checkIfPaymentRecordExist(member.getId(), myChallengeId, PaymentStatus.APPLIED);
         savePaymentRecord(myChallenge, member.getId(), PaymentStatus.APPLIED);
 
         myChallenge.updateImpUid(requestDto.getImp_uid());
@@ -93,8 +94,8 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         return message;
     }
 
-    private void checkIfPaymentRecordExist(Long memberId, Long myChallengeId) {
-        Optional<PaymentRecord> paymentRecords = paymentRecordRepository.findByMemberIdAndMyChallengeId(memberId, myChallengeId);
+    private void checkIfPaymentRecordExist(Long memberId, Long myChallengeId, PaymentStatus paymentStatus) {
+        Optional<PaymentRecord> paymentRecords = paymentRecordRepository.findByMemberIdAndMyChallengeIdAndPaymentStatus(memberId, myChallengeId, paymentStatus);
         if (paymentRecords.isPresent()) {
             throw new PaymentRecordExistException("이미 존재하는 결제 내역입니다.");
         }

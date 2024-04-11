@@ -58,9 +58,9 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
         checkMyChallengeExistence(member.getId(), groupId);
 
         MyChallenge newMyChallenge = MyChallenge.of(member, group, deposit);
-        savePaymentRecordWhenDepositZero(newMyChallenge, member.getId());
-
         myChallengeRepository.save(newMyChallenge);
+
+        savePaymentRecordWhenDepositZero(newMyChallenge, member.getId());
         group.addGroupParticipantCount();
         return newMyChallenge.getId();
     }

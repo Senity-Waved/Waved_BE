@@ -45,7 +45,6 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
 
         validateMember(member, myChallenge);
-
         group.deleteGroupParticipantCount();
         myChallengeRepository.delete(myChallenge);
     }
