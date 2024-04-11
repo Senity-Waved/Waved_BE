@@ -1,8 +1,8 @@
 package com.senity.waved.domain.challengeGroup.controller;
 
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupResponseDto;
-import com.senity.waved.domain.verification.dto.response.VerificationResponseDto;
 import com.senity.waved.domain.challengeGroup.service.ChallengeGroupService;
+import com.senity.waved.domain.verification.dto.response.VerificationResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

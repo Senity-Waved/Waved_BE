@@ -2,6 +2,7 @@ package com.senity.waved.domain.challenge.service;
 
 import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
+import com.senity.waved.domain.challenge.exception.ExampleImageNotFoundException;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.dto.response.ChallengeGroupHomeResponseDto;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
@@ -100,6 +101,15 @@ public class ChallengeServiceImpl implements ChallengeService {
     public void deleteOldNotifications() {
         ZonedDateTime deleteBefore = ZonedDateTime.now().toLocalDate().minusDays(14).atStartOfDay(ZoneId.systemDefault());
         notificationRepository.deleteNotificationsByCreateDate(deleteBefore);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getExampleImageUrl(Long challengeId) {
+        if (challengeId != 3L) {
+            throw new ExampleImageNotFoundException("인증 예시 이미지를 찾을 수 없습니다.");
+        }
+        return "{'원티드.png', '점핏.png', '사람인.png', '잡코리아.png'}";
     }
 
     private void notifyMembersAppliedGroup(Long groupId, String title, String message) {

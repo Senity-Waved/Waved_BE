@@ -2,6 +2,7 @@ package com.senity.waved.base.exception;
 
 import com.senity.waved.common.ResponseDto;
 import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
+import com.senity.waved.domain.challenge.exception.ExampleImageNotFoundException;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotCompletedException;
 import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotFoundException;
 import com.senity.waved.domain.liked.exception.DuplicationLikeException;
@@ -76,6 +77,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ChallengeNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ResponseDto> handleChallengeNotFoundException(ChallengeNotFoundException e) {
+        return ResponseDto.of(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(ExampleImageNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ResponseDto> handleExampleImageNotFoundException(ExampleImageNotFoundException e) {
         return ResponseDto.of(HttpStatus.NOT_FOUND, e.getMessage());
     }
 

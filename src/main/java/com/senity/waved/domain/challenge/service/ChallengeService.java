@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface ChallengeService {
     List<ChallengeGroupHomeResponseDto> getHomeChallengeGroupsListed();
+    String getExampleImageUrl(Long challengeId);
     Page<ChallengeReviewResponseDto> getReviewsPaged(Long challengeId, int pageNumber, int pageSize);
 }
