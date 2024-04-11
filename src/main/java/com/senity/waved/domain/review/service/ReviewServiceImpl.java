@@ -4,7 +4,6 @@ import com.senity.waved.domain.challenge.entity.Challenge;
 import com.senity.waved.domain.challenge.exception.ChallengeNotFoundException;
 import com.senity.waved.domain.challenge.repository.ChallengeRepository;
 import com.senity.waved.domain.challengeGroup.entity.ChallengeGroup;
-import com.senity.waved.domain.challengeGroup.exception.ChallengeGroupNotCompletedException;
 import com.senity.waved.domain.challengeGroup.repository.ChallengeGroupRepository;
 import com.senity.waved.domain.member.entity.Member;
 import com.senity.waved.domain.member.exception.MemberNotFoundException;
@@ -20,8 +19,6 @@ import com.senity.waved.domain.review.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.ZonedDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -108,9 +105,10 @@ public class ReviewServiceImpl implements ReviewService {
         ChallengeGroup group = challengeGroupRepository.findById(id)
                 .orElseThrow(() -> new MyChallengeNotFoundException("해당 챌린지 그룹을 찾을 수 없습니다."));
 
+        /* 테스트용 미종료 챌린지 리뷰 작성 허용
         if (group.getEndDate().isAfter(ZonedDateTime.now())) {
             throw new ChallengeGroupNotCompletedException("종료된 챌린지 그룹에 대해서만 리뷰 작성 가능합니다.");
-        }
+        } */
 
         return group;
     }
