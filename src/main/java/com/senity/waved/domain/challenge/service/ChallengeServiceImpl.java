@@ -82,11 +82,12 @@ public class ChallengeServiceImpl implements ChallengeService {
             if (latestGroup.getStartDate().plusHours(9).equals(ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS))) {
                 Long lastGroupIndex = latestGroupIndex - 1;
                 ChallengeGroup lastGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);
-                String endMessage = String.format("%s %d기가 종료되었습니다. 환급 신청해주세요.", challenge.getTitle(), lastGroupIndex);
-                notifyMembersAppliedGroup(lastGroup.getId(), "챌린지 종료 알림", endMessage);
 
-                String startMessage = String.format("%s %d기가 오늘부터 시작됩니다.", challenge.getTitle(), latestGroupIndex);
-                notifyMembersAppliedGroup(latestGroup.getId(), "챌린지 시작 알림", startMessage);
+                String endMessage = String.format("%s %d기가 \r\n종료되었습니다. 진행 완료 챌린지 내역에서 \r\n성공 여부를 확인하고 환급 신청해주세요.", challenge.getTitle(), lastGroupIndex);
+                notifyMembersAppliedGroup(lastGroup.getId(), "챌린지 종료", endMessage);
+
+                String startMessage = String.format("%s %d기가 \r\n오늘부터 시작됩니다.", challenge.getTitle(), latestGroupIndex);
+                notifyMembersAppliedGroup(latestGroup.getId(), "챌린지 시작", startMessage);
 
                 ChallengeGroup newGroup = ChallengeGroup.from(latestGroup, challenge);
                 challengeGroupRepository.save(newGroup);
