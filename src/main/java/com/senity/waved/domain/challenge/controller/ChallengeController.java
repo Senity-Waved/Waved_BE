@@ -23,11 +23,6 @@ public class ChallengeController {
         return challengeService.getHomeChallengeGroupsListed();
     }
 
-    @GetMapping("/{challengeId}/exampleImage")
-    public String getVerificationExampleImageUrl(@PathVariable("challengeId") Long challengeId) {
-        return challengeService.getExampleImageUrl(challengeId);
-    }
-
     @GetMapping("/{challengeId}/reviews")
     public Page<ChallengeReviewResponseDto> getReviews(
             @PathVariable("challengeId") Long challengeId,
