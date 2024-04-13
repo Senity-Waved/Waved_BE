@@ -20,6 +20,7 @@ public class ChallengeGroupHomeResponseDto {
     private Boolean isFree;
     private Long participantCount;
     private ZonedDateTime startDate;
+    private ZonedDateTime endDate;
     private Long challengeGroupId;  // group 상세페이지 호출을 위한 id값
     private String imageUrl;
 
@@ -30,6 +31,7 @@ public class ChallengeGroupHomeResponseDto {
                 .isFree(challenge.getIsFree())
                 .participantCount(group.getParticipantCount())
                 .startDate(group.getStartDate().plusHours(9))
+                .endDate(group.getEndDate().plusHours(9))
                 .challengeGroupId(group.getId())
                 .imageUrl(challenge.getImageUrl())
                 .build();
