@@ -24,7 +24,7 @@ public class MyChallengeCompletedDto extends MyChallengeResponseDto {
     public static MyChallengeCompletedDto of(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge) {
         long days = ChronoUnit.DAYS.between(group.getStartDate(), group.getEndDate());
         int successCount = days > 10 ? 10 : 5;
-        Boolean isSuccessed = myChallenge.getSuccessCount() > successCount ? true : false;
+        Boolean isSuccessed = myChallenge.getSuccessCount() < successCount ? false : true;
         return MyChallengeCompletedDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate().plusHours(9))
