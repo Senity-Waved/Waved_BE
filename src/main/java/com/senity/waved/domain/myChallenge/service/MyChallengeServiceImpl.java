@@ -54,7 +54,8 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     public List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status) {
         Member member = getMemberByEmail(email);
         List<MyChallenge> myChallengesListed;
-        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS).minusHours(9);
+//        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS).minusHours(9);
+        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS);
 
         switch (status) {
             case PROGRESS:
