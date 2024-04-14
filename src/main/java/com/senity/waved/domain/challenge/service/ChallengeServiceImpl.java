@@ -70,15 +70,18 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     // @Scheduled(fixedDelay = 10000)
-    @Scheduled(cron = "0 0 20 * * SUN") // 매주 월요일 5시, 배포 서버: 일요일 20시
+    // @Scheduled(cron = "0 0 20 * * SUN") // 매주 월요일 5시, 배포 서버: 일요일 20시
+    @Scheduled(cron = "0 48 20 * * SUN")
     public void makeChallengeGroupAndDoNotificationScheduled() {
         List<Challenge> challengeList = challengeRepository.findAll();
 
         for (Challenge challenge : challengeList) {
             Long latestGroupIndex = challenge.getLatestGroupIndex();
             ChallengeGroup latestGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), latestGroupIndex);
+            log.error("-------------------------------- startdate " + latestGroup.getStartDate());
+            log.error("-------------------------------- now " + ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS));
 
-            if (latestGroup.getStartDate().plusHours(9).equals(ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS))) {
+            if (latestGroup.getStartDate().equals(ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS))) {
 
                 Long lastGroupIndex = latestGroupIndex - 1;
                 ChallengeGroup lastGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);
@@ -97,7 +100,6 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Transactional
-    // @Scheduled(fixedDelay = 10000)
     @Scheduled(cron = "0 0 18 * * SUN")
     public void deleteOldNotifications() {
         ZonedDateTime deleteBefore = ZonedDateTime.now().toLocalDate().minusDays(14).atStartOfDay(ZoneId.systemDefault());
