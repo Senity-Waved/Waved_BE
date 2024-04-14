@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +54,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     public List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status) {
         Member member = getMemberByEmail(email);
         List<MyChallenge> myChallengesListed;
-        ZonedDateTime todayStart = ZonedDateTime.now().toLocalDate().atStartOfDay(ZoneId.systemDefault());
+        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS).minusHours(9);
 
         switch (status) {
             case PROGRESS:
