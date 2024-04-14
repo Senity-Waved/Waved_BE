@@ -83,8 +83,8 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         String message = myChallenge.getSuccessCount() < successCount ?
                 "챌린지 성공률을 달성하지 못해 예치금을 환급받지 못했습니다." : "챌린지 성공률을 달성해 예치금을 환급받았습니다.";
 
-        if (status == PaymentStatus.SUCCESS) {
-            cancelChallengePayment(email, myChallengeId);
+        if (status == PaymentStatus.SUCCESS && myChallenge.getDeposit() != 0) {
+            cancelImportPayment(String.valueOf(myChallenge.getImpUid()));
         }
 
         savePaymentRecord(myChallenge, member.getId(), status);
