@@ -87,6 +87,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
             cancelImportPayment(String.valueOf(myChallenge.getImpUid()));
         }
 
+        myChallenge.updateIsRefundRequested();
         savePaymentRecord(myChallenge, member.getId(), status);
         return message;
     }
