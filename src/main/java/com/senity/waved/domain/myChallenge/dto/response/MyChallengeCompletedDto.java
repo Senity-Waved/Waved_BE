@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.time.temporal.ChronoUnit;
+
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,7 +22,9 @@ public class MyChallengeCompletedDto extends MyChallengeResponseDto {
     private Long myChallengeId;
 
     public static MyChallengeCompletedDto of(MyChallenge myChallenge, ChallengeGroup group, Challenge challenge) {
-        Boolean isSuccessed = myChallenge.getSuccessCount() > 10 ? true : false;
+        long days = ChronoUnit.DAYS.between(group.getStartDate(), group.getEndDate());
+        int successCount = days > 10 ? 10 : 5;
+        Boolean isSuccessed = myChallenge.getSuccessCount() > successCount ? true : false;
         return MyChallengeCompletedDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .startDate(group.getStartDate().plusHours(9))

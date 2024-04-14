@@ -57,7 +57,6 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         Member member = getMemberByEmail(email);
         List<MyChallenge> myChallengesListed;
         ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS).plusHours(9);
-        log.info("----------------------------- todayStart : " + todayStart);
 
         switch (status) {
             case PROGRESS:

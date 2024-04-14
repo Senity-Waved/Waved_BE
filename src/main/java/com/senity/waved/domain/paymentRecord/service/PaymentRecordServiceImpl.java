@@ -75,7 +75,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
 
         long days = ChronoUnit.DAYS.between(group.getStartDate(), group.getEndDate());
-        int successCount = (int) (days * 0.8);
+        int successCount = days > 10 ? 10 : 5;
 
         PaymentStatus status = myChallenge.getSuccessCount() < successCount ?
                 PaymentStatus.FAIL : PaymentStatus.SUCCESS;
