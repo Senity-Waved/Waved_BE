@@ -70,7 +70,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     // @Scheduled(fixedDelay = 10000)
-    @Scheduled(cron = "0 0 19 * * SUN") // 매주 월요일 4시, 베포 서버: 일요일 19시
+    @Scheduled(cron = "0 0 20 * * SUN") // 매주 월요일 5시, 배포 서버: 일요일 20시
     public void makeChallengeGroupAndDoNotificationScheduled() {
         List<Challenge> challengeList = challengeRepository.findAll();
 
@@ -78,7 +78,8 @@ public class ChallengeServiceImpl implements ChallengeService {
             Long latestGroupIndex = challenge.getLatestGroupIndex();
             ChallengeGroup latestGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), latestGroupIndex);
 
-            if (latestGroup.getStartDate().plusHours(9).equals(ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS))) {
+            if (latestGroup.getStartDate().plusHours(9).equals(ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS))) {
+
                 Long lastGroupIndex = latestGroupIndex - 1;
                 ChallengeGroup lastGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);
 
