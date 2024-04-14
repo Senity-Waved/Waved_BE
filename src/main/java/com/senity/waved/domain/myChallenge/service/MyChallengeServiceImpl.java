@@ -20,6 +20,7 @@ import com.senity.waved.domain.myChallenge.exception.MyChallengeNotFoundExceptio
 import com.senity.waved.domain.myChallenge.repository.MyChallengeRepository;
 import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatchException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -54,8 +56,8 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     public List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status) {
         Member member = getMemberByEmail(email);
         List<MyChallenge> myChallengesListed;
-//        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS).minusHours(9);
-        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS).minusHours(9);
+        log.info("----------------------------- todayStart : " + todayStart.truncatedTo(ChronoUnit.DAYS).minusHours(9));
 
         switch (status) {
             case PROGRESS:
