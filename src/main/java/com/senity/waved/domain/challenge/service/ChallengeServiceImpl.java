@@ -69,9 +69,9 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 45 11 * * SUN")
+    @Scheduled(cron = "0 50 11 * * SUN")
     public void schedulingTest1() {
-        log.error("0 45 11 * * SUN");
+        log.error("0 50 11 * * SUN");
         log.error("----------------------------------------------------------------------");
         log.error("----------------------------------------------------------------------");
         log.error("----------------------------------------------------------------------");
@@ -85,9 +85,9 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 45 20 * * SUN")
+    @Scheduled(cron = "0 50 20 * * SUN")
     public void schedulingTest2() {
-        log.error("0 45 20 * * SUN");
+        log.error("0 50 20 * * SUN");
         log.error("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         log.error("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
         log.error("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
