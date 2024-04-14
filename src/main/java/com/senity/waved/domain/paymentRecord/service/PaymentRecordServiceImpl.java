@@ -109,7 +109,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     }
 
     private void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
-        checkIfPaymentRecordExist(memberId, myChallenge.getId(), PaymentStatus.APPLIED);
+        checkIfPaymentRecordExist(memberId, myChallenge.getId(), status);
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
 
         String groupTitle = group.getGroupTitle();
