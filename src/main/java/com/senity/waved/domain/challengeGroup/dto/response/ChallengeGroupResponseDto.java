@@ -31,6 +31,7 @@ public class ChallengeGroupResponseDto {
     private Long myChallengeId;
 
     public static ChallengeGroupResponseDto of(ChallengeGroup group, Challenge challenge, Long myChallengeId) {
+        String imageUrl = String.format("https://wavedstorage.blob.core.windows.net/blob/%s_.png", challenge.getImageUrl());
         Boolean isApplied = myChallengeId > 0;
         return ChallengeGroupResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
@@ -44,7 +45,7 @@ public class ChallengeGroupResponseDto {
                 .isFree(challenge.getIsFree())
                 .myChallengeId(myChallengeId)
                 .challengeId(challenge.getId())
-                .imageUrl(challenge.getImageUrl())
+                .imageUrl(imageUrl)
                 .build();
     }
 }

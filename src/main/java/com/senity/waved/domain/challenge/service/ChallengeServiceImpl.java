@@ -70,7 +70,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     // @Scheduled(fixedDelay = 10000) // 10초 단위 (테스트용)
-    @Scheduled(cron = "0 0 4 * * WED") // 매주 수요일 4시 메서드 호출 (테스트용)
+    @Scheduled(cron = "0 0 4 * * MON") // 매주 월요일 4시 메서드 호출
     public void makeChallengeGroupAndDoNotificationScheduled() {
         List<Challenge> challengeList = challengeRepository.findAll();
 
@@ -97,7 +97,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     // @Scheduled(fixedDelay = 10000)
-    @Scheduled(cron = "0 0 3 * * WED")
+    @Scheduled(cron = "0 0 3 * * MON")
     public void deleteOldNotifications() {
         ZonedDateTime deleteBefore = ZonedDateTime.now().toLocalDate().minusDays(14).atStartOfDay(ZoneId.systemDefault());
         notificationRepository.deleteNotificationsByCreateDate(deleteBefore);
