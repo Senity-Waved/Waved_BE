@@ -49,7 +49,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
             throw new DepositAmountNotMatchException("마이 챌린지의 예치금과 결제 금액이 일치하지 않습니다.");
         }
         savePaymentRecord(myChallenge, member.getId(), PaymentStatus.APPLIED);
-
         myChallenge.updateImpUid(requestDto.getImp_uid());
         myChallenge.updateIsPaid(true);
         myChallengeRepository.save(myChallenge);
@@ -111,9 +110,8 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     private void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
         checkIfPaymentRecordExist(memberId, myChallenge.getId(), status);
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
-
         String groupTitle = group.getGroupTitle();
-        group.addParticipantCount();
+        updateGroupParticipantCount(group, status);
 
         PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
         paymentRecordRepository.save(paymentRecord);
@@ -137,5 +135,13 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     private void validateMember(Member member, MyChallenge myChallenge) {
         if(!myChallenge.getMemberId().equals(member.getId()))
             throw new MemberAndMyChallengeNotMatchException("해당 멤버의 마이 챌린지가 아닙니다.");
+    }
+
+    private void updateGroupParticipantCount(ChallengeGroup group, PaymentStatus status) {
+        if (status.equals(PaymentStatus.APPLIED)) {
+            group.addParticipantCount();
+        } else if (status.equals(PaymentStatus.CANCELED)) {
+            group.subtractParticipantCount();
+        }
     }
 }
