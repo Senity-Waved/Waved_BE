@@ -41,7 +41,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private Member createNewMember(String email, String nickname) {
         AuthLevel authLevel = AuthLevel.MEMBER;
         List<String> adminMembers = Arrays.asList(
-                "waved7777@gmail.com", "imholy96@gmail.com", "vywns9978@gmail.com", "waved8888@gmail.com", "fetest1228@gmail.com"
+                "waved7777@gmail.com", "imholy96@gmail.com", "vywns9978@gmail.com", "waved8888@gmail.com", "fetest1228@gmail.com", "dudtjq1407@gmail.com", "gyubi210@gmail.com"
         );
 
         if (adminMembers.contains(email)) {

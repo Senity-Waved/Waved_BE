@@ -25,6 +25,7 @@ public class ChallengeGroupHomeResponseDto {
     private String imageUrl;
 
     public static ChallengeGroupHomeResponseDto of(ChallengeGroup group, Challenge challenge) {
+        String imageUrl = String.format("https://wavedstorage.blob.core.windows.net/blob/%s_home.png", challenge.getImageUrl());
         return ChallengeGroupHomeResponseDto.builder()
                 .groupTitle(group.getGroupTitle())
                 .verificationType(challenge.getVerificationType())
@@ -33,7 +34,7 @@ public class ChallengeGroupHomeResponseDto {
                 .startDate(group.getStartDate().plusHours(9))
                 .endDate(group.getEndDate().plusHours(9))
                 .challengeGroupId(group.getId())
-                .imageUrl(challenge.getImageUrl())
+                .imageUrl(imageUrl)
                 .build();
     }
 }
