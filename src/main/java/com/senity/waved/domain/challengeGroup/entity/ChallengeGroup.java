@@ -35,9 +35,13 @@ public class ChallengeGroup extends BaseEntity {
     @Column(name = "challenge_id")
     private Long challengeId;
 
-    public void updateGroupParticipantCount(Long change) {
-        if (participantCount + change >= 0) {
-            participantCount += change;
+    public void addParticipantCount() {
+        participantCount++;
+    }
+
+    public void subtractParticipantCount() {
+        if (participantCount > 0) {
+            participantCount--;
         }
     }
 

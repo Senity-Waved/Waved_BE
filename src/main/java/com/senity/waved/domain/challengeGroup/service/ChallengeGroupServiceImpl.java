@@ -184,7 +184,7 @@ public class ChallengeGroupServiceImpl implements ChallengeGroupService {
     private void savePaymentRecordWhenDepositZero(MyChallenge myChallenge, Long memberId, ChallengeGroup group) {
         if (myChallenge.getDeposit() == 0) {
             String groupTitle = group.getGroupTitle();
-            group.updateGroupParticipantCount(1L);
+            group.addParticipantCount();
 
             PaymentRecord paymentRecord = PaymentRecord.of(PaymentStatus.APPLIED, memberId, myChallenge, groupTitle);
             paymentRecordRepository.save(paymentRecord);

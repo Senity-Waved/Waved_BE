@@ -113,7 +113,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
 
         String groupTitle = group.getGroupTitle();
-        group.updateGroupParticipantCount(1L);
+        group.addParticipantCount();
 
         PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
         paymentRecordRepository.save(paymentRecord);
