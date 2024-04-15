@@ -49,7 +49,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     @Transactional(readOnly = true)
     public List<AdminChallengeGroupResponseDto> getGroups() {
-        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS).minusHours(9);
+        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
         List<ChallengeGroup> groups = groupRepository.findChallengeGroupsInProgress(todayStart);
 
         return groups.stream()
@@ -148,7 +148,7 @@ public class AdminServiceImpl implements AdminService {
 
     private void createCanceledVerificationNotification(Verification verification, String groupTitle, Long memberId) {
         int month = verification.getCreateDate().getMonthValue();
-        int day = verification.getCreateDate().plusHours(9).getDayOfMonth();
+        int day = verification.getCreateDate().getDayOfMonth();
         String message = String.format("%s의 \r\n%d월 %d일 인증이 취소되었습니다.", groupTitle, month, day);
 
         Notification newNotification = Notification.of(memberId, "인증 취소", message);

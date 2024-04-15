@@ -9,6 +9,5 @@ import java.util.Optional;
 public interface LikedRepository extends JpaRepository<Liked, Long> {
     boolean existsByMemberIdAndVerification(Long memberId, Verification verification);
     Long countLikesByVerification(Verification verification);
-
     Optional<Liked> findByMemberIdAndVerification(Long memberId, Verification verification);
 }

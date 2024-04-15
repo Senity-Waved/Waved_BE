@@ -27,8 +27,8 @@ public class MyChallengeCompletedDto extends MyChallengeResponseDto {
         Boolean isSuccessed = myChallenge.getSuccessCount() < successCount ? false : true;
         return MyChallengeCompletedDto.builder()
                 .groupTitle(group.getGroupTitle())
-                .startDate(group.getStartDate().plusHours(9))
-                .endDate(group.getEndDate().plusHours(9))
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
                 .deposit(myChallenge.getDeposit())
                 .challengeGroupId(group.getId())
                 .myChallengeId(myChallenge.getId())

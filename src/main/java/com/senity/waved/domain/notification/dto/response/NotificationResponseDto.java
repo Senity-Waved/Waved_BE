@@ -22,7 +22,7 @@ public class NotificationResponseDto {
                 .notificationId(notification.getId())
                 .title(notification.getTitle())
                 .message(notification.getMessage())
-                .createDate(notification.getCreateDate().plusHours(9))
+                .createDate(notification.getCreateDate())
                 .build();
     }
 }

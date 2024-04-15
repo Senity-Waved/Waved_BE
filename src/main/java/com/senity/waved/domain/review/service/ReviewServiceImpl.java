@@ -109,7 +109,6 @@ public class ReviewServiceImpl implements ReviewService {
         if (group.getEndDate().isAfter(ZonedDateTime.now())) {
             throw new ChallengeGroupNotCompletedException("종료된 챌린지 그룹에 대해서만 리뷰 작성 가능합니다.");
         } */
-
         return group;
     }
 }

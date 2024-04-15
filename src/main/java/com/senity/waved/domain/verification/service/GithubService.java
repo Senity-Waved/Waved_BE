@@ -20,7 +20,7 @@ public class GithubService {
 
     public boolean hasCommitsToday(String githubId, String token) throws IOException {
         GHCommit commits = githubApi.getCommits(githubId, token);
-        ZonedDateTime commitDate = commits.getCommitDate().toInstant().atZone(ZoneId.of("GMT")).plusHours(9).truncatedTo(ChronoUnit.DAYS);
-        return commitDate.equals(ZonedDateTime.now(ZoneId.of("GMT")).plusHours(9).truncatedTo(ChronoUnit.DAYS));
+        ZonedDateTime commitDate = commits.getCommitDate().toInstant().atZone(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
+        return commitDate.equals(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS));
     }
 }
