@@ -32,9 +32,34 @@ public class QuizServiceImpl implements QuizService {
 
         Quiz quiz = findQuizByDate(challengeGroupId, today);
 
+
         ZonedDateTime plusDate = quiz.getDate();
+
+        log.info("++++++++++++++++++ todayQuiz&Zoned : " + today.truncatedTo(ChronoUnit.DAYS));
+        log.info("++++++++++++++++++ todayQuiz&local : " + today.toLocalDate());
+
+
+        log.error("----------------------------------------------------------------------");
+        log.error("----------------------------------------------------------------------");
+        log.error("----------------------------------------------------------------------");
+        log.error("----------------------------------------------------------------------");
+        log.error("----------------------------------------------------------------------");
+        log.error("----------------------------------------------------------------------");
+        log.error("----------------------------------------------------------------------");
+        log.error("----------------------------------------------------------------------");
+        log.error("----------------------------------------------------------------------");
         log.info("_____________________ todayQuiz : " + today);
         log.info("_____________________ Quizdate  : " + plusDate);
+        log.info("______________ todayQuiz zoneId : " + today.getZone());
+        log.info("______________ Quizdate zoneId  : " + plusDate.getZone());
+
+        ZonedDateTime today2 = ZonedDateTime.now(plusDate.getZone()).truncatedTo(ChronoUnit.DAYS);
+        Quiz quiz2 = findQuizByDate(challengeGroupId, today2);
+        if(today2.equals(quiz2.getDate())) {
+            log.error("--------------------------- today.equals(quiz.getDate()) SUCCESS!!");
+        }
+
+
         return new QuizResponseDto(plusDate, quiz.getQuestion());
     }
 
