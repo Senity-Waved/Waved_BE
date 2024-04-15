@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.ColumnDefault;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
@@ -91,7 +92,7 @@ public class MyChallenge extends BaseEntity {
     }
 
     public boolean isVerified() {
-        ZonedDateTime currentDate = ZonedDateTime.now();
+        ZonedDateTime currentDate = ZonedDateTime.now(ZoneId.systemDefault());
         ZonedDateTime startDate = getStartDate();
         long daysFromStart = ChronoUnit.DAYS.between(startDate, currentDate);
 

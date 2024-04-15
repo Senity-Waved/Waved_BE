@@ -20,8 +20,8 @@ public class TextVerificationResponseDto extends VerificationResponseDto {
     public static TextVerificationResponseDto of(Verification verification, Member member, boolean isLiked) {
         ZonedDateTime verificationDate = null;
         if (verification.getCreateDate() != null) {
-            LocalDateTime localDateTime = verification.getCreateDate().toLocalDateTime().plusHours(9);
-            verificationDate = ZonedDateTime.of(localDateTime, ZoneId.of("Asia/Seoul"));
+            LocalDateTime localDateTime = verification.getCreateDate().toLocalDateTime();
+            verificationDate = ZonedDateTime.of(localDateTime, ZoneId.systemDefault());
         }
 
         return TextVerificationResponseDto.builder()

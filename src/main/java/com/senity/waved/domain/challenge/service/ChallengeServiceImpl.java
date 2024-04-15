@@ -70,7 +70,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     // @Scheduled(fixedDelay = 10000)
-    @Scheduled(cron = "0 0 16 * * SUN") // 매주 월요일 1시, 배포 서버 일요일 16시
+    @Scheduled(cron = "0 0 1 * * MON") // 매주 월요일 1시
     public void makeChallengeGroupAndDoNotificationScheduled() {
         List<Challenge> challengeList = challengeRepository.findAll();
 
@@ -78,7 +78,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             Long latestGroupIndex = challenge.getLatestGroupIndex();
             ChallengeGroup latestGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), latestGroupIndex);
 
-            if (latestGroup.getStartDate().plusHours(9).equals(ZonedDateTime.now(ZoneId.of("GMT")).plusHours(9).truncatedTo(ChronoUnit.DAYS))) {
+            if (latestGroup.getStartDate().equals(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS))) {
 
                 Long lastGroupIndex = latestGroupIndex - 1;
                 ChallengeGroup lastGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);
@@ -97,7 +97,7 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 17 * * SUN")
+    @Scheduled(cron = "0 0 2 * * MON")
     public void deleteOldNotifications() {
         ZonedDateTime deleteBefore = ZonedDateTime.now().toLocalDate().minusDays(14).atStartOfDay(ZoneId.systemDefault());
         notificationRepository.deleteNotificationsByCreateDate(deleteBefore);

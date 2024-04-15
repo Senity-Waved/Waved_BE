@@ -19,13 +19,16 @@ import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
 import com.siot.IamportRestClient.request.CancelData;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
-
+@Slf4j
 @Service
 @AllArgsConstructor
 public class PaymentRecordServiceImpl implements PaymentRecordService {
@@ -59,6 +62,10 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     public void cancelChallengePayment(String email, Long myChallengeId) {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
+
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
+        log.info("----------------------------- now : " + now);
+        log.info("-------- challengeGroup startDate : " + myChallenge.getStartDate());
 
         validateMember(member, myChallenge);
         cancelImportPayment(String.valueOf(myChallenge.getImpUid()));

@@ -23,7 +23,7 @@ public class PaymentRecordResponseDto {
                 .groupTitle(paymentRecord.getGroupTitle())
                 .status(paymentRecord.getPaymentStatus())
                 .deposit(paymentRecord.getDeposit())
-                .createDate(paymentRecord.getCreateDate().plusHours(9))
+                .createDate(paymentRecord.getCreateDate())
                 .build();
     }
 }

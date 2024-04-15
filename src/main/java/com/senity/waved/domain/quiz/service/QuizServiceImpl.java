@@ -27,21 +27,21 @@ public class QuizServiceImpl implements QuizService {
     @Override
     public QuizResponseDto getTodaysQuiz(Long challengeGroupId) {
         verificationService.IsChallengeGroupTextType(challengeGroupId);
-        ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime today = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
         Quiz quiz = findQuizByDate(challengeGroupId, today);
 
-        ZonedDateTime plusDate = quiz.getDate().plusHours(9);
+        ZonedDateTime plusDate = quiz.getDate();
         return new QuizResponseDto(plusDate, quiz.getQuestion());
     }
 
     @Override
     public QuizResponseDto getQuizByDate(Long challengeGroupId, Timestamp requestedQuizDate) {
         ZonedDateTime quizDate = requestedQuizDate.toInstant().atZone(ZoneId.systemDefault())
-                .withZoneSameInstant(ZoneId.of("Asia/Seoul")).truncatedTo(ChronoUnit.DAYS);
+                .withZoneSameInstant(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
         verificationService.IsChallengeGroupTextType(challengeGroupId);
         Quiz quiz = findQuizByDate(challengeGroupId, quizDate);
 
-        ZonedDateTime plusDate = quiz.getDate().plusHours(9);
+        ZonedDateTime plusDate = quiz.getDate();
         return new QuizResponseDto(plusDate, quiz.getQuestion());
     }
 

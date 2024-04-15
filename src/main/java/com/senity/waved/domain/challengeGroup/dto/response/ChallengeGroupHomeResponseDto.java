@@ -31,8 +31,8 @@ public class ChallengeGroupHomeResponseDto {
                 .verificationType(challenge.getVerificationType())
                 .isFree(challenge.getIsFree())
                 .participantCount(group.getParticipantCount())
-                .startDate(group.getStartDate().plusHours(9))
-                .endDate(group.getEndDate().plusHours(9))
+                .startDate(group.getStartDate())
+                .endDate(group.getEndDate())
                 .challengeGroupId(group.getId())
                 .imageUrl(imageUrl)
                 .build();
