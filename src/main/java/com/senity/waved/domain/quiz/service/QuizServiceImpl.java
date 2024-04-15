@@ -28,33 +28,9 @@ public class QuizServiceImpl implements QuizService {
     public QuizResponseDto getTodaysQuiz(Long challengeGroupId) {
         verificationService.IsChallengeGroupTextType(challengeGroupId);
 
-        ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Z")).truncatedTo(ChronoUnit.DAYS);
-
-        // Quiz quiz = findQuizByDate(challengeGroupId, today);
-        Quiz quiz = quizRepository.findById(9L).orElseThrow(() -> new QuizNotFoundException("웅앵웅"));
+        ZonedDateTime today = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
+        Quiz quiz = findQuizByDate(challengeGroupId, today);
         ZonedDateTime plusDate = quiz.getDate();
-
-        log.error("----------------------------------------------------------------------");
-        log.error("----------------------------------------------------------------------");
-        log.error("----------------------------------------------------------------------");
-        log.error("----------------------------------------------------------------------");
-        log.error("----------------------------------------------------------------------");
-        log.error("----------------------------------------------------------------------");
-        log.error("----------------------------------------------------------------------");
-        log.error("----------------------------------------------------------------------");
-        log.error("----------------------------------------------------------------------");
-        log.info("_____________________ todayQuiz : " + today);
-        log.info("______________ today system def : " + ZonedDateTime.now(ZoneId.systemDefault()));
-        log.info("_____________________ Quizdate  : " + plusDate);
-        log.info("______________ todayQuiz zoneId : " + today.getZone());
-        log.info("______________ Quizdate zoneId  : " + plusDate.getZone());
-
-        ZonedDateTime today2 = ZonedDateTime.now(plusDate.getZone()).truncatedTo(ChronoUnit.DAYS);
-        Quiz quiz2 = findQuizByDate(challengeGroupId, today2);
-        if(today2.equals(quiz2.getDate())) {
-            log.error("--------------------------- today.equals(quiz.getDate()) SUCCESS!!");
-        }
-
 
         return new QuizResponseDto(plusDate, quiz.getQuestion());
     }
@@ -62,8 +38,8 @@ public class QuizServiceImpl implements QuizService {
     @Override
     public QuizResponseDto getQuizByDate(Long challengeGroupId, Timestamp requestedQuizDate) {
 
-        ZonedDateTime quizDate = requestedQuizDate.toInstant().atZone(ZoneId.of("Z"))
-                .withZoneSameInstant(ZoneId.of("Z")).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime quizDate = requestedQuizDate.toInstant().atZone(ZoneId.systemDefault())
+                .withZoneSameInstant(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
 
         verificationService.IsChallengeGroupTextType(challengeGroupId);
         Quiz quiz = findQuizByDate(challengeGroupId, quizDate);
