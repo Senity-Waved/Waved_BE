@@ -30,14 +30,9 @@ public class QuizServiceImpl implements QuizService {
 
         ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Z")).truncatedTo(ChronoUnit.DAYS);
 
-        //Quiz quiz = findQuizByDate(challengeGroupId, today);
+        // Quiz quiz = findQuizByDate(challengeGroupId, today);
         Quiz quiz = quizRepository.findById(9L).orElseThrow(() -> new QuizNotFoundException("웅앵웅"));
         ZonedDateTime plusDate = quiz.getDate();
-
-
-        log.info("++++++++++++++++++ todayQuiz&Zoned : " + today.truncatedTo(ChronoUnit.DAYS));
-        log.info("++++++++++++++++++ todayQuiz&local : " + today.toLocalDate());
-
 
         log.error("----------------------------------------------------------------------");
         log.error("----------------------------------------------------------------------");
@@ -49,6 +44,7 @@ public class QuizServiceImpl implements QuizService {
         log.error("----------------------------------------------------------------------");
         log.error("----------------------------------------------------------------------");
         log.info("_____________________ todayQuiz : " + today);
+        log.info("______________ today system def : " + ZonedDateTime.now(ZoneId.systemDefault()));
         log.info("_____________________ Quizdate  : " + plusDate);
         log.info("______________ todayQuiz zoneId : " + today.getZone());
         log.info("______________ Quizdate zoneId  : " + plusDate.getZone());
