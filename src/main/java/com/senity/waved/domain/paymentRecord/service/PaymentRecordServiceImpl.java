@@ -61,16 +61,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         Member member = getMemberByEmail(email);
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
 
-//        ZonedDateTime now = ZonedDateTime.now(ZoneId.systemDefault());
-//        log.info("----------------------------- now : " + now);
-//        log.info("-------- challengeGroup startDate : " + myChallenge.getStartDate());
-//
-//        ZonedDateTime tmp = ZonedDateTime.now(ZoneId.systemDefault()).plusDays(7).truncatedTo(ChronoUnit.DAYS);
-//        ZonedDateTime tmp2 = ZonedDateTime.of(LocalDateTime.from(myChallenge.getStartDate()), ZoneId.of("Asia/Seoul"));
-//        if(tmp.equals(tmp2)) {
-//            log.info("------------------------ now & startdate(asia/seoul 설정) 비교 O");
-//        }
-
         validateMember(member, myChallenge);
         cancelImportPayment(String.valueOf(myChallenge.getImpUid()));
 
