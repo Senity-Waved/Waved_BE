@@ -23,6 +23,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
@@ -77,8 +78,9 @@ public class ChallengeServiceImpl implements ChallengeService {
         for (Challenge challenge : challengeList) {
             Long latestGroupIndex = challenge.getLatestGroupIndex();
             ChallengeGroup latestGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), latestGroupIndex);
+            ZonedDateTime startDate = ZonedDateTime.of(LocalDateTime.from(latestGroup.getStartDate()), ZoneId.of("Asia/Seoul"));
 
-            if (latestGroup.getStartDate().equals(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS))) {
+            if (startDate.equals(ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS))) {
 
                 Long lastGroupIndex = latestGroupIndex - 1;
                 ChallengeGroup lastGroup = getGroupByChallengeIdAndGroupIndex(challenge.getId(), lastGroupIndex);

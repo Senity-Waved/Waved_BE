@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 public class MyVerifsResponseDto {
+
     private int[] myVerifs;
     private String groupTitle;
     private ZonedDateTime startDate;

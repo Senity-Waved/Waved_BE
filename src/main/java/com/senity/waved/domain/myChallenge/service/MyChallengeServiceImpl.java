@@ -47,6 +47,8 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         MyChallenge myChallenge = getMyChallengeById(myChallengeId);
         ChallengeGroup group = getChallengeGroupById(myChallenge.getChallengeGroupId());
 
+
+
         validateMember(member, myChallenge);
         group.subtractParticipantCount();
         myChallengeRepository.delete(myChallenge);
@@ -70,6 +72,11 @@ public class MyChallengeServiceImpl implements MyChallengeService {
                 break;
             default:
                 throw new InvalidChallengeStatusException("유효하지 않은 챌린지 상태 입니다.");
+        }
+
+        log.error("--------------------------todayStart : " + todayStart);
+        if(!myChallengesListed.isEmpty()) {
+            log.error("---------------myChallenge startDate : " + myChallengesListed.get(0).getStartDate());
         }
 
         return myChallengesListed.stream()

@@ -15,6 +15,7 @@ import java.time.temporal.ChronoUnit;
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MyChallengeCompletedDto extends MyChallengeResponseDto {
+
     private Boolean isReviewed;
     private Boolean isRefundRequested;
     private Boolean isSuccessed;
