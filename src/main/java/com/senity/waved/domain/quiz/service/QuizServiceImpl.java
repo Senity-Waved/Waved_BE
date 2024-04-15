@@ -40,8 +40,10 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public QuizResponseDto getQuizByDate(Long challengeGroupId, Timestamp requestedQuizDate) {
-        ZonedDateTime quizDate = requestedQuizDate.toInstant().atZone(ZoneId.systemDefault())
-                .withZoneSameInstant(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
+
+        ZonedDateTime quizDate = requestedQuizDate.toInstant().atZone(ZoneId.of("Z"))
+                .withZoneSameInstant(ZoneId.of("Z")).truncatedTo(ChronoUnit.DAYS);
+
         verificationService.IsChallengeGroupTextType(challengeGroupId);
         Quiz quiz = findQuizByDate(challengeGroupId, quizDate);
 

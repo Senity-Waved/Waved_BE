@@ -74,14 +74,6 @@ public class MyChallengeServiceImpl implements MyChallengeService {
                 throw new InvalidChallengeStatusException("유효하지 않은 챌린지 상태 입니다.");
         }
 
-        log.error("--------------------------todayStart : " + todayStart);
-        if(!myChallengesListed.isEmpty()) {
-            log.error("---------------myChallenge startDate : " + myChallengesListed.get(0).getStartDate());
-            if(myChallengesListed.get(0).getStartDate().equals(todayStart)) {
-                log.error("------------zonedId Z testing success");
-            }
-        }
-
         return myChallengesListed.stream()
                 .map(myChallenge -> mapToResponseDto(myChallenge, status, member))
                 .collect(Collectors.toList());
