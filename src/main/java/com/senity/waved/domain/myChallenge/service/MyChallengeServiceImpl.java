@@ -58,7 +58,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     public List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status) {
         Member member = getMemberByEmail(email);
         List<MyChallenge> myChallengesListed;
-        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("UTC")).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("Z")).truncatedTo(ChronoUnit.DAYS);
 
         switch (status) {
             case PROGRESS:
@@ -74,40 +74,11 @@ public class MyChallengeServiceImpl implements MyChallengeService {
                 throw new InvalidChallengeStatusException("유효하지 않은 챌린지 상태 입니다.");
         }
 
-        log.error("++++++++++++++++++++todayStart &zonedate : " + todayStart.truncatedTo(ChronoUnit.DAYS));
-        if (!myChallengesListed.isEmpty()) {
-            log.error("++++++++++++++++++++myChallenge startDate &zonedat : " + myChallengesListed.get(0).getStartDate().truncatedTo(ChronoUnit.DAYS));
-            if (myChallengesListed.get(0).getStartDate().truncatedTo(ChronoUnit.DAYS).equals(todayStart.truncatedTo(ChronoUnit.DAYS))) {
-                log.error("++++++++++++++++++++날짜 비교 테스트 성공 LocalDate &zonedat");
-            }
-        }
-
-
-        log.error("--------------------------todayStart &localdate: " + todayStart.toLocalDate());
-        if (!myChallengesListed.isEmpty()) {
-            log.error("---------------myChallenge startDate &localdate: " + myChallengesListed.get(0).getStartDate().toLocalDate());
-            if (myChallengesListed.get(0).getStartDate().toLocalDate().equals(todayStart.toLocalDate())) {
-                log.error("------------날짜 비교 테스트 성공 UTC &localdate");
-            }
-        }
-
-
-        log.error("-------------------------------------------------------------------------------");
-        log.error("-------------------------------------------------------------------------------");
-        log.error("-------------------------------------------------------------------------------");
-        log.error("-------------------------------------------------------------------------------");
         log.error("--------------------------todayStart : " + todayStart);
         if(!myChallengesListed.isEmpty()) {
             log.error("---------------myChallenge startDate : " + myChallengesListed.get(0).getStartDate());
             if(myChallengesListed.get(0).getStartDate().equals(todayStart)) {
-                log.error("------------날짜 비교 테스트 성공 UTC");
-            }
-
-            ZoneId zone = myChallengesListed.get(0).getStartDate().getZone();
-            log.error("-------------------db zone : " + zone);
-            ZonedDateTime tmp = ZonedDateTime.now(zone).truncatedTo(ChronoUnit.DAYS);
-            if(tmp.equals(myChallengesListed.get(0).getStartDate())) {
-                log.error("------------날짜 비교 테스트 성공 " + zone);
+                log.error("------------zonedId Z testing success");
             }
         }
 

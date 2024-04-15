@@ -28,7 +28,7 @@ public class QuizServiceImpl implements QuizService {
     public QuizResponseDto getTodaysQuiz(Long challengeGroupId) {
         verificationService.IsChallengeGroupTextType(challengeGroupId);
 
-        ZonedDateTime today = ZonedDateTime.now(ZoneId.of("UTC")).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime today = ZonedDateTime.now(ZoneId.of("Z")).truncatedTo(ChronoUnit.DAYS);
 
         Quiz quiz = findQuizByDate(challengeGroupId, today);
 
