@@ -27,10 +27,14 @@ public class QuizServiceImpl implements QuizService {
     @Override
     public QuizResponseDto getTodaysQuiz(Long challengeGroupId) {
         verificationService.IsChallengeGroupTextType(challengeGroupId);
-        ZonedDateTime today = ZonedDateTime.now(ZoneId.systemDefault()).truncatedTo(ChronoUnit.DAYS);
+
+        ZonedDateTime today = ZonedDateTime.now(ZoneId.of("UTC")).truncatedTo(ChronoUnit.DAYS);
+
         Quiz quiz = findQuizByDate(challengeGroupId, today);
 
         ZonedDateTime plusDate = quiz.getDate();
+        log.info("_____________________ todayQuiz : " + today);
+        log.info("_____________________ Quizdate  : " + plusDate);
         return new QuizResponseDto(plusDate, quiz.getQuestion());
     }
 

@@ -58,7 +58,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
     public List<MyChallengeResponseDto> getMyChallengesListed(String email, ChallengeStatus status) {
         Member member = getMemberByEmail(email);
         List<MyChallenge> myChallengesListed;
-        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("GMT")).truncatedTo(ChronoUnit.DAYS);
+        ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("UTC")).truncatedTo(ChronoUnit.DAYS);
 
         switch (status) {
             case PROGRESS:
@@ -78,7 +78,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         if(!myChallengesListed.isEmpty()) {
             log.error("---------------myChallenge startDate : " + myChallengesListed.get(0).getStartDate());
             if(myChallengesListed.get(0).getStartDate().equals(todayStart)) {
-                log.error("------------날짜 비교 테스트 성공 GMT");
+                log.error("------------날짜 비교 테스트 성공 UTC");
             }
         }
 
