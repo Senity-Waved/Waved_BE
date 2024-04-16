@@ -13,6 +13,7 @@ import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import com.senity.waved.domain.paymentRecord.exception.DepositAmountNotMatchException;
 import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatchException;
+import com.senity.waved.domain.paymentRecord.exception.PaymentRecordExistException;
 import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -24,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
+
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -91,13 +94,18 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         return message;
     }
 
+    @Transactional
     public void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
         String groupTitle = group.getGroupTitle();
         updateGroupParticipantCount(group, status);
 
         PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
-        paymentRecordRepository.save(paymentRecord);
+        try {
+            paymentRecordRepository.save(paymentRecord);
+        } catch (Exception e) {
+            throw new PaymentRecordExistException("이미 존재하는 예치금 내역입니다.");
+        }
     }
 
     private void cancelImportPayment(String impUid) {
