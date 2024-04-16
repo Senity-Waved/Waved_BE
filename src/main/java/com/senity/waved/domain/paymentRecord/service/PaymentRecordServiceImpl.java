@@ -20,7 +20,6 @@ import com.siot.IamportRestClient.request.CancelData;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -92,9 +91,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         return message;
     }
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    public synchronized void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
-        // checkIfPaymentRecordExist(memberId, myChallenge.getId(), status);
+    public void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
         String groupTitle = group.getGroupTitle();
         updateGroupParticipantCount(group, status);
@@ -102,13 +99,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
         paymentRecordRepository.save(paymentRecord);
     }
-
-/*    private void checkIfPaymentRecordExist(Long memberId, Long myChallengeId, PaymentStatus paymentStatus) {
-        Optional<PaymentRecord> paymentRecords = paymentRecordRepository.findByMemberIdAndMyChallengeIdAndPaymentStatus(memberId, myChallengeId, paymentStatus);
-        if (paymentRecords.isPresent()) {
-            throw new PaymentRecordExistException("이미 존재하는 결제 내역입니다.");
-        }
-    }*/
 
     private void cancelImportPayment(String impUid) {
         try {

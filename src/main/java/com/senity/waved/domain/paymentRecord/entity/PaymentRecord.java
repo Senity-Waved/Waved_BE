@@ -30,18 +30,6 @@ public class PaymentRecord {
     @Column(name = "group_title")
     private String groupTitle;
 
-/*
-    @Column(name = "member_id")
-    private Long memberId;
-
-    @Column(name = "my_challenge_id")
-    private Long myChallengeId;
-
-    @Column(name="payment_status")
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
-*/
-
     public static PaymentRecord of(PaymentStatus status, Long memberId, MyChallenge myChallenge, String groupTitle) {
         Long deposit = status.equals(PaymentStatus.APPLIED) ?
                 myChallenge.getDeposit() * (-1) : status.equals(PaymentStatus.FAIL) ? 0 : myChallenge.getDeposit();
