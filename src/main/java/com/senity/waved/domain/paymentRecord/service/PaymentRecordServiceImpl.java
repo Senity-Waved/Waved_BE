@@ -21,6 +21,7 @@ import com.siot.IamportRestClient.request.CancelData;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
@@ -93,6 +94,17 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         return message;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
+        checkIfPaymentRecordExist(memberId, myChallenge.getId(), status);
+        ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
+        String groupTitle = group.getGroupTitle();
+        updateGroupParticipantCount(group, status);
+
+        PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
+        paymentRecordRepository.save(paymentRecord);
+    }
+
     private void checkIfPaymentRecordExist(Long memberId, Long myChallengeId, PaymentStatus paymentStatus) {
         Optional<PaymentRecord> paymentRecords = paymentRecordRepository.findByMemberIdAndMyChallengeIdAndPaymentStatus(memberId, myChallengeId, paymentStatus);
         if (paymentRecords.isPresent()) {
@@ -107,16 +119,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         } catch (IamportResponseException | IOException e) {
             throw new RuntimeException("결제 취소 중 오류가 발생했습니다.", e);
         }
-    }
-
-    private void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
-        checkIfPaymentRecordExist(memberId, myChallenge.getId(), status);
-        ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
-        String groupTitle = group.getGroupTitle();
-        updateGroupParticipantCount(group, status);
-
-        PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
-        paymentRecordRepository.save(paymentRecord);
     }
 
     private Member getMemberByEmail(String email) {
