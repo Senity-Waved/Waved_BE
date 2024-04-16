@@ -13,6 +13,7 @@ import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import com.senity.waved.domain.paymentRecord.exception.DepositAmountNotMatchException;
 import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatchException;
+import com.senity.waved.domain.paymentRecord.exception.PaymentRecordExistException;
 import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -20,10 +21,12 @@ import com.siot.IamportRestClient.request.CancelData;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 
 @Slf4j
@@ -93,17 +96,21 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         return message;
     }
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
+        checkIfPaymentRecordExist(memberId, myChallenge.getId(), status);
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
         String groupTitle = group.getGroupTitle();
         updateGroupParticipantCount(group, status);
 
-        try {
-            PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
-            // paymentRecordRepository.save(paymentRecord);
-        } catch (Exception e) {
-            // throw new PaymentRecordExistException("이미 존재하는 예치금 내역입니다.");
-            log.error("------------------- sql exception");
+        PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
+        paymentRecordRepository.save(paymentRecord);
+    }
+
+    private void checkIfPaymentRecordExist(Long memberId, Long myChallengeId, PaymentStatus paymentStatus) {
+        Optional<PaymentRecord> paymentRecords = paymentRecordRepository.findByMemberIdAndMyChallengeIdAndPaymentStatus(memberId, myChallengeId, paymentStatus);
+        if (paymentRecords.isPresent()) {
+            throw new PaymentRecordExistException("이미 존재하는 결제 내역입니다.");
         }
     }
 

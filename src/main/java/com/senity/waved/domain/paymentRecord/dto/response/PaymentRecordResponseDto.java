@@ -1,7 +1,6 @@
 package com.senity.waved.domain.paymentRecord.dto.response;
 
 import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
-import com.senity.waved.domain.paymentRecord.entity.PaymentRecordId;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -21,11 +20,9 @@ public class PaymentRecordResponseDto {
     private ZonedDateTime createDate;
 
     public static PaymentRecordResponseDto from(PaymentRecord paymentRecord) {
-        PaymentRecordId paymentId = paymentRecord.getId();
-
         return PaymentRecordResponseDto.builder()
                 .groupTitle(paymentRecord.getGroupTitle())
-                .status(paymentId.getPaymentStatus())
+                .status(paymentRecord.getPaymentStatus())
                 .deposit(paymentRecord.getDeposit())
                 .createDate(paymentRecord.getCreateDate())
                 .build();
