@@ -100,7 +100,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
 
         try {
             PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
-            paymentRecordRepository.save(paymentRecord);
+            // paymentRecordRepository.save(paymentRecord);
         } catch (Exception e) {
             // throw new PaymentRecordExistException("이미 존재하는 예치금 내역입니다.");
             log.error("------------------- sql exception");
