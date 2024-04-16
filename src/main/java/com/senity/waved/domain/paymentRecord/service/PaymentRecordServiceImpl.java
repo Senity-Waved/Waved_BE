@@ -95,7 +95,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
+    public synchronized void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
         checkIfPaymentRecordExist(memberId, myChallenge.getId(), status);
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
         String groupTitle = group.getGroupTitle();
