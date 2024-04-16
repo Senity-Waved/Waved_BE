@@ -120,7 +120,9 @@ public class MemberServiceImpl implements MemberService {
     public Page<PaymentRecordResponseDto> getMyPaymentRecordsPaged(String email, int pageNumber, int pageSize) {
         Member member = getMemberByEmail(email);
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("createDate").descending());
-        Page<PaymentRecord> paymentRecordPaged = paymentRecordRepository.getPaymentRecordByMemberId(member.getId(), pageable);
+        // Page<PaymentRecord> paymentRecordPaged = paymentRecordRepository.getPaymentRecordByMemberId(member.getId(), pageable);
+
+        Page<PaymentRecord> paymentRecordPaged = paymentRecordRepository.getPaymentRecordByIdMemberIdWithin(member.getId(), pageable);
 
         List<PaymentRecordResponseDto> responseDtoList = getPaymentRecordsListed(paymentRecordPaged);
         return new PageImpl<>(responseDtoList, pageable, paymentRecordPaged.getTotalElements());

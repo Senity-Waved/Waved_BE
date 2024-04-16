@@ -13,7 +13,6 @@ import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import com.senity.waved.domain.paymentRecord.exception.DepositAmountNotMatchException;
 import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatchException;
-import com.senity.waved.domain.paymentRecord.exception.PaymentRecordExistException;
 import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -26,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -96,7 +94,7 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public synchronized void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
-        checkIfPaymentRecordExist(memberId, myChallenge.getId(), status);
+        // checkIfPaymentRecordExist(memberId, myChallenge.getId(), status);
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
         String groupTitle = group.getGroupTitle();
         updateGroupParticipantCount(group, status);
@@ -105,12 +103,12 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         paymentRecordRepository.save(paymentRecord);
     }
 
-    private void checkIfPaymentRecordExist(Long memberId, Long myChallengeId, PaymentStatus paymentStatus) {
+/*    private void checkIfPaymentRecordExist(Long memberId, Long myChallengeId, PaymentStatus paymentStatus) {
         Optional<PaymentRecord> paymentRecords = paymentRecordRepository.findByMemberIdAndMyChallengeIdAndPaymentStatus(memberId, myChallengeId, paymentStatus);
         if (paymentRecords.isPresent()) {
             throw new PaymentRecordExistException("이미 존재하는 결제 내역입니다.");
         }
-    }
+    }*/
 
     private void cancelImportPayment(String impUid) {
         try {
