@@ -1,6 +1,7 @@
 package com.senity.waved.domain.paymentRecord.entity;
 
 import com.senity.waved.domain.myChallenge.entity.MyChallenge;
+import com.senity.waved.domain.paymentRecord.exception.PaymentRecordExistException;
 import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -33,13 +34,16 @@ public class PaymentRecord {
     public static PaymentRecord of(PaymentStatus status, Long memberId, MyChallenge myChallenge, String groupTitle) {
         Long deposit = status.equals(PaymentStatus.APPLIED) ?
                 myChallenge.getDeposit() * (-1) : status.equals(PaymentStatus.FAIL) ? 0 : myChallenge.getDeposit();
-        PaymentRecordId paymentId = new PaymentRecordId(memberId, myChallenge.getId(), status);
-
-        return PaymentRecord.builder()
-                .deposit(deposit)
-                .id(paymentId)
-                .groupTitle(groupTitle)
-                .build();
+        try {
+            PaymentRecordId paymentId = new PaymentRecordId(memberId, myChallenge.getId(), status);
+            return PaymentRecord.builder()
+                    .deposit(deposit)
+                    .id(paymentId)
+                    .groupTitle(groupTitle)
+                    .build();
+        } catch (Exception e) {
+            throw new PaymentRecordExistException("이미 존재하는 예치금 내역입니다.");
+        }
     }
 }
 
