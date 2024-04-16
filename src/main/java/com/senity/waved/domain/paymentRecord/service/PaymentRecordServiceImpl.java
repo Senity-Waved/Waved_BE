@@ -13,7 +13,6 @@ import com.senity.waved.domain.paymentRecord.entity.PaymentRecord;
 import com.senity.waved.domain.paymentRecord.entity.PaymentStatus;
 import com.senity.waved.domain.paymentRecord.exception.DepositAmountNotMatchException;
 import com.senity.waved.domain.paymentRecord.exception.MemberAndMyChallengeNotMatchException;
-import com.senity.waved.domain.paymentRecord.exception.PaymentRecordExistException;
 import com.senity.waved.domain.paymentRecord.repository.PaymentRecordRepository;
 import com.siot.IamportRestClient.IamportClient;
 import com.siot.IamportRestClient.exception.IamportResponseException;
@@ -94,7 +93,6 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
         return message;
     }
 
-    @Transactional
     public void savePaymentRecord(MyChallenge myChallenge, Long memberId, PaymentStatus status) {
         ChallengeGroup group = getGroupById(myChallenge.getChallengeGroupId());
         String groupTitle = group.getGroupTitle();
@@ -104,7 +102,8 @@ public class PaymentRecordServiceImpl implements PaymentRecordService {
             PaymentRecord paymentRecord = PaymentRecord.of(status, memberId, myChallenge, groupTitle);
             paymentRecordRepository.save(paymentRecord);
         } catch (Exception e) {
-            throw new PaymentRecordExistException("이미 존재하는 예치금 내역입니다.");
+            // throw new PaymentRecordExistException("이미 존재하는 예치금 내역입니다.");
+            log.error("------------------- sql exception");
         }
     }
 
