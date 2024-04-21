@@ -59,6 +59,8 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         List<MyChallenge> myChallengesListed;
         ZonedDateTime todayStart = ZonedDateTime.now(ZoneId.of("Z")).truncatedTo(ChronoUnit.DAYS);
 
+        log.info("----------------------------today : " + todayStart);
+
         switch (status) {
             case PROGRESS:
                 myChallengesListed = myChallengeRepository.findMyChallengesInProgressAndIsPaidTrue(member.getId(), todayStart);
@@ -75,7 +77,16 @@ public class MyChallengeServiceImpl implements MyChallengeService {
 
         return myChallengesListed.stream()
                 .sorted(Comparator.comparing(MyChallenge::getStartDate).reversed())
-                .map(myChallenge -> mapToResponseDto(myChallenge, status, member))
+                .map(myChallenge -> {
+                    log.info("----myChallenge id : "  + myChallenge.getId() + ", " + myChallenge.getStartDate());
+                    log.info("zoneId : " + myChallenge.getStartDate().getZone());
+
+                    if (todayStart.equals(myChallenge.getStartDate())) {
+                        log.info("+ myChallenge startDate is today");
+                    }
+
+                    return mapToResponseDto(myChallenge, status, member);
+                })
                 .collect(Collectors.toList());
     }
 
