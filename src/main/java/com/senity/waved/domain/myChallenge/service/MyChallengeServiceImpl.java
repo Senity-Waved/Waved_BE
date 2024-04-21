@@ -74,7 +74,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         }
 
         return myChallengesListed.stream()
-                .sorted(Comparator.comparing(MyChallenge::getCreateDate).reversed())
+                .sorted(Comparator.comparing(MyChallenge::getStartDate).reversed())
                 .map(myChallenge -> mapToResponseDto(myChallenge, status, member))
                 .collect(Collectors.toList());
     }
