@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,6 +74,7 @@ public class MyChallengeServiceImpl implements MyChallengeService {
         }
 
         return myChallengesListed.stream()
+                .sorted(Comparator.comparing(MyChallenge::getCreateDate).reversed())
                 .map(myChallenge -> mapToResponseDto(myChallenge, status, member))
                 .collect(Collectors.toList());
     }
