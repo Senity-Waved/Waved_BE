@@ -1,4 +1,4 @@
-## 🌊 챌린지의 파도를 넘어 취업으로, WAVED  
+## 🌊 챌린지의 파도를 넘어 취업으로, WAVED-BE  
 
 
 ### 📆 개발기간
@@ -7,7 +7,7 @@
 
 ### 🔧 Tools
 
-<div align=center> 
+<div align=left> 
   <img src="https://img.shields.io/badge/JAVA 17-407999?style=for-the-badge&logo=JAVA 17&logoColor=white">
   <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
   <img src="https://img.shields.io/badge/Spring Security-6DB33F?style=for-the-badge&logo=Spring Security&logoColor=white"> 
@@ -29,7 +29,8 @@
 ### 🏄‍♀️ 아키텍쳐
 ![waved-BE-Page-1](https://i.ibb.co/CM6FNjz/waved-BE-Page-1.jpg)
 
-### 🏄‍♀️ API명세
+### 🏄‍♀️ API명세  
+- 포스트맨 : https://documenter.getpostman.com/view/34016201/2sA3JRXds2     
 
 |  | Method | URI | Description |
 | --- | --- | --- | --- |
@@ -73,9 +74,8 @@
 | 알림 | GET | /api/v1/event/subscribe | 알림 구독 |
 |  | GET | /api/v1/event/new | 새로운 알림 유무 확인 |
 
-### 🏄‍♀️ 테이블 (다이어그램)
-
-<img width="1152" alt="스크린샷 2023-12-21 오후 2 08 32" src="https://i.ibb.co/djSMQCh/image.png"> 
+### 🏄‍♀️ 테이블 (다이어그램)  
+<img width="700" alt="스크린샷 2023-12-21 오후 2 08 32" src="https://i.ibb.co/djSMQCh/image.png"> 
 
 
 ### 🏄‍♀️ 사이트
