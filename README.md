@@ -50,7 +50,8 @@ https://waved-likelion.site/
 - 포스트맨 : https://documenter.getpostman.com/view/34016201/2sA3JRXds2
   
 ### 테이블 (다이어그램)  
-<img src="https://github.com/chaewon-io/Waved_BE/assets/82140052/cf6ceb01-1bdd-42ee-aeff-a196ab3a9dc4" width="1000"/>     
+<img src="https://github.com/chaewon-io/Waved_BE/assets/82140052/6be390d1-c15f-42c0-bc11-15e71e8466a2" width="1000"/>     
+  
   
 ## 패키지 구조
 ```
